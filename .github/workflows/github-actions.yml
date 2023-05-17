@@ -1,0 +1,120 @@
+name: for gitops
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branched:
+      - develop
+
+jobs:
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.image.outputs.version }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Get verion
+        id: image
+        run: |
+          VERSION=$(echo ${{ github.sha }} | cut -c1-8)
+          echo VERSION=$VERSION
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # TODO: module cache 작업 및 test 추가 예정
+      # - name: Cache node modules
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.OS }}-build-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.OS }}-build-
+      #       ${{ runner.OS }}-
+
+      # - run: |
+      #     yarn install --frozen-lockfile
+
+      # - name: Run unit tests
+      #   run: yarn test:e2e
+
+      - name: Login to ncp Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.NCP_COTAINER_REGISTRY }}
+          username: ${{ secrets.NCP_ACCESS_KEY }}
+          password: ${{ secrets.NCP_SECRET_KEY }}
+          
+      # TODO: tag 버저닝
+      - name: Build Image & Push Imag
+        run: |
+          docker build -t $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG -f deploy/develop/Dockerfile .
+          docker tag $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG $DOCKER_REGISTRY/$DOCKER_REPOSITORY:develop
+          docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG"
+        env:
+          DOCKER_REGISTRY: ${{ secrets.NCP_COTAINER_REGISTRY }}
+          DOCKER_REPOSITORY: ssamdi
+          IMAGE_TAG: ${{ steps.image.outputs.version }}
+
+      # - name: Push to GitHub Packages
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: |
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/infinite-novel:${{ steps.image.outputs.version }}
+
+  update-manifest:
+    runs-on: ubuntu-latest
+    needs: docker-build-and-push
+    steps:
+      - name: Checkout kube-manifest repository
+        uses: actions/checkout@v3
+        with:
+          repository: mash-up-kr/ssam-d-Node-manifest
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ref: ssamd # TODO: branch name으로 바꾸기
+
+      - name: cat yaml
+        run: cat ssamd.yaml
+
+      - name: update yaml with yq
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/ssamd:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
+
+      - name: Commit andpush files
+        run: |
+          git config --global user.email GIT_USER_EMAIL
+          git config --global user.name GIT_USER_NAME
+          git add .
+          git commit -am "update kube-manifest"
+          git push -u origin ssamd
+
+      # TODO: DISCORD webhook 추가 예정
+      # - name: Test Success
+      #   uses: rjstone/discord-webhook-notify@v1
+      #   if: success()
+      #   with:
+      #     severity: info
+      #     details: Github Action Succeeded!
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+
+      # - name: Test Failure
+      #   uses: rjstone/discord-webhook-notify@v1
+      #   if: failure()
+      #   with:
+      #     severity: error
+      #     details: Github Action Failed!
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+
+      # - name: Test Cancelled
+      #   uses: rjstone/discord-webhook-notify@v1
+      #   if: cancelled()
+      #   with:
+      #     severity: warn
+      #     details: Github Action Cancelled!
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
