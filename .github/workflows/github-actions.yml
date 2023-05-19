@@ -52,10 +52,9 @@ jobs:
         run: |
           docker build -t $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG -f deploy/develop/Dockerfile .
           docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG"
         env:
           DOCKER_REGISTRY: ${{ secrets.NCP_COTAINER_REGISTRY }}
-          DOCKER_REPOSITORY: ssamdi
+          DOCKER_REPOSITORY: ssamd
           IMAGE_TAG: ${{ steps.image.outputs.version }}
 
       # - name: Push to GitHub Packages
@@ -77,9 +76,6 @@ jobs:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ref: ssamd # TODO: branch name으로 바꾸기
 
-      - name: cat yaml
-        run: cat ssamd.yaml
-
       - name: update yaml with yq
         uses: mikefarah/yq@master
         with:
@@ -87,8 +83,8 @@ jobs:
 
       - name: Commit andpush files
         run: |
-          git config --global user.email GIT_USER_EMAIL
-          git config --global user.name GIT_USER_NAME
+          git config --global user.email ${{ secrets.GIT_USER_EMAIL }}
+          git config --global user.name  ${{ secrets.GIT_USER_NAME }}
           git add .
           git commit -am "update kube-manifest"
           git push -u origin ssamd
