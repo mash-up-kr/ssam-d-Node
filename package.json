@@ -4,6 +4,7 @@
   "description": "",
   "author": "",
   "private": true,
+  "packageManager": "yarn@3.5.1",
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
