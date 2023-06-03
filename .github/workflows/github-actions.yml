@@ -2,10 +2,10 @@ name: for gitops
 on:
   push:
     branches:
-      - develop
+      - main
   pull_request:
     branched:
-      - develop
+      - main
 
 jobs:
   docker-build-and-push:

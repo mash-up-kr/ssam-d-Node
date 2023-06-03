@@ -1,15 +1,6 @@
 FROM node:16-alpine
 
-#TODO 수정 예정
-ENV TZ="Asia/Seoul"
-
+COPY .package.json /app
+RUN yarn install --frozen-lockfile
 COPY . /app
-
-# EXPOSE 3200
-
 WORKDIR /app
-
-RUN yarn install
-
-
-
