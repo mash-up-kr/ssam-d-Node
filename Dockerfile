@@ -8,4 +8,8 @@ COPY ./package.json /app
 
 RUN pnpm i
 
+COPY prisma /app/prisma
+
+RUN pnpm prisma generate 
+
 COPY . /app
