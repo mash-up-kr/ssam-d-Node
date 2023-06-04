@@ -24,16 +24,6 @@ jobs:
           echo VERSION=$VERSION
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # TODO: module cache 작업 및 test 추가 예정
-      # - name: Cache node modules
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.OS }}-build-${{ hashFiles('**/yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.OS }}-build-
-      #       ${{ runner.OS }}-
-
       # - run: |
       #     yarn install --frozen-lockfile
 
@@ -47,8 +37,7 @@ jobs:
           username: ${{ secrets.NCP_ACCESS_KEY }}
           password: ${{ secrets.NCP_SECRET_KEY }}
 
-      # TODO: tag 버저닝
-      - name: Build Image & Push Imag
+      - name: Build Image & Push Image
         run: |
           docker build -t $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG
@@ -56,14 +45,6 @@ jobs:
           DOCKER_REGISTRY: ${{ secrets.NCP_COTAINER_REGISTRY }}
           DOCKER_REPOSITORY: ssamd
           IMAGE_TAG: ${{ steps.image.outputs.version }}
-
-      # - name: Push to GitHub Packages
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: |
-      #       ${{ secrets.DOCKERHUB_USERNAME }}/infinite-novel:${{ steps.image.outputs.version }}
 
   update-manifest:
     runs-on: ubuntu-latest
