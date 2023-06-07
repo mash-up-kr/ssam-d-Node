@@ -3,10 +3,11 @@ import { IsEmpty } from 'class-validator';
 import { IsEmail } from 'class-validator';
 
 //회원가입
-export class UserReqDto {
+export class LoginReqDto {
   nickname: string;
   @IsEmail()
   email: string;
+  socialId: string;
   provider: string;
 }
 

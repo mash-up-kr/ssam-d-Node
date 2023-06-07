@@ -12,6 +12,20 @@ datasource db {
 
 model User {
   id        Int     @default(autoincrement()) @id
-  nickname  String
+  nickname  String  @db.VarChar(20)
+  email String 
+  refresh_token String? 
+  social_id String
+  provider String @default("KAKAO")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+//  deleted_at 
+  //signal Signal[]
+ 
 }
+
+// enum Provider{
+//   KAKAO
+// }
+
 
