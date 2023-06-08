@@ -58,16 +58,49 @@ $ pnpm run test:e2e
 $ pnpm run test:cov
 ```
 
-## Support
+### API Spec Example
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+[Tspec 공식문서](https://ts-spec.github.io/tspec/guide/defining-api-spec)
 
-## Stay in touch
+```typescript
+import { Tspec } from 'tspec';
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+export type AuthorApiSpec = Tspec.DefineApiSpec<{
+  basePath: '/keywords'; // 기본 경로
+  tags: ['Keyword']; // 스웨거 태깅
+  paths: {
+    '/': {
+      get: {
+        summary: 'API 요약 - get';
+        responses: {
+          200: UserResDto;
+        };
+      };
+      post: {
+        summary: 'API 요약 - post';
+        requestBody: UserReqDto;
+        responses: {
+          201: UserResDto;
+        };
+      };
+    };
+    '/{id}': {
+      patch: {
+        summary: 'API 요약 - patch';
+        path: { id: number };
+        requestBody: UserReqDto;
+        responses: {
+          200: UserResDto;
+        };
+      };
+      delete: {
+        summary: 'API 요약 - delete';
+        path: { id: number };
+        responses: {
+          204: void;
+        };
+      };
+    };
+  };
+}>;
+```
