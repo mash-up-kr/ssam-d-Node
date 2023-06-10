@@ -8,7 +8,7 @@ type AuthApiSpec = Tspec.DefineApiSpec<{
   tags: ['유저'];
   paths: {
     '/login': {
-      patch: {
+      post: {
         summary: '카카오 로그인';
         body: LoginReqDto;
         responses: { 200: LoginResDto };
