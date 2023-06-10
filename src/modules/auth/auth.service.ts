@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
 import { User, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { LoginResDto } from './dto/login-res-dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -13,37 +14,9 @@ export class AuthService {
     private readonly configService: ConfigService
   ) {}
 
-  // async getUserIdIfExist(id: number) {
-  // 	const user = await this..findOne({
-  // 		where: { id },
-  // 	});
-
-  // 	if (user) {
-  // 		return { id: user.id, type: user.type };
-  // 	} else throw new UnauthorizedException();
-  // }
   async login(loginReqDto: LoginReqDto) {
     const { nickname, socialId, email, provider } = loginReqDto;
     //const newuser = await this.prisma.user.findFirst({ where: { email } });
-    //TODO: jwt ,refresh token
-    //가입하지 않은 유저이면 db에 저장
-    //중복되는 코드 어케하지
-
-    /**
-     *
-     * 1. db에 존재하는지 체크
-     * 2. 존재하면 토큰 발급
-     * 3. 존재안하면 저장하고 토큰 발급
-     *
-     *
-     * 1. db에 존재하는지 체크
-     * 2. 존재 안하면 디비 저장
-     * 3. 토큰 발급
-     *
-     *
-     *
-     * 4. . jwt 가드로 체크 (유효성)
-     */
 
     const user = await this.getUserExist(email);
 
@@ -76,12 +49,14 @@ export class AuthService {
       },
     });
 
-    return {
-      access_token: await this.jwtService.signAsync(payload, {
-        secret: this.configService.get('JWT_SECRET'),
-        expiresIn: this.configService.get('TOKEN_EXPRED_TIME_MS'),
-      }),
-    };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: this.configService.get('TOKEN_EXPRED_TIME_MS'),
+    });
+    return new LoginResDto({
+      accessToken,
+      refreshToken,
+    });
   }
   //아이디로 조회
   async getUserIdIfExist(id: number) {
@@ -97,10 +72,5 @@ export class AuthService {
     const user = await this.prisma.user.findFirst({ where: { email } });
 
     return user;
-    // if (user === undefined)
-    //   //존재x
-    //   //회원가입 한 적 없으면
-    //   return false;
-    // else return true;
   }
 }
