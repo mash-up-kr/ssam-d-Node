@@ -42,30 +42,4 @@ export class UsersService {
     const { email } = userReqDto;
     return this.prisma.user.findFirst({ where: { email } });
   }
-
-  async login(userReqDto: UserReqDto) {
-    //   const { nickname, email, provider } = userReqDto;
-    //   const newuser = await this.prisma.user.findFirst({ where: { email } });
-    //   //TODO: jwt ,refresh token
-    //   //가입하지 않은 유저이면 db에 저장
-    //   //중복되는 코드 어케하지
-    //   if (newuser === undefined) {
-    //     const refreshToken = 'token';
-    //     const accessToken = 'token';
-    //     const user = await this.prisma.user.create({
-    //       data: {
-    //         nickname: nickname,
-    //         email: email,
-    //         refresh_token: refreshToken,
-    //         provider: provider,
-    //       },
-    //     });
-    //     return accessToken;
-    //   } else {
-    //     const refreshToken = 'token';
-    //     const accessToken = 'token';
-    //     //TODO: jwt ,refresh token
-    //     return accessToken;
-    //   }
-  }
 }

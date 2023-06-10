@@ -9,8 +9,4 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-  @Post('login')
-  create(@Body() userReqDto: UserReqDto) {
-    return this.usersService.login(userReqDto);
-  }
 }
