@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-   pull_request:
+  pull_request:
     types:
       - closed
     branches:
@@ -25,12 +25,6 @@ jobs:
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      # - run: |
-      #     yarn install --frozen-lockfile
-
-      # - name: Run unit tests
-      #   run: yarn test:e2e
 
       - name: Login to ncp Container Registry
         uses: docker/login-action@v2
