@@ -10,10 +10,4 @@ export class AuthController {
   create(@Body() loginReqDto: LoginReqDto) {
     return this.authService.login(loginReqDto);
   }
-
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfile() {
-    return 'test';
-  }
 }

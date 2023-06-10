@@ -10,17 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id        Int     @default(autoincrement()) @id
   nickname  String  @db.VarChar(20)
   email String 
-  refresh_token String? 
-  social_id String
+  refreshToken String? @map("refresh_token")
+  socialId String @map("social_id") @unique
   provider String @default("KAKAO")
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-//  deleted_at 
-  //signal Signal[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
  
 }
 
