@@ -26,7 +26,7 @@ export class AuthService {
         data: {
           nickname: nickname,
           email: email,
-          social_id: socialId,
+          socialId: socialId,
           provider: provider,
         },
       });
@@ -45,7 +45,7 @@ export class AuthService {
         id: user.id,
       },
       data: {
-        refresh_token: refreshToken,
+        refreshToken: refreshToken,
       },
     });
 
