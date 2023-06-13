@@ -1,6 +1,4 @@
-import { PickType } from '@nestjs/mapped-types';
-import { IsEmpty, IsString } from 'class-validator';
-import { IsEmail } from 'class-validator';
+import { IsString, IsEmail } from 'class-validator';
 
 //회원가입
 export class LoginReqDto {
