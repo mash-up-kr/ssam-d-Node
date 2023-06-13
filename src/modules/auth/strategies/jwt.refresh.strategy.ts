@@ -10,11 +10,9 @@ import { AuthService } from 'src/modules/auth/auth.service';
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh-token') {
   constructor(private readonly authService: AuthService, private readonly configService: ConfigService) {
-    //const jwtConfig = configService.get<JwtConfig>('jwtConfig');
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       IgnoreExpiration: false,
-      //secretOrKey: jwtConfig.jwtRefreshTokenSecret,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
