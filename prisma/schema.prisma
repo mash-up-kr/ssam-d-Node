@@ -10,8 +10,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id        Int     @default(autoincrement()) @id
-  nickname  String
+  nickname  String  @db.VarChar(20)
+  email String 
+  refreshToken String? @map("refresh_token")
+  socialId String @map("social_id") @unique
+  provider String @default("KAKAO")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+ 
 }
+
+// enum Provider{
+//   KAKAO
+// }
+
 

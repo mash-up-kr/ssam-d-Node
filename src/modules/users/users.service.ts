@@ -10,7 +10,8 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  create(userReqDto: UserReqDto) {
-    return this.prisma.user.create({ data: userReqDto });
+  findOne(userReqDto: UserReqDto) {
+    const { email } = userReqDto;
+    return this.prisma.user.findFirst({ where: { email } });
   }
 }
