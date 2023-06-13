@@ -36,7 +36,7 @@ export class AuthService {
     const payload = { id: upsertUser.id };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME_MS'),
+      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
     });
     //db에 refreshToken 저장
     await this.prisma.user.update({
@@ -51,7 +51,7 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload, {
         secret: this.configService.get('JWT_SECRET'),
-        expiresIn: this.configService.get('TOKEN_EXPRED_TIME_MS'),
+        expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
       }),
     };
   }
