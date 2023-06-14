@@ -1,10 +1,8 @@
 import { Tspec } from 'tspec';
 import { UserNicknameReqDto, UserOnboardingReqDto } from './dto/user-req-dto';
 import { ApiResponse } from 'src/types/common';
-
-type Wrap<T> = {
-  [key in keyof T]: T[key];
-};
+import { UserNotFoundException } from 'src/exceptions';
+import { ExceptionSpecWrap, QuerySpecWrap } from 'src/types/tspec';
 
 type UsersApiSpec = Tspec.DefineApiSpec<{
   basePath: '/users';
@@ -14,7 +12,7 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
     '/nickname/duplication': {
       get: {
         summary: '유저 닉네임 중복 체크';
-        query: Wrap<UserNicknameReqDto>;
+        query: QuerySpecWrap<UserNicknameReqDto>;
         responses: { 200: ApiResponse; 409: ApiResponse };
       };
     };
@@ -23,7 +21,7 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
         summary: '온보딩 과정 - 유저 정보 입력';
 
         body: UserOnboardingReqDto;
-        responses: { 200: ApiResponse };
+        responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };
     '/alarm': {
@@ -32,7 +30,7 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
         body: {
           agreeAlarm: boolean;
         };
-        responses: { 200: ApiResponse };
+        responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };
   };

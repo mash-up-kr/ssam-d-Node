@@ -2,22 +2,21 @@ import { BaseException } from './exception.abstract';
 import { ExceptionParams, ExceptionType } from './exception.type';
 
 export const createException = (exceptionType: ExceptionType) => {
-  return <T extends string = string>(defaultStatusCode = 500, defaultMessage: T) => {
-    return class extends BaseException {
-      name: string;
-      type = exceptionType;
-
+  return <C extends number, T extends string>(defaultStatusCode: C, defaultMessage: T) => {
+    return class extends BaseException<C, T> {
+      composedMessage: string;
       constructor(arg?: ExceptionParams<T>) {
-        super(
-          defaultStatusCode,
-          arg ? composeExceptionMessage(defaultMessage, arg) : defaultMessage,
-        );
+        super(exceptionType, defaultStatusCode, defaultMessage);
+
+        if (arg) {
+          this.composedMessage = composeExceptionMessage(defaultMessage, arg);
+        }
       }
     };
   };
 };
 
-function composeExceptionMessage(message: string, options = {}) {
+function composeExceptionMessage(message: string, options = {}): string {
   return message.replace(/{{([a-zA-Z0-9_-]+)}}/g, (_: string, matched: string) => {
     return options[matched];
   });

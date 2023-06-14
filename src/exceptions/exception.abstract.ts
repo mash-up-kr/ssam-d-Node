@@ -1,9 +1,8 @@
 import { ExceptionType } from './exception.type';
 
-export abstract class BaseException {
-  readonly type: ExceptionType = ExceptionType.INTERNAL;
-
-  constructor(readonly statusCode: number, public message: string) {
+export abstract class BaseException<StatusCode = number, Message = string> {
+  constructor(public type: ExceptionType, public statusCode: StatusCode, public message: Message) {
+    this.type = type;
     this.statusCode = statusCode;
     this.message = message;
   }
