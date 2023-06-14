@@ -27,5 +27,8 @@ export class UsersService {
     await this.userRepository.update(userId, { nickname });
     await this.userKeywordRepository.add(userId, keywordIds);
   }
+
+  async updateAgreeAlarm(userId: number, agreeAlarm: boolean) {
+    await this.userRepository.update(userId, { agreeAlarm });
   }
 }

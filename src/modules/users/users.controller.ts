@@ -14,5 +14,12 @@ export class UsersController {
   async saveOnboarding(@AuthUser() userId: number, onboardingDto: UserOnboardingReqDto) {
     await this.usersService.saveOnboarding(userId, onboardingDto);
   }
+
+  /**
+   * @todo guard
+   */
+  @Patch('/alarm')
+  async updateAgreeAlarm(@AuthUser() userId: number, agreeAlarm: boolean) {
+    await this.usersService.updateAgreeAlarm(userId, agreeAlarm);
   }
 }
