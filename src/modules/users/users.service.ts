@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserOnboardingReqDto, UserReqDto } from './dto/user-req-dto';
 import { UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordsService } from '../keywords/keywords.service';
+import { DuplicatedNicknameException } from 'src/exceptions';
 
 @Injectable()
 export class UsersService {
@@ -13,8 +14,15 @@ export class UsersService {
 
   async findOne(userReqDto: UserReqDto) {
     const { email } = userReqDto;
-    const user = await this.userRepository.get({ where: { email } });
+    const user = await this.userRepository.get({ email });
     return user;
+  }
+
+  async isDuplicatedNickname(nickname: string) {
+    const user = await this.userRepository.get({ nickname });
+    if (user) {
+      throw new DuplicatedNicknameException({ nickname });
+    }
   }
 
   async saveOnboarding(userId: number, onboardingDto: UserOnboardingReqDto) {

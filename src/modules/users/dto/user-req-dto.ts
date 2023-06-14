@@ -1,7 +1,12 @@
+import { PickType } from '@nestjs/mapped-types';
 import { IsEmail } from 'class-validator';
 
 //회원가입
 export class UserReqDto {
+  /**
+   * 닉네임
+   * @example 쌈디
+   */
   nickname: string;
   @IsEmail()
   email: string;
@@ -9,10 +14,6 @@ export class UserReqDto {
 }
 
 export class UserOnboardingReqDto {
-  /**
-   * 닉네임
-   * @example 쌈디
-   */
   nickname: string;
 
   /**
