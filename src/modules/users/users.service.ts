@@ -1,17 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserReqDto } from './dto/user-req-dto';
+import { UserOnboardingReqDto, UserReqDto } from './dto/user-req-dto';
+import { UserKeywordRepository, UserRepository } from 'src/repositories';
+import { KeywordsService } from '../keywords/keywords.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly keywordsService: KeywordsService,
+    private readonly userRepository: UserRepository,
+    private readonly userKeywordRepository: UserKeywordRepository
+  ) {}
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findOne(userReqDto: UserReqDto) {
+    const { email } = userReqDto;
+    const user = await this.userRepository.get({ where: { email } });
+    return user;
   }
 
-  findOne(userReqDto: UserReqDto) {
-    const { email } = userReqDto;
-    return this.prisma.user.findFirst({ where: { email } });
+  async saveOnboarding(userId: number, onboardingDto: UserOnboardingReqDto) {
+    const { nickname, keywords: plainKeywords } = onboardingDto;
+
+    await this.keywordsService.add(plainKeywords);
+    const keywords = await this.keywordsService.getList(plainKeywords);
+    const keywordIds = keywords.map(keyword => keyword.id);
+
+    await this.userRepository.update(userId, { nickname });
+    await this.userKeywordRepository.add(userId, keywordIds);
+  }
   }
 }

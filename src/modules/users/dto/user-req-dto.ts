@@ -21,7 +21,4 @@ export class UserOnboardingReqDto {
    * ["매쉬업", "노드", "안드로이드", "디자인"]
    */
   keywords: string[];
-  @IsEmail()
-  email: string;
-  provider: string;
 }

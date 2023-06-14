@@ -12,20 +12,24 @@ datasource db {
 
 
 model User {
-  id        Int     @default(autoincrement()) @id
-  nickname  String  @db.VarChar(20)
-  email String 
-  refreshToken String? @map("refresh_token")
-  socialId String @map("social_id") @unique
-  provider String @default("KAKAO")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
- 
+  id            Int       @id @default(autoincrement())
+  nickname      String    @db.VarChar(20)
+  email         String  
+  refreshToken  String?                     @map("refresh_token")
+  socialId      String    @unique           @map("social_id")
+  provider      String    @default("KAKAO")
+  createdAt     DateTime  @default(now())   @map("created_at")
+  updatedAt     DateTime  @updatedAt        @map("updated_at")
+  agreeAlarm    Boolean   @default(false)   @map("agree_alarm")
 }
 
-// enum Provider{
-//   KAKAO
-// }
+model UserKeywords {
+  id        Int @id @default(autoincrement())
+  userId    Int @map("user_id")
+  keywordId Int @map("keyword_id")
+}
 
-
+model Keywords {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+}
