@@ -1,13 +1,14 @@
-import { IsString, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsOptional } from 'class-validator';
 
 //회원가입
 export class LoginReqDto {
-  @IsString()
-  nickname: string;
   @IsEmail()
+  @IsOptional()
   email: string;
+
   @IsString()
   socialId: string;
+
   @IsString()
   provider: string;
 }

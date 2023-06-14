@@ -13,24 +13,15 @@ export class AuthService {
   ) {}
 
   async login(loginReqDto: LoginReqDto) {
-    const { nickname, socialId, email, provider } = loginReqDto;
+    const { socialId, email, provider } = loginReqDto;
 
     /**
      * 유저가 있으면 업데이트, 없으면 생성
      */
     const upsertUser = await this.prisma.user.upsert({
-      where: {
-        socialId: socialId,
-      },
-      update: {
-        socialId: socialId,
-      },
-      create: {
-        nickname: nickname,
-        email: email,
-        socialId: socialId,
-        provider: provider,
-      },
+      where: { socialId },
+      update: { email },
+      create: { email, socialId, provider },
     });
 
     const payload = { id: upsertUser.id };
