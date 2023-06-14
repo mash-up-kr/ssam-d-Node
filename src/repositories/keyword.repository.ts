@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Keyword } from 'src/domains/keyword';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

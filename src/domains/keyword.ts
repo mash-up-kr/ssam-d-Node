@@ -1,4 +1,4 @@
-class Keyword {
+export class Keyword {
   private readonly _id: number;
   private readonly _name: string;
 

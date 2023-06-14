@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Keyword } from 'src/domains/keyword';
 import { KeywordRepository } from 'src/repositories';
 
 @Injectable()

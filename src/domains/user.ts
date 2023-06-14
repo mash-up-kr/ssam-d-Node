@@ -1,7 +1,7 @@
 //개발하면서 역할이 들어남
 // 공통적인 코드 validation , 행동 , 함수 , 유효한 유저인지 검증, 유지보수하기 쉽게
 
-class User {
+export class User {
   private readonly _id: number;
   private readonly _nickname: string;
   private readonly _email: string;
