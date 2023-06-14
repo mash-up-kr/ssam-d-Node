@@ -4,12 +4,11 @@ import { ExceptionParams, ExceptionType } from './exception.type';
 export const createException = (exceptionType: ExceptionType) => {
   return <C extends number, T extends string>(defaultStatusCode: C, defaultMessage: T) => {
     return class extends BaseException<C, T> {
-      composedMessage: string;
       constructor(arg?: ExceptionParams<T>) {
         super(exceptionType, defaultStatusCode, defaultMessage);
 
         if (arg) {
-          this.composedMessage = composeExceptionMessage(defaultMessage, arg);
+          super.composedMessage = composeExceptionMessage(defaultMessage, arg);
         }
       }
     };

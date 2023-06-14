@@ -13,5 +13,5 @@ export class NeedLoginException extends ExceptionOf.USER(401, '로그인이 필�
 
 export class DuplicatedNicknameException extends ExceptionOf.USER(
   409 as const,
-  '{{nickname}}은 이미 존재하는 닉네임입니다' as const
+  '{{nickname}}은(는) 이미 존재하는 닉네임입니다' as const
 ) {}
