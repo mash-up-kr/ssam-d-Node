@@ -4,12 +4,16 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { User } from 'src/domains/user';
+import { UserRepository } from 'src/repositories';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly userRepository: UserRepository
   ) {}
 
   async login(loginReqDto: LoginReqDto) {
@@ -18,26 +22,20 @@ export class AuthService {
     /**
      * 유저가 있으면 업데이트, 없으면 생성
      */
-    const upsertUser = await this.prisma.user.upsert({
-      where: { socialId },
-      update: { email },
-      create: { email, socialId, provider },
-    });
 
-    const payload = { id: upsertUser.id };
+    const userData = { email: email, provider: provider };
+    const user = await this.userRepository.upsert(socialId, userData);
+
+    const payload = { id: user.id };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
     });
     //db에 refreshToken 저장
-    await this.prisma.user.update({
-      where: {
-        id: upsertUser.id,
-      },
-      data: {
-        refreshToken: refreshToken,
-      },
-    });
+
+    const updatedRfreshToken = { refreshToken: refreshToken };
+
+    await this.userRepository.update(user.id, updatedRfreshToken);
 
     return {
       access_token: await this.jwtService.signAsync(payload, {
@@ -45,22 +43,5 @@ export class AuthService {
         expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
       }),
     };
-  }
-  //아이디로 조회
-  async getUserIdIfExist(id: number) {
-    const user = await this.prisma.user.findFirst({ where: { id } });
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    return { id: user.id, nickname: user.nickname, email: user.email };
-  }
-
-  //이메일로 조회
-  async getUserExist(email: string) {
-    const user = await this.prisma.user.findFirst({ where: { email } });
-
-    return user;
   }
 }
