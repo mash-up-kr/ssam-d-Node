@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
 import { KeywordRepository } from 'src/repositories';
 import * as mecab from 'mecab-ya';
+import { KeywordExtractException } from 'src/exceptions';
 
 @Injectable()
 export class KeywordsService {
@@ -27,7 +28,7 @@ export class KeywordsService {
   private async extract(content: string): Promise<KeywordDic> {
     return new Promise((resolve, reject) => {
       mecab.pos(content, (err: unknown, result: MecabOutput) => {
-        if (err) reject(err);
+        if (err) reject(new KeywordExtractException());
         const keywords = result.filter(([_, form]) => form === 'NNG').map(([word]) => word);
         const keywordDic = keywords.reduce((dic, keyword) => {
           if (!dic[keyword]) dic[keyword] = 0;
