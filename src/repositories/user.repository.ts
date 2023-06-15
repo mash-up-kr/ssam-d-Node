@@ -16,4 +16,18 @@ export class UserRepository {
     const user = await this.prisma.user.update({ where: { id }, data: userData });
     return new User(user);
   }
+  async save(userData: User): Promise<User> {
+    const user = await this.prisma.user.create({ data: userData });
+    return new User(user);
+  }
+  async upsert(socialId: string, userData: Partial<User>): Promise<User> {
+    const { email, provider } = userData;
+
+    const user = await this.prisma.user.upsert({
+      where: { socialId },
+      update: { socialId },
+      create: { socialId, email, provider },
+    });
+    return new User(user);
+  }
 }
