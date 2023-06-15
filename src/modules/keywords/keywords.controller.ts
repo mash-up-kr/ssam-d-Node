@@ -5,7 +5,7 @@ import { KeywordsService } from './keywords.service';
 export class KeywordsController {
   constructor(private readonly keywordsService: KeywordsService) {}
 
-  @Get()
+  @Get('/recommend')
   async recommend(@Query('content') content: string) {
     const keywords = await this.keywordsService.recommend(content);
     return { keywords };

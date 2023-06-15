@@ -16,4 +16,4 @@ export class DuplicatedNicknameException extends ExceptionOf.USER(
   '{{nickname}}은(는) 이미 존재하는 닉네임입니다' as const
 ) {}
 
-export class KeywordExtractException extends ExceptionOf.USER(401, '키워드를 추출할 수 없습니다.' as const) {}
+export class KeywordExtractException extends ExceptionOf.INTERNAL(500, '키워드를 추출할 수 없습니다.' as const) {}
