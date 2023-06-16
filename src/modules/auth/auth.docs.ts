@@ -11,7 +11,7 @@ type AuthApiSpec = Tspec.DefineApiSpec<{
       post: {
         summary: '카카오 로그인';
         body: LoginReqDto;
-        responses: { 200: LoginResDto };
+        responses: { 200: ApiResponse<LoginResDto> };
       };
     };
   };
