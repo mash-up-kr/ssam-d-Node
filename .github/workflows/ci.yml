@@ -21,7 +21,7 @@ jobs:
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo ${{ secrets.BRANCH_ENV }}
+          echo "${{ secrets.BRANCH_ENV }}"
 
       - name: Login to ncp Container Registry
         uses: docker/login-action@v2
