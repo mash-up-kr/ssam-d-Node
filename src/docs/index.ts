@@ -7,7 +7,7 @@ export async function InitApiDocMiddleware(app: INestApplication, port: number |
       title: '쌈디 - API 문서',
       servers: [
         { url: `http://localhost:${port}/api`, description: '현재 서버' },
-        { url: `https://keylink.kr/api`, description: '실서버' },
+        { url: `49.50.166.183:30000/api`, description: '개발서버' },
       ],
       securityDefinitions: {
         jwt: {
