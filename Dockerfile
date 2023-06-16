@@ -13,3 +13,5 @@ COPY prisma /app/prisma
 RUN pnpm prisma generate 
 
 COPY . /app
+
+RUN pnpm build
