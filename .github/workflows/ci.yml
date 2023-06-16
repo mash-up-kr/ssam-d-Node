@@ -15,13 +15,25 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Some check on branch
+        id: branch_check
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "::set-output name=env_name::ssamd"
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "::set-output name=env_name::ssamd-dev"
+          else
+             echo "::set-output name=env_name::Features"
+          fi
+
       - name: Get verion
         id: image
         run: |
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "${{ secrets.BRANCH_ENV }}"
+          echo "I'm using variable ${{ steps.branch_check.outputs.env_name }}"
 
       - name: Login to ncp Container Registry
         uses: docker/login-action@v2
