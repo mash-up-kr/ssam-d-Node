@@ -1,18 +1,7 @@
-import { PickType } from '@nestjs/mapped-types';
-import { IsEmpty } from 'class-validator';
-import { IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsOptional } from 'class-validator';
 
 //회원가입
 export class LoginReqDto {
-  /**
-   * 닉네임
-   *
-   * @type {string}
-   * @example 혜온
-   *
-   */
-  nickname: string;
-
   /**
    * 이메일
    *
@@ -20,13 +9,16 @@ export class LoginReqDto {
    * @example ain0103@naver.com
    */
   @IsEmail()
+  @IsOptional()
   email: string;
 
   /**
    *카카오 회원 아이디
    * @type {string}
    * @example 0342
+   *
    */
+  @IsString()
   socialId: string;
 
   /**
@@ -35,7 +27,6 @@ export class LoginReqDto {
    * @type {string}
    * @example KAKAO
    */
+  @IsString()
   provider: string;
 }
-
-//export class UserNameReqDto extends PickType(UserReqDto, ['email']) {}
