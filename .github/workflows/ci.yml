@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - develop
 
 jobs:
   docker-build-and-push:
@@ -46,12 +47,12 @@ jobs:
         with:
           repository: mash-up-kr/ssam-d-Node-manifest
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ref: ssamd # TODO: branch name으로 바꾸기
+          ref: ${{ secrets.BRANCH_ENV_VARIABLES }}
 
       - name: update yaml with yq
         uses: mikefarah/yq@master
         with:
-          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/ssamd:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
+          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/${{ secrets.BRANCH_ENV_VARIABLES }}:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
 
       - name: Commit andpush files
         run: |
@@ -59,7 +60,7 @@ jobs:
           git config --global user.name  ${{ secrets.GIT_USER_NAME }}
           git add .
           git commit -am "update kube-manifest"
-          git push -u origin ssamd
+          git push -u origin ${{ secrets.BRANCH_ENV_VARIABLES }}
 
       # TODO: DISCORD webhook 추가 예정
       # - name: Test Success
