@@ -26,6 +26,7 @@ export class AuthService {
 
     const userData = { email: email, provider: provider };
     const user = await this.userRepository.upsert(socialId, userData);
+    const userId = user.id;
 
     const payload = { id: user.id };
     const refreshToken = await this.jwtService.signAsync(payload, {
@@ -36,13 +37,14 @@ export class AuthService {
 
     const updatedRfreshToken = { refreshToken: refreshToken };
 
-    await this.userRepository.update(user.id, updatedRfreshToken);
+    await this.userRepository.update(userId, updatedRfreshToken);
 
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
     });
     return new LoginResDto({
+      userId,
       accessToken,
       refreshToken,
     });

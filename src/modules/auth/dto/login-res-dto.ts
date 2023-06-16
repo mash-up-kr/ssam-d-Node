@@ -1,5 +1,12 @@
 export class LoginResDto {
   /**
+   *
+   * @readonly
+   * @type {number}
+   * @example 2
+   */
+  readonly userId: number;
+  /**
    * access token
    *
    * @readonly
@@ -24,7 +31,8 @@ export class LoginResDto {
    * @todo user 포함해서 반환
    */
 
-  constructor({ accessToken, refreshToken }) {
+  constructor({ userId, accessToken, refreshToken }) {
+    this.userId = userId;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
   }
