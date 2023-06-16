@@ -21,6 +21,8 @@ model User {
   createdAt     DateTime  @default(now())   @map("created_at")
   updatedAt     DateTime  @updatedAt        @map("updated_at")
   agreeAlarm    Boolean   @default(false)   @map("agree_alarm")
+  sender Signal[] @relation("Sender")
+  receiver Signal[] @relation("Receiver")
 }
 
 model UserKeywords {
@@ -33,3 +35,17 @@ model Keywords {
   id    Int     @id @default(autoincrement())
   name  String  @unique
 }
+
+model Signal {
+  id Int @id @default(autoincrement())
+  content String 
+  keywords String
+  sender User @relation("Sender", fields: [senderId],references: [id] )
+  receiver User @relation("Receiver",fields: [receiverId],references: [id])
+  senderId Int @map("sender_id")
+  receiverId Int @map("receiver_id")
+  deletedAt DateTime? @map("deleted_at") 
+  
+  
+}
+
