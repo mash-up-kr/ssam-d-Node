@@ -33,7 +33,7 @@ jobs:
           VERSION=$(echo ${{ github.sha }} | cut -c1-8)
           echo VERSION=$VERSION
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "I'm using variable ${{ steps.branch_check.outputs.env_name }}"
+          echo "I'm using variable "
 
       - name: Login to ncp Container Registry
         uses: docker/login-action@v2
@@ -60,12 +60,12 @@ jobs:
         with:
           repository: mash-up-kr/ssam-d-Node-manifest
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ref: ${{ secrets.BRANCH_ENV }}
+          ref: ${{ steps.branch_check.outputs.env_name }}
 
       - name: update yaml with yq
         uses: mikefarah/yq@master
         with:
-          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/${{ secrets.BRANCH_ENV }}:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
+          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/${{ steps.branch_check.outputs.env_name }}:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
 
       - name: Commit andpush files
         run: |
@@ -73,7 +73,7 @@ jobs:
           git config --global user.name  ${{ secrets.GIT_USER_NAME }}
           git add .
           git commit -am "update kube-manifest"
-          git push -u origin ${{ secrets.BRANCH_ENV }}
+          git push -u origin ${{ steps.branch_check.outputs.env_name }}
 
       # TODO: DISCORD webhook 추가 예정
       # - name: Test Success
