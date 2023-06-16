@@ -6,13 +6,13 @@ import { RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './core/exception-filters/custom-exception.filter';
 import * as dotenv from 'dotenv';
-import { IS_DEV } from './common/constants';
+import { IS_LOCAL } from './common/constants';
 
 declare const module: any;
 
 async function bootstrap() {
-  if (IS_DEV) {
-    dotenv.config({ path: '.env.development' });
+  if (IS_LOCAL) {
+    dotenv.config({ path: '.env.local' });
   }
   const app = await NestFactory.create(AppModule);
 
