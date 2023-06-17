@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from 'src/domains/user';
 import { UserRepository } from 'src/repositories';
 
+import { LoginResDto } from './dto/login-res-dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,6 +26,7 @@ export class AuthService {
 
     const userData = { email: email, provider: provider };
     const user = await this.userRepository.upsert(socialId, userData);
+    const userId = user.id;
 
     const payload = { id: user.id };
     const refreshToken = await this.jwtService.signAsync(payload, {
@@ -35,13 +37,16 @@ export class AuthService {
 
     const updatedRfreshToken = { refreshToken: refreshToken };
 
-    await this.userRepository.update(user.id, updatedRfreshToken);
+    await this.userRepository.update(userId, updatedRfreshToken);
 
-    return {
-      access_token: await this.jwtService.signAsync(payload, {
-        secret: this.configService.get('JWT_SECRET'),
-        expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
-      }),
-    };
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
+    });
+    return new LoginResDto({
+      userId,
+      accessToken,
+      refreshToken,
+    });
   }
 }
