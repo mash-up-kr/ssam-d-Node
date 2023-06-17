@@ -7,7 +7,8 @@ WORKDIR /app
 COPY ./package.json /app
 RUN pnpm i
 
-RUN sudo chmod 777 node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
+# RUN chmod +x ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
+# RUN ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
 
 COPY prisma /app/prisma
 RUN pnpm prisma generate 
