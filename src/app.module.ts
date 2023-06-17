@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { KeywordsModule } from './modules/keywords/keywords.module';
+import { SignalModule } from './modules/signal/signal.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -16,6 +17,7 @@ import { KeywordsModule } from './modules/keywords/keywords.module';
     UsersModule,
     AuthModule,
     KeywordsModule,
+    SignalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

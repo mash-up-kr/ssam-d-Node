@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id            Int       @id @default(autoincrement())
-  nickname      String?    @db.VarChar(20)
+  nickname      String?   @db.VarChar(20)
   email         String?  
   refreshToken  String?                     @map("refresh_token")
   socialId      String    @unique           @map("social_id")
@@ -21,15 +21,84 @@ model User {
   createdAt     DateTime  @default(now())   @map("created_at")
   updatedAt     DateTime  @updatedAt        @map("updated_at")
   agreeAlarm    Boolean   @default(false)   @map("agree_alarm")
+  sender        Signal[]  @relation("Sender")
+  receiver      Signal[]  @relation("Receiver")
+  roomUser      RoomUser[]
+  deviceToken   DeviceToken[]
+  send          Chat[]    @relation("Sender")
+  receive       Chat[]    @relation("Receiver")
+  trash         Trash[]
+  
 }
 
 model UserKeywords {
-  id        Int @id @default(autoincrement())
-  userId    Int @map("user_id")
-  keywordId Int @map("keyword_id")
+  id        Int     @id @default(autoincrement())
+  userId    Int     @map("user_id")
+  keywordId Int     @map("keyword_id")
 }
 
 model Keywords {
   id    Int     @id @default(autoincrement())
   name  String  @unique
 }
+
+model Signal {
+  id            Int          @id @default(autoincrement())
+  content       String 
+  keywords      String
+  sender        User         @relation("Sender", fields: [senderId],references: [id] )
+  receiver      User         @relation("Receiver",fields: [receiverId],references: [id])
+  senderId      Int          @map("sender_id")
+  receiverId    Int          @map("receiver_id")
+  room          Room         @relation(fields: [roomId],references: [id])
+  roomId        Int          @map("room_id")
+  deletedAt     DateTime?    @map("deleted_at") 
+  
+  
+}
+
+model Room {
+  id          Int         @id @default(autoincrement())
+  keywords    String?
+  isAlive     Boolean     @map("is_alive")    @default(true)
+  createdAt   DateTime    @default(now())     @map("created_at")
+  signal      Signal[]
+  roomUser    RoomUser[]
+
+}
+
+model RoomUser{
+  id          Int       @id @default(autoincrement())
+  deletedAt   DateTime? @map("deleted_at") 
+  user        User      @relation(fields: [userId],references: [id])
+  userId      Int       @map("user_id")
+  room        Room      @relation(fields: [roomId],references: [id])
+  roomId      Int       @map("room_id")
+}
+
+model DeviceToken {
+  id            Int     @id @default(autoincrement())
+  deviceToken   String  @map("device_token")
+  user          User    @relation(fields: [userId],references: [id])
+  userId        Int     @map("user_id")
+}
+
+model Chat {
+  id          Int       @id @default(autoincrement())
+  content     String 
+  createdAt   DateTime  @default(now())       @map("created_at")
+  sender      User      @relation("Sender", fields: [senderId],references: [id] )
+  receiver    User      @relation("Receiver",fields: [receiverId],references: [id])
+  senderId    Int       @map("sender_id")
+  receiverId  Int       @map("receiver_id")
+}
+
+model Trash {
+  id          Int       @id @default(autoincrement())
+  content     String 
+  keywords    String?
+  user        User      @relation(fields: [userId],references: [id])
+  userId      Int       @map("user_id")
+
+}
+

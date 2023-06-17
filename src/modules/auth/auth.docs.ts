@@ -4,7 +4,7 @@ import { ApiResponse } from 'src/types/common';
 import { LoginResDto } from './dto/login-res-dto';
 
 type AuthApiSpec = Tspec.DefineApiSpec<{
-  basePath: '/users';
+  basePath: '/auth';
   tags: ['유저'];
   paths: {
     '/login': {
