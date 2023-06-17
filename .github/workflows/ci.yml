@@ -3,16 +3,30 @@ on:
   push:
     branches:
       - main
+      - develop
 
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.image.outputs.version }}
+      env_name: ${{ steps.branch_check.outputs.env_name }}
 
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Some check on branch
+        id: branch_check
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "::set-output name=env_name::ssamd"
+          elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "::set-output name=env_name::ssamd-dev"
+          else
+              echo "::set-output name=env_name::Features"
+          fi
 
       - name: Get verion
         id: image
@@ -34,7 +48,7 @@ jobs:
           docker push $DOCKER_REGISTRY/$DOCKER_REPOSITORY:$IMAGE_TAG
         env:
           DOCKER_REGISTRY: ${{ secrets.NCP_COTAINER_REGISTRY }}
-          DOCKER_REPOSITORY: ssamd
+          DOCKER_REPOSITORY: ${{ steps.branch_check.outputs.env_name }}
           IMAGE_TAG: ${{ steps.image.outputs.version }}
 
   update-manifest:
@@ -46,12 +60,12 @@ jobs:
         with:
           repository: mash-up-kr/ssam-d-Node-manifest
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ref: ssamd # TODO: branch name으로 바꾸기
+          ref: ${{ needs.docker-build-and-push.outputs.env_name }}
 
       - name: update yaml with yq
         uses: mikefarah/yq@master
         with:
-          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/ssamd:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
+          cmd: yq '( select(di == 1) | .spec.template.spec.containers[0].image ) = "${{ secrets.NCP_COTAINER_REGISTRY }}/${{ needs.docker-build-and-push.outputs.env_name }}:${{ needs.docker-build-and-push.outputs.version }}"' -i   'ssamd.yaml'
 
       - name: Commit andpush files
         run: |
@@ -59,7 +73,7 @@ jobs:
           git config --global user.name  ${{ secrets.GIT_USER_NAME }}
           git add .
           git commit -am "update kube-manifest"
-          git push -u origin ssamd
+          git push -u origin ${{ needs.docker-build-and-push.outputs.env_name }}
 
       # TODO: DISCORD webhook 추가 예정
       # - name: Test Success
