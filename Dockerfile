@@ -5,11 +5,14 @@ RUN npm i -g pnpm
 WORKDIR /app
 
 COPY ./package.json /app
-
 RUN pnpm i
 
-COPY prisma /app/prisma
+# RUN chmod +x ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
+# RUN ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
 
+COPY prisma /app/prisma
 RUN pnpm prisma generate 
 
 COPY . /app
+RUN pnpm tspec generate --outputPath openapi.json
+RUN pnpm build
