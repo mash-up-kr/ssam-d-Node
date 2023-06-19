@@ -1,18 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
+import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
+import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
+import { KeywordsService } from '../keywords/keywords.service';
 
 describe('UsersService', () => {
   let service: UsersService;
-
+  let userRepository: UserRepository;
+  let userKeywordRepository: UserKeywordRepository;
+  let keywordRepository: KeywordRepository;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [
+        UsersService,
+        { provide: UserRepository, useValue: MockUserRepository() },
+        { provide: UserKeywordRepository, useValue: MockUserKeywordrRepository() },
+        { provide: KeywordRepository, useValue: MockKeywordRepository() },
+        {
+          provide: KeywordsService,
+          useFactory: keywordRepository => new KeywordsService(keywordRepository),
+          inject: [KeywordRepository],
+        },
+      ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
+    userRepository = module.get(UserRepository);
+    userKeywordRepository = module.get(UserKeywordRepository);
+    keywordRepository = module.get(KeywordRepository);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(userRepository).toBeDefined();
+    expect(userKeywordRepository).toBeDefined();
+    expect(keywordRepository).toBeDefined();
   });
 });
