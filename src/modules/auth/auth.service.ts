@@ -1,10 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/domains/user';
 import { UserRepository } from 'src/repositories';
 
 import { LoginResDto } from './dto/login-res-dto';
@@ -12,7 +10,6 @@ import { LoginResDto } from './dto/login-res-dto';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly userRepository: UserRepository
   ) {}
