@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './core/exception-filters/custom-exception.filter';
 import * as dotenv from 'dotenv';
 import { IS_LOCAL } from './common/constants';
+import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
 
 declare const module: any;
 
@@ -28,5 +29,10 @@ async function bootstrap() {
   await InitApiDocMiddleware(app, port);
 
   await app.listen(port);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();
