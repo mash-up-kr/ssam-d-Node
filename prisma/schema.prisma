@@ -28,19 +28,25 @@ model User {
   send          Chat[]    @relation("Sender")
   receive       Chat[]    @relation("Receiver")
   trash         Trash[]
-  
-}
+  keywords      UserKeywords[]
 
-model UserKeywords {
-  id        Int     @id @default(autoincrement())
-  userId    Int     @map("user_id")
-  keywordId Int     @map("keyword_id")
 }
 
 model Keywords {
   id    Int     @id @default(autoincrement())
   name  String  @unique
+  users UserKeywords[]
 }
+
+
+model UserKeywords {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  keywordId Int       @map("keyword_id")
+  user      User      @relation(fields: [userId], references: [id])
+  keyword   Keywords  @relation(fields: [keywordId], references: [id])
+}
+
 
 model Signal {
   id            Int          @id @default(autoincrement())
