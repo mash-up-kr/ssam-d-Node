@@ -9,7 +9,7 @@ export class UserKeywordRepository {
 
   async add(userId: number, keywordIds: number[]): Promise<void> {
     const data = keywordIds.map(keywordId => ({ userId, keywordId }));
-    await this.prisma.userKeywords.createMany({ data });
+    await this.prisma.userKeyword.createMany({ data });
   }
 
   /**
@@ -19,20 +19,20 @@ export class UserKeywordRepository {
     const joinedKeywordIds = Prisma.join(keywordIds);
     const keywords: Pick<Keyword, 'id'>[] = await this.prisma.$queryRaw`
       SELECT
-        Keywords.id
+        keyword.id
       FROM
-        Keywords
+        keyword
         	LEFT OUTER JOIN (
         		SELECT
         			id, keyword_id
         		FROM
-        			UserKeywords
+        			user_keyword
         		WHERE
         			user_id = ${userId}
-        	) uk ON uk.keyword_id = Keywords.id
+        	) uk ON uk.keyword_id = keyword.id
       WHERE
         uk.id IS NULL AND
-        Keywords.id IN (${joinedKeywordIds})
+        keyword.id IN (${joinedKeywordIds})
     `;
 
     return keywords;

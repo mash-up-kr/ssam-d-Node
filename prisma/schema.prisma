@@ -28,22 +28,28 @@ model User {
   send          Chat[]    @relation("Sender")
   receive       Chat[]    @relation("Receiver")
   trash         Trash[]
-  keywords      UserKeywords[]
+  keywords      UserKeyword[]
+
+  @@map("user")
 }
 
-model Keywords {
+model Keyword {
   id    Int     @id @default(autoincrement())
   name  String  @unique
-  users UserKeywords[]
+  users UserKeyword[]
+
+  @@map("keyword")
 }
 
 
-model UserKeywords {
+model UserKeyword {
   id        Int       @id @default(autoincrement())
   userId    Int       @map("user_id")
   keywordId Int       @map("keyword_id")
   user      User      @relation(fields: [userId], references: [id])
-  keyword   Keywords  @relation(fields: [keywordId], references: [id])
+  keyword   Keyword   @relation(fields: [keywordId], references: [id])
+
+  @@map("user_keyword")
 }
 
 
@@ -58,6 +64,8 @@ model Signal {
   room          Room         @relation(fields: [roomId],references: [id])
   roomId        Int          @map("room_id")
   deletedAt     DateTime?    @map("deleted_at")   
+
+  @@map("signal")
 }
 
 model Room {
@@ -68,6 +76,7 @@ model Room {
   signal      Signal[]
   roomUser    RoomUser[]
 
+  @@map("room")
 }
 
 model RoomUser{
@@ -77,6 +86,8 @@ model RoomUser{
   userId      Int       @map("user_id")
   room        Room      @relation(fields: [roomId],references: [id])
   roomId      Int       @map("room_id")
+
+  @@map("room_user")
 }
 
 model DeviceToken {
@@ -84,6 +95,8 @@ model DeviceToken {
   deviceToken   String  @map("device_token")
   user          User    @relation(fields: [userId],references: [id])
   userId        Int     @map("user_id")
+
+  @@map("device_token")
 }
 
 model Chat {
@@ -94,6 +107,8 @@ model Chat {
   receiver    User      @relation("Receiver",fields: [receiverId],references: [id])
   senderId    Int       @map("sender_id")
   receiverId  Int       @map("receiver_id")
+
+  @@map("chat")
 }
 
 model Trash {
@@ -103,5 +118,6 @@ model Trash {
   user        User      @relation(fields: [userId],references: [id])
   userId      Int       @map("user_id")
 
+  @@map("trash")
 }
 
