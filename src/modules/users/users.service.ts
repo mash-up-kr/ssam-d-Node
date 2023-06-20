@@ -1,16 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { UserOnboardingReqDto, UserReqDto } from './dto/user-req-dto';
-import { UserKeywordRepository, UserRepository } from 'src/repositories';
-import { KeywordsService } from '../keywords/keywords.service';
+import { UserNicknameReqDto, UserReqDto } from './dto/user-req-dto';
+import { UserRepository } from 'src/repositories';
 import { DuplicatedNicknameException, UserNotFoundException } from 'src/exceptions';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly keywordsService: KeywordsService,
-    private readonly userRepository: UserRepository,
-    private readonly userKeywordRepository: UserKeywordRepository
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async findOne(userReqDto: UserReqDto) {
     const { email } = userReqDto;
@@ -25,17 +20,12 @@ export class UsersService {
     }
   }
 
-  async saveOnboarding(userId: number, onboardingDto: UserOnboardingReqDto) {
+  async updateNickname(userId: number, userNicknameDto: UserNicknameReqDto) {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
 
-    const { nickname, keywords: plainKeywords } = onboardingDto;
-
-    await this.keywordsService.add(plainKeywords);
-    const keywords = await this.keywordsService.getList(plainKeywords);
-    const keywordIds = keywords.map(keyword => keyword.id);
-
-    await this.userKeywordRepository.add(userId, keywordIds);
+    const { nickname } = userNicknameDto;
+    await this.isDuplicatedNickname(nickname);
     await this.userRepository.update(userId, { nickname });
   }
 
