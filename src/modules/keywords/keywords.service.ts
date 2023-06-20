@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
-import { KeywordRepository } from 'src/repositories';
+import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import * as mecab from 'mecab-ya';
-import { KeywordExtractException } from 'src/exceptions';
+import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
 
 @Injectable()
 export class KeywordsService {
@@ -16,7 +16,26 @@ export class KeywordsService {
     'NNP', // 고유 명사
   ];
 
-  constructor(private readonly keywordRepository: KeywordRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly keywordRepository: KeywordRepository,
+    private readonly userKeywordRepository: UserKeywordRepository
+  ) {}
+
+  async addUserKeywords(userId: number, plainKeywords: string[]) {
+    const user = await this.userRepository.get({ id: userId });
+    if (!user) throw new UserNotFoundException();
+
+    await this.add(plainKeywords);
+
+    const keywords = await this.getList(plainKeywords);
+    const keywordIds = keywords.map(keyword => keyword.id);
+
+    const unregisteredKeywords = await this.userKeywordRepository.getUnregisterdKeywords(userId, keywordIds);
+    const unregisteredKeywordIds = unregisteredKeywords.map(keyword => keyword.id);
+
+    await this.userKeywordRepository.add(userId, unregisteredKeywordIds);
+  }
 
   async add(plainKeywords: string[]): Promise<void> {
     const keywordData = plainKeywords.map(keyword => ({ name: keyword }));

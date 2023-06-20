@@ -1,5 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { KeywordsService } from './keywords.service';
+import { AuthGuard } from '../auth/guards/jwt.auth.guard';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { KeywordReqDto } from './dto/keyword-req.dto';
 
 @Controller('keywords')
 export class KeywordsController {
@@ -9,5 +12,11 @@ export class KeywordsController {
   async recommend(@Query('content') content: string) {
     const keywords = await this.keywordsService.recommend(content);
     return { keywords };
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/')
+  async addUserKeywords(@AuthUser() userId: number, @Body() keywordsDto: KeywordReqDto) {
+    await this.keywordsService.addUserKeywords(userId, keywordsDto.keywords);
   }
 }

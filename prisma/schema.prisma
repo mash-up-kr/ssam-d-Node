@@ -29,7 +29,6 @@ model User {
   receive       Chat[]    @relation("Receiver")
   trash         Trash[]
   keywords      UserKeywords[]
-
 }
 
 model Keywords {
@@ -58,9 +57,7 @@ model Signal {
   receiverId    Int          @map("receiver_id")
   room          Room         @relation(fields: [roomId],references: [id])
   roomId        Int          @map("room_id")
-  deletedAt     DateTime?    @map("deleted_at") 
-  
-  
+  deletedAt     DateTime?    @map("deleted_at")   
 }
 
 model Room {
