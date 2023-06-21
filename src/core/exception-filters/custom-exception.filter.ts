@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { IS_LOCAL } from 'src/common/constants';
 import { BaseException } from 'src/exceptions/exception.abstract';
 
 @Catch()
@@ -22,7 +23,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       responseBody.message = exception.composedMessage ?? exception.message;
     }
 
-    if (exception instanceof Error && this.configService.get('NODE_ENV') !== 'local') {
+    if (exception instanceof Error && !IS_LOCAL) {
       await this.handle(request, exception);
     }
 
