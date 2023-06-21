@@ -19,7 +19,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');
 
-  app.useGlobalFilters(new CustomExceptionFilter());
+  app.useGlobalFilters(new CustomExceptionFilter(configService));
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.setGlobalPrefix('api', {
     exclude: [{ path: 'docs', method: RequestMethod.GET }],
