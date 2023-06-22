@@ -78,7 +78,7 @@ model RoomUser{
 
 model DeviceToken {
   id            Int     @id @default(autoincrement())
-  deviceToken   String  @map("device_token")
+  deviceToken   String  @map("device_token") @unique
   user          User    @relation(fields: [userId],references: [id])
   userId        Int     @map("user_id")
 }

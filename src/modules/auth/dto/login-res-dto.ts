@@ -28,12 +28,15 @@ export class LoginResDto {
 
   /**
    *
-   * @todo user 포함해서 반환
+   * @readonly
+   * @example dfklaj3849
    */
+  readonly deviceToken: string;
 
-  constructor({ userId, accessToken, refreshToken }) {
+  constructor({ userId, accessToken, refreshToken, deviceToken }) {
     this.userId = userId;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    this.deviceToken = deviceToken;
   }
 }
