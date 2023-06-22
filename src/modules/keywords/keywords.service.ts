@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
-import * as mecab from 'mecab-ya';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
+import { ElasticSearchResponse, KeywordMap } from './keywords.type';
 
 @Injectable()
 export class KeywordsService {
@@ -12,8 +12,8 @@ export class KeywordsService {
    * https://docs.google.com/spreadsheets/d/1-9blXKjtjeKZqsf4NzHeYJCrr49-nXeRF6D80udfcwY/edit#gid=589544265
    */
   private readonly targetPOS = [
-    'NNG', // 일반 명사
-    'NNP', // 고유 명사
+    'NNG(General Noun)', // 일반 명사
+    'NNP(Proper Noun)', // 고유 명사
   ];
 
   constructor(
@@ -48,30 +48,43 @@ export class KeywordsService {
   }
 
   async recommend(content: string) {
-    const keywordDic = await this.extract(content);
-    return Object.entries(keywordDic)
+    const keywordMap = await this.extract(content);
+    return Object.entries(keywordMap)
       .sort((a, b) => b[1] - a[1])
       .map(([keyword]) => keyword);
   }
 
-  private async extract(content: string): Promise<KeywordDic> {
-    return new Promise((resolve, reject) => {
-      mecab.pos(content, (err: unknown, result: MecabOutput) => {
-        if (err) reject(new KeywordExtractException());
-
-        const keywords = result.filter(([_, form]) => this.targetPOS.includes(form)).map(([word]) => word);
-        const keywordDic = keywords.reduce((dic, keyword) => {
-          if (!dic[keyword]) dic[keyword] = 0;
-          dic[keyword]++;
-          return dic;
-        }, {});
-        resolve(keywordDic);
+  private async extract(content: string): Promise<KeywordMap> {
+    try {
+      const response = await fetch(`http://localhost:9200/_analyze`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tokenizer: 'nori_tokenizer',
+          explain: true,
+          text: [content],
+        }),
       });
-    });
+
+      const result: ElasticSearchResponse = await response.json();
+      const tokens = result.detail.tokenizer.tokens;
+
+      const keywords = tokens
+        .filter(token => token.token.length > 1)
+        .filter(token => this.targetPOS.includes(token.leftPOS))
+        .map(token => token.token);
+
+      const keywordMap: KeywordMap = keywords.reduce((dic, keyword) => {
+        if (!dic[keyword]) dic[keyword] = 0;
+        dic[keyword]++;
+        return dic;
+      }, {});
+
+      return keywordMap;
+    } catch (error) {
+      throw new KeywordExtractException();
+    }
   }
 }
-
-type MecabOutput = string[][];
-type KeywordDic = {
-  [keyword: string]: number;
-};
