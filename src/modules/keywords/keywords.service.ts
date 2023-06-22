@@ -3,6 +3,7 @@ import { Keyword } from 'src/domains/keyword';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
 import { ElasticSearchResponse, KeywordMap } from './keywords.type';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class KeywordsService {
@@ -17,6 +18,7 @@ export class KeywordsService {
   ];
 
   constructor(
+    private readonly configService: ConfigService,
     private readonly userRepository: UserRepository,
     private readonly keywordRepository: KeywordRepository,
     private readonly userKeywordRepository: UserKeywordRepository
@@ -56,7 +58,8 @@ export class KeywordsService {
 
   private async extract(content: string): Promise<KeywordMap> {
     try {
-      const response = await fetch(`http://localhost:9200/_analyze`, {
+      const esHost = this.configService.get<string>('ELASTICSEARCH_URL');
+      const response = await fetch(esHost, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
