@@ -1,5 +1,5 @@
 import { Tspec } from 'tspec';
-import { UserNicknameReqDto, UserOnboardingReqDto } from './dto/user-req-dto';
+import { UserNicknameReqDto } from './dto/user-req-dto';
 import { ApiResponse } from 'src/types/common';
 import { UserNotFoundException } from 'src/exceptions';
 import { ExceptionSpecWrap, QuerySpecWrap } from 'src/types/tspec';
@@ -16,11 +16,10 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
         responses: { 200: ApiResponse; 409: ApiResponse };
       };
     };
-    '/onboarding': {
+    '/nickname': {
       patch: {
-        summary: '온보딩 과정 - 유저 정보 입력';
-
-        body: UserOnboardingReqDto;
+        summary: '온보딩 과정 - 유저 닉네임 입력';
+        body: UserNicknameReqDto;
         responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };

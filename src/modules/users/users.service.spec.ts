@@ -3,12 +3,13 @@ import { UsersService } from './users.service';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
 import { KeywordsService } from '../keywords/keywords.service';
+import { UserNotFoundException } from 'src/exceptions';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let userRepository: UserRepository;
-  let userKeywordRepository: UserKeywordRepository;
-  let keywordRepository: KeywordRepository;
+  let userRepository: ReturnType<typeof MockUserRepository>;
+  let userKeywordRepository: ReturnType<typeof MockUserKeywordrRepository>;
+  let keywordRepository: ReturnType<typeof MockKeywordRepository>;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -35,5 +36,18 @@ describe('UsersService', () => {
     expect(userRepository).toBeDefined();
     expect(userKeywordRepository).toBeDefined();
     expect(keywordRepository).toBeDefined();
+  });
+
+  describe('알람수신 동의 API', () => {
+    it('존재하지 않는 유저의 경우 예외 Throw', async () => {
+      userRepository.get.mockResolvedValue(null);
+      const userId = 1,
+        agreeAlarm = true;
+      try {
+        await service.updateAgreeAlarm(userId, agreeAlarm);
+      } catch (error) {
+        expect(error).toBeInstanceOf(UserNotFoundException);
+      }
+    });
   });
 });

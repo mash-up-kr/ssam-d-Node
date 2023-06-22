@@ -2,7 +2,7 @@ import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
-import { UserOnboardingReqDto } from './dto/user-req-dto';
+import { UserNicknameReqDto } from './dto/user-req-dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,9 +14,9 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Patch('/onboarding')
-  async saveOnboarding(@AuthUser() userId: number, @Body() onboardingDto: UserOnboardingReqDto) {
-    await this.usersService.saveOnboarding(userId, onboardingDto);
+  @Patch('/nickname')
+  async updateNickname(@AuthUser() userId: number, @Body() userNicknameDto: UserNicknameReqDto) {
+    await this.usersService.updateNickname(userId, userNicknameDto);
   }
 
   @UseGuards(AuthGuard)

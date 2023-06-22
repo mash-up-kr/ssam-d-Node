@@ -7,14 +7,14 @@ export class KeywordRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async add(keywords: Pick<Keyword, 'name'>[]): Promise<void> {
-    await this.prisma.keywords.createMany({
+    await this.prisma.keyword.createMany({
       data: keywords,
       skipDuplicates: true,
     });
   }
 
   async getList(keywords: string[]) {
-    const keywordEntities = await this.prisma.keywords.findMany({ where: { name: { in: keywords } } });
+    const keywordEntities = await this.prisma.keyword.findMany({ where: { name: { in: keywords } } });
     return keywordEntities.map(keywordEntity => new Keyword(keywordEntity));
   }
 }
