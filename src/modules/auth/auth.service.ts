@@ -6,7 +6,6 @@ import { LoginReqDto } from './dto/login-req-dto';
 import { UserRepository } from 'src/repositories';
 import { DeviceTokenRepository } from 'src/repositories';
 
-import { LoginResDto } from './dto/login-res-dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,26 +31,25 @@ export class AuthService {
      */
 
     const savedDeviceToken = await this.deviceTokenRepository.upsert(deviceToken, userId);
-
     const payload = { id: user.id };
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
-    });
-
+    const refreshToken = await this.generateRefreshToken(payload);
     const updatedRfreshToken = { refreshToken: refreshToken };
 
     await this.userRepository.update(userId, updatedRfreshToken);
-
-    const accessToken = await this.jwtService.signAsync(payload, {
+    const accessToken = await this.generateAccessToken(payload);
+    const loginData = { userId, accessToken, refreshToken, deviceToken: savedDeviceToken.deviceToken };
+    return loginData;
+  }
+  async generateAccessToken(payload: object) {
+    return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
     });
-    return new LoginResDto({
-      userId,
-      accessToken,
-      refreshToken,
-      deviceToken: savedDeviceToken.deviceToken,
+  }
+  async generateRefreshToken(payload: object) {
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
     });
   }
 }

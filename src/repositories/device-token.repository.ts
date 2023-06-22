@@ -6,11 +6,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class DeviceTokenRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async save(deviceTokenText: string, userId: number): Promise<DeviceToken> {
-    const deviceTokenData = { deviceToken: deviceTokenText, userId: userId };
-    const deviceToken = await this.prisma.deviceToken.create({ data: deviceTokenData });
+  async save(deviceToken: string, userId: number): Promise<DeviceToken> {
+    const savedDeviceToken = await this.prisma.deviceToken.create({
+      data: { deviceToken: deviceToken, userId: userId },
+    });
 
-    return new DeviceToken(deviceToken);
+    return new DeviceToken(savedDeviceToken);
   }
 
   async findDeviceToken(deviceTokenText: string): Promise<DeviceToken> {
@@ -18,12 +19,12 @@ export class DeviceTokenRepository {
 
     return new DeviceToken(deviceToken);
   }
-  async upsert(deviceTokenText: string, userId: number): Promise<DeviceToken> {
-    const deviceToken = await this.prisma.deviceToken.upsert({
-      where: { deviceToken: deviceTokenText },
-      update: { deviceToken: deviceTokenText },
-      create: { deviceToken: deviceTokenText, userId: userId },
+  async upsert(deviceToken: string, userId: number): Promise<DeviceToken> {
+    const savedDeviceToken = await this.prisma.deviceToken.upsert({
+      where: { deviceToken: deviceToken },
+      update: { deviceToken: deviceToken },
+      create: { deviceToken: deviceToken, userId: userId },
     });
-    return new DeviceToken(deviceToken);
+    return new DeviceToken(savedDeviceToken);
   }
 }
