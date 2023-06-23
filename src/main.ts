@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './core/exception-filters/custom-exception.filter';
 import * as dotenv from 'dotenv';
 import { IS_LOCAL } from './common/constants';
+import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
 
 declare const module: any;
 
