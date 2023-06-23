@@ -1,4 +1,4 @@
-export class signal {
+export class Signal {
   private readonly _id: number;
   private readonly _content: string;
   private readonly _keywords: string;

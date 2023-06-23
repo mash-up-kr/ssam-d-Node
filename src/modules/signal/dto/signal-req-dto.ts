@@ -11,5 +11,11 @@ export class SignalReqDto {
    */
   @IsString()
   content: string;
+
+  /**
+   *
+   * @type {string[]}
+   * @example ["종강", "엽떡", "대학생"]
+   */
   keywords: string[];
 }

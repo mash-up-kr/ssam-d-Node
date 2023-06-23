@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Keyword } from 'src/domains/keyword';
+import { UserKeyword } from 'src/domains/user-keyword';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -36,5 +37,24 @@ export class UserKeywordRepository {
     `;
 
     return keywords;
+  }
+  /**
+   * 함수 이름이 적절한지
+   */
+  async getMatchingInfoForSignal(userId: number, keyword: string[]): Promise<Pick<UserKeyword, 'userId'>[]> {
+    const joinedKeyword = Prisma.join(keyword);
+    const matchingInfo: Pick<UserKeyword, 'userId'>[] = await this.prisma.$queryRaw`
+    SELECT 
+      uk.user_id, ARRAY_AGG(uk.keyword_id) AS overlappingKeywords
+    FROM 
+      user_keyword uk
+    WHERE 
+      uk.keywordId IN (${joinedKeyword})
+    GROUP BY 
+      uk.userId
+    HAVING 
+      COUNT(DISTINCT uk.keywordId) > 0
+    `;
+    return matchingInfo;
   }
 }
