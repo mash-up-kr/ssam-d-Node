@@ -11,5 +11,7 @@ export class SignalController {
    * 있으면 시그널
    */
   @Post('/send')
-  async recommend(@Body() signalReqDto: SignalReqDto) {}
+  async recommend(@Body() signalReqDto: SignalReqDto) {
+    /**키워드 */
+  }
 }
