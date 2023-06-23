@@ -41,11 +41,11 @@ export class UserKeywordRepository {
   /**
    * 함수 이름이 적절한지
    */
-  async getMatchingInfoForSignal(userId: number, keyword: string[]): Promise<Pick<UserKeyword, 'userId'>[]> {
+  async getMatchingInfoForSignal(keyword: string[]): Promise<Pick<UserKeyword, 'userId'>[]> {
     const joinedKeyword = Prisma.join(keyword);
     const matchingInfo: Pick<UserKeyword, 'userId'>[] = await this.prisma.$queryRaw`
     SELECT 
-      uk.user_id, ARRAY_AGG(uk.keyword_id) AS overlappingKeywords
+      uk.user_id, ARRAY_AGG(uk.name) AS matchingKeywords
     FROM 
       user_keyword uk
     WHERE 

@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
+import { UserKeyword } from 'src/domains/user-keyword';
+import { SignalReqDto } from '../signal/dto/signal-req-dto';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
 import { ElasticSearchResponse, KeywordMap } from './keywords.type';
@@ -90,5 +92,10 @@ export class KeywordsService {
     } catch (error) {
       throw new KeywordExtractException();
     }
+  }
+  async matchingUserByKeywords(signalReqDto: SignalReqDto) {
+    const { senderId, keywords } = signalReqDto;
+    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(keywords);
+    return Object.entries(matchingInfo).filter(([index, obj]) => obj.userId !== senderId);
   }
 }
