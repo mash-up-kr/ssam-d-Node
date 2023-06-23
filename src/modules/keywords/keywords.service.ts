@@ -24,7 +24,7 @@ export class KeywordsService {
     private readonly userKeywordRepository: UserKeywordRepository
   ) {}
 
-  async addUserKeywords(userId: number, plainKeywords: string[]) {
+  async addUserKeywords(userId: number, plainKeywords: string[]): Promise<void> {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
 
@@ -49,7 +49,7 @@ export class KeywordsService {
     return keywords;
   }
 
-  async recommend(content: string) {
+  async recommend(content: string): Promise<string[]> {
     const keywordMap = await this.extract(content);
     return Object.entries(keywordMap)
       .sort((a, b) => b[1] - a[1])
