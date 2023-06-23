@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { IS_LOCAL } from 'src/common/constants';
@@ -6,6 +6,7 @@ import { BaseException } from 'src/exceptions/exception.abstract';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger();
   constructor(private readonly configService: ConfigService) {}
 
   async catch(exception: BaseException | Error, host: ArgumentsHost) {
@@ -23,8 +24,11 @@ export class CustomExceptionFilter implements ExceptionFilter {
       responseBody.message = exception.composedMessage ?? exception.message;
     }
 
-    if (exception instanceof Error && !IS_LOCAL) {
-      await this.handle(request, exception);
+    if (exception instanceof Error) {
+      this.logger.error(`api : ${request.method} ${request.url} message : ${exception.message}`);
+      if (!IS_LOCAL) {
+        await this.handle(request, exception);
+      }
     }
 
     response.status(responseBody.statusCode).json(responseBody);
