@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
+import { UserKeyword } from 'src/domains/user-keyword';
+import { SignalReqDto } from '../signal/dto/signal-req-dto';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import * as mecab from 'mecab-ya';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
@@ -68,6 +70,11 @@ export class KeywordsService {
         resolve(keywordDic);
       });
     });
+  }
+  async matchingUserByKeywords(signalReqDto: SignalReqDto) {
+    const { senderId, keywords } = signalReqDto;
+    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(keywords);
+    return Object.entries(matchingInfo).filter(([index, obj]) => obj.userId !== senderId);
   }
 }
 
