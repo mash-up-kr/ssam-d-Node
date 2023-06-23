@@ -18,7 +18,6 @@ export class UserKeywordRepository {
    */
   async getUnregisterdKeywords(userId: number, keywordIds: number[]): Promise<Pick<Keyword, 'id'>[]> {
     const joinedKeywordIds = Prisma.join(keywordIds);
-    console.log(joinedKeywordIds);
     const keywords: Pick<Keyword, 'id'>[] = await this.prisma.$queryRaw`
       SELECT
         keyword.id
