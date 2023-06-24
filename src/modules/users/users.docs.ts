@@ -32,5 +32,12 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
         responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };
+    '/:id': {
+      patch: {
+        summary: '유저 삭제';
+        path: { id: number };
+        responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
+      };
+    };
   };
 }>;

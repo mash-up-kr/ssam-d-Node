@@ -12,6 +12,10 @@ export class UserRepository {
     return new User(userEntity);
   }
 
+  async delete(id: number): Promise<void> {
+    await this.prisma.user.delete({ where: { id } });
+  }
+
   async update(id: number, userData: Partial<User>): Promise<User> {
     const user = await this.prisma.user.update({ where: { id }, data: userData });
     return new User(user);

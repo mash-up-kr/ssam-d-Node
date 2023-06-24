@@ -28,5 +28,10 @@ async function bootstrap() {
   await InitApiDocMiddleware(app, port);
 
   await app.listen(port);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();
