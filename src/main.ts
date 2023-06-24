@@ -8,8 +8,6 @@ import { CustomExceptionFilter } from './core/exception-filters/custom-exception
 import * as dotenv from 'dotenv';
 import { IS_LOCAL } from './common/constants';
 
-declare const module: any;
-
 async function bootstrap() {
   if (IS_LOCAL) {
     dotenv.config({ path: '.env.local' });
@@ -28,10 +26,5 @@ async function bootstrap() {
   await InitApiDocMiddleware(app, port);
 
   await app.listen(port);
-
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
 }
 bootstrap();

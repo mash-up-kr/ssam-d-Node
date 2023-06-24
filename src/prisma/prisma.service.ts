@@ -37,7 +37,7 @@ const setSoftDeleteMiddleware = (prisma: PrismaClient) => {
         params.args.where['deletedAt'] = null;
       }
       if (params.action === 'findMany') {
-        params.args['where'] = { deleted: null };
+        params.args['where'] = { deletedAt: null };
       }
       if (params.action == 'update') {
         params.action = 'updateMany';
