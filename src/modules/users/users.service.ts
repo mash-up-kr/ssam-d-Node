@@ -21,9 +21,9 @@ export class UsersService {
     await this.userRepository.delete(userId);
   }
 
-  async isDuplicatedNickname(nickname: string): Promise<void> {
+  async isDuplicatedNickname(userId: number, nickname: string): Promise<void> {
     const user = await this.userRepository.get({ nickname });
-    if (user) {
+    if (user && user.id !== userId) {
       throw new DuplicatedNicknameException({ nickname });
     }
   }
@@ -33,7 +33,7 @@ export class UsersService {
     if (!user) throw new UserNotFoundException();
 
     const { nickname } = userNicknameDto;
-    await this.isDuplicatedNickname(nickname);
+    await this.isDuplicatedNickname(userId, nickname);
     await this.userRepository.update(userId, { nickname });
   }
 
