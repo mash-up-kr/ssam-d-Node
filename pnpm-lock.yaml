@@ -38,9 +38,6 @@ dependencies:
   cross-env:
     specifier: ^7.0.3
     version: 7.0.3
-  mecab-ya:
-    specifier: ^0.1.1
-    version: 0.1.1
   passport-jwt:
     specifier: ^4.0.1
     version: 4.0.1
@@ -4239,12 +4236,6 @@ packages:
       tmpl: 1.0.5
     dev: true
 
-  /mecab-ya@0.1.1:
-    resolution: {integrity: sha512-3q0xRf3QRU+G5CRJpCnPrgZGkkPukbSj7xGt7ghyJfhcgJnIKg+TO3Tb4uadPA+cYQKFXovFjyLJdt45C+OfPQ==}
-    dependencies:
-      shell-quote: 1.8.1
-    dev: false
-
   /media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
     engines: {node: '>= 0.6'}
@@ -5075,10 +5066,6 @@ packages:
   /shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
-
-  /shell-quote@1.8.1:
-    resolution: {integrity: sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==}
-    dev: false
 
   /shelljs@0.8.5:
     resolution: {integrity: sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==}
