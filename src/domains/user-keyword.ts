@@ -1,6 +1,6 @@
 export class UserKeyword {
   private readonly _userId: number;
-  private readonly _keywords: string[];
+  private readonly _keywords: string;
   private readonly _count: string;
 
   constructor(userKeyword) {
@@ -12,7 +12,7 @@ export class UserKeyword {
   get userId(): number {
     return this._userId;
   }
-  get keywords(): string[] {
+  get keywords(): string {
     return this._keywords;
   }
   get count(): string {
