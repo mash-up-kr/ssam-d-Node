@@ -72,8 +72,9 @@ export class KeywordsService {
       });
 
       const result: ElasticSearchResponse = await response.json();
-      const tokens = result.detail.tokenizer.tokens;
+      if (result.error) throw result.error;
 
+      const tokens = result.detail.tokenizer.tokens;
       const keywords = tokens
         .filter(token => token.token.length > 1)
         .filter(token => this.targetPOS.includes(token.leftPOS))

@@ -5,6 +5,8 @@ export type ElasticSearchResponse = {
     tokenizer: { name: 'nori_tokenizer'; tokens: NoriToken[] };
     tokenfilters: [];
   };
+  error?: object;
+  status?: number;
 };
 
 export type NoriToken = {
