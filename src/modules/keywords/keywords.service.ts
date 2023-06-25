@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
-import { SignalReqDto } from '../signal/dto/signal-req-dto';
 import { ElasticSearchResponse, KeywordMap } from './keywords.type';
 import { ConfigService } from '@nestjs/config';
-import { KeywordRepository, UserKeywordRepository, UserRepository, TrashRepository } from 'src/repositories';
-import * as mecab from 'mecab-ya';
+import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
-import { SignalService } from '../signal/signal.service';
+import { UserKeyword } from 'src/domains/user-keyword';
 
 @Injectable()
 export class KeywordsService {
@@ -24,9 +22,7 @@ export class KeywordsService {
     private readonly configService: ConfigService,
     private readonly userRepository: UserRepository,
     private readonly keywordRepository: KeywordRepository,
-    private readonly userKeywordRepository: UserKeywordRepository,
-    private readonly trashRepository: TrashRepository,
-    private readonly signalService: SignalService
+    private readonly userKeywordRepository: UserKeywordRepository
   ) {}
 
   async addUserKeywords(userId: number, plainKeywords: string[]): Promise<void> {
@@ -96,18 +92,8 @@ export class KeywordsService {
       throw new KeywordExtractException();
     }
   }
-  async matchingUserByKeywords(signalReqDto: SignalReqDto) {
-    const { senderId, keywords, content } = signalReqDto;
+  async matchingUserByKeywords(senderId: number, keywords: string[]): Promise<UserKeyword[]> {
     const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
-    /** 매칭 x -> trash */
-    if (!matchingInfo.length) {
-      const trashData = { userId: senderId, keywords: keywords.join(','), content: content };
-      await this.trashRepository.save(trashData);
-    } else {
-      /**
-       * TODO:  deviceToken으로 알림하고 시그널 전송하기
-       * */
-      await this.signalService.sendSignal(signalReqDto, matchingInfo);
-    }
+    return matchingInfo;
   }
 }

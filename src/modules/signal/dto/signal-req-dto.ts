@@ -1,8 +1,6 @@
-import { IsString, IsNumber } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class SignalReqDto {
-  @IsNumber()
-  senderId: number;
   /**
    * 시그널 내용
    *
@@ -13,9 +11,10 @@ export class SignalReqDto {
   content: string;
 
   /**
-   *
+   *추출한 키워드 + 사용자 정의 키워드
    * @type {string[]}
    * @example ["종강", "엽떡", "대학생"]
    */
+
   keywords: string[];
 }
