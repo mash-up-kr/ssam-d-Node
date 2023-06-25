@@ -45,10 +45,12 @@ export class UserKeywordRepository {
     const matchingInfo: UserKeyword[] = await this.prisma.$queryRaw`
         SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords, COUNT(k.name) AS count
           FROM user_keyword uk
-          JOIN keyword k 
-            ON uk.keyword_id = k.id
-         WHERE k.name IN (${joinedKeyword}) 
-           AND uk.user_id != ${senderId}
+          JOIN (
+            SELECT *
+            FROM keyword 
+            WHERE name IN (${joinedKeyword})
+          ) k ON uk.keyword_id = k.id
+         WHERE uk.user_id != ${senderId}
       GROUP BY uk.user_id
       `;
 
