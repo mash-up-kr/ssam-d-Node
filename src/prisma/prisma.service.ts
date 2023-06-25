@@ -1,9 +1,17 @@
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { DMMF } from '@prisma/client/runtime';
+import { IS_LOCAL } from 'src/common/constants';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  constructor() {
+    super({
+      log: IS_LOCAL ? ['error', 'info', 'query', 'warn'] : [],
+    });
+  }
   async onModuleInit(): Promise<void> {
+    setSoftDeleteMiddleware(this);
     await this.$connect();
   }
 
@@ -13,3 +21,55 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     });
   }
 }
+
+/**
+ * @description
+ * soft delete를 위한 middleware 설정
+ * https://www.prisma.io/docs/concepts/components/prisma-client/middleware/soft-delete-middleware#step-3-optionally-prevent-readupdate-of-soft-deleted-records
+ */
+const setSoftDeleteMiddleware = (prisma: PrismaClient) => {
+  prisma.$use(async (params, next) => {
+    const models = Prisma.dmmf.datamodel.models;
+    const modelNames = models.map(model => model.name);
+    if (modelNames.includes(params.model) && isSoftDeleteEnabled(params.model, models)) {
+      if (params.action === 'findUnique' || params.action === 'findFirst') {
+        params.action = 'findFirst';
+        params.args.where['deletedAt'] = null;
+      }
+      if (params.action === 'findMany') {
+        params.args['where'] = { deletedAt: null };
+      }
+      if (params.action == 'update') {
+        params.action = 'updateMany';
+        params.args.where['deletedAt'] = null;
+      }
+      if (params.action == 'updateMany') {
+        if (params.args.where != undefined) {
+          params.args.where['deletedAt'] = null;
+        } else {
+          params.args['where'] = { deletedAt: null };
+        }
+      }
+      if (params.action == 'delete') {
+        params.action = 'update';
+        params.args['data'] = { deletedAt: new Date() };
+      }
+      if (params.action == 'deleteMany') {
+        params.action = 'updateMany';
+        if (params.args.data != undefined) {
+          params.args.data['deletedAt'] = new Date();
+        } else {
+          params.args['data'] = { deletedAt: new Date() };
+        }
+      }
+    }
+    return next(params);
+  });
+};
+
+const isSoftDeleteEnabled = (modelName: string, modelData: DMMF.Model[]): boolean => {
+  return modelData
+    .find(model => model.name == modelName)
+    .fields.map(filed => filed.name)
+    .includes('deletedAt');
+};

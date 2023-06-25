@@ -14,6 +14,13 @@ export class UsersService {
     return user;
   }
 
+  async deleteById(userId: number): Promise<void> {
+    const user = await this.userRepository.get({ id: userId });
+    if (!user) throw new UserNotFoundException();
+
+    await this.userRepository.delete(userId);
+  }
+
   async isDuplicatedNickname(nickname: string): Promise<void> {
     const user = await this.userRepository.get({ nickname });
     if (user) {

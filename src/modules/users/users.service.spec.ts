@@ -4,6 +4,7 @@ import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/re
 import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
 import { KeywordsService } from '../keywords/keywords.service';
 import { UserNotFoundException } from 'src/exceptions';
+import { userDataObject } from 'test/mock/data/user.data.mock';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -48,6 +49,19 @@ describe('UsersService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(UserNotFoundException);
       }
+    });
+  });
+
+  describe('유저 삭제 API', () => {
+    it('존재하지 않는 유저의 경우 예외 Throw', async () => {
+      userRepository.get.mockResolvedValue(null);
+      const userId = 1;
+      await expect(service.deleteById(userId)).rejects.toBeInstanceOf(UserNotFoundException);
+    });
+    it('유저 정상 삭제', async () => {
+      const userId = 1;
+      const res = await service.deleteById(userId);
+      expect(res).toEqual(undefined);
     });
   });
 });

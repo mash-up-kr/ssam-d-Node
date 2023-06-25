@@ -20,6 +20,7 @@ model User {
   provider      String    @default("KAKAO")
   createdAt     DateTime  @default(now())   @map("created_at")
   updatedAt     DateTime  @updatedAt        @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
   agreeAlarm    Boolean   @default(false)   @map("agree_alarm")
   sender        Signal[]  @relation("Sender")
   receiver      Signal[]  @relation("Receiver")
