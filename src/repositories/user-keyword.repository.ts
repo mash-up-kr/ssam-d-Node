@@ -18,6 +18,7 @@ export class UserKeywordRepository {
    */
   async getUnregisterdKeywords(userId: number, keywordIds: number[]): Promise<Pick<Keyword, 'id'>[]> {
     const joinedKeywordIds = Prisma.join(keywordIds);
+    console.log(joinedKeywordIds);
     const keywords: Pick<Keyword, 'id'>[] = await this.prisma.$queryRaw`
       SELECT
         keyword.id
@@ -38,23 +39,20 @@ export class UserKeywordRepository {
 
     return keywords;
   }
-  /**
-   * 함수 이름이 적절한지
-   */
-  async getMatchingInfoForSignal(keyword: string[]): Promise<Pick<UserKeyword, 'userId'>[]> {
+
+  async getMatchingInfoForSignal(senderId: number, keyword: string[]): Promise<UserKeyword[]> {
     const joinedKeyword = Prisma.join(keyword);
-    const matchingInfo: Pick<UserKeyword, 'userId'>[] = await this.prisma.$queryRaw`
-    SELECT 
-      uk.user_id, ARRAY_AGG(uk.name) AS matchingKeywords
-    FROM 
-      user_keyword uk
-    WHERE 
-      uk.keywordId IN (${joinedKeyword})
-    GROUP BY 
-      uk.userId
-    HAVING 
-      COUNT(DISTINCT uk.keywordId) > 0
-    `;
-    return matchingInfo;
+    const matchingInfo: UserKeyword[] = await this.prisma.$queryRaw`
+
+      SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords, COUNT(k.name) AS count
+      FROM user_keyword uk
+      JOIN keyword k ON uk.keyword_id = k.id
+      WHERE k.name IN (${joinedKeyword}) AND uk.user_id != ${senderId}
+      GROUP BY uk.user_id
+
+      `;
+    const userKeywords: UserKeyword[] = matchingInfo.map(data => new UserKeyword(data));
+
+    return userKeywords;
   }
 }

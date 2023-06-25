@@ -95,7 +95,14 @@ export class KeywordsService {
   }
   async matchingUserByKeywords(signalReqDto: SignalReqDto) {
     const { senderId, keywords } = signalReqDto;
-    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(keywords);
-    return Object.entries(matchingInfo).filter(([index, obj]) => obj.userId !== senderId);
+    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
+    /** 매칭 x -> trash */
+    if (!matchingInfo.length) {
+    } else {
+      /**
+       * TODO:  deviceToken으로 알림하고 시그널 전송하기
+       * */
+    }
+    return matchingInfo;
   }
 }
