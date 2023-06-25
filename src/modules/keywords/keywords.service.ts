@@ -96,8 +96,4 @@ export class KeywordsService {
     const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
     return matchingInfo;
   }
-  async matchingUserByKeywords(senderId: number, keywords: string[]): Promise<UserKeyword[]> {
-    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
-    return matchingInfo;
-  }
 }
