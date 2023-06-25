@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SignalRepository, TrashRepository } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
-import { UserKeyword } from 'src/domains/user-keyword';
 import { Signal } from 'src/domains/signal';
 import { KeywordsService } from '../keywords/keywords.service';
 @Injectable()
