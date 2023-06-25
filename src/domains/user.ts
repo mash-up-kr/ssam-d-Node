@@ -8,6 +8,7 @@ export class User {
   private readonly _refreshToken?: string;
   private readonly _socialId: string;
   private readonly _provider: string;
+  private readonly _profileImageUrl: string;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
   private readonly _agreeAlarm: boolean;
@@ -19,6 +20,7 @@ export class User {
     this._refreshToken = user.refreshToken;
     this._socialId = user.socialId;
     this._provider = user.provider;
+    this._profileImageUrl = user.profileImageUrl;
     this._createdAt = user.createdAt;
     this._updatedAt = user.updatedAt;
     this._agreeAlarm = user.agreeAlarm;
@@ -41,6 +43,9 @@ export class User {
   }
   get provider(): string {
     return this._provider;
+  }
+  get profileImageUrl(): string {
+    return this._profileImageUrl;
   }
   get createdAt(): Date {
     return this._createdAt;

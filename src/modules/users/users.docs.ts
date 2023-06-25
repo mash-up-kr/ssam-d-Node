@@ -3,6 +3,8 @@ import { UserNicknameReqDto } from './dto/user-req-dto';
 import { ApiResponse } from 'src/types/common';
 import { UserNotFoundException } from 'src/exceptions';
 import { ExceptionSpecWrap, QuerySpecWrap } from 'src/types/tspec';
+import { User } from 'src/domains/user';
+import { UserResDto } from './dto/user-res-dto';
 
 type UsersApiSpec = Tspec.DefineApiSpec<{
   basePath: '/users';
@@ -32,11 +34,16 @@ type UsersApiSpec = Tspec.DefineApiSpec<{
         responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };
-    '/:id': {
-      patch: {
+    '/{id}': {
+      delete: {
         summary: '유저 삭제';
         path: { id: number };
         responses: { 200: ApiResponse; 400: ExceptionSpecWrap<UserNotFoundException> };
+      };
+      get: {
+        summary: '유저 정보 조회';
+        path: { id: number };
+        responses: { 200: ApiResponse<UserResDto>; 400: ExceptionSpecWrap<UserNotFoundException> };
       };
     };
   };

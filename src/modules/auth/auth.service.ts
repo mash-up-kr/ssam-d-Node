@@ -5,6 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
 import { UserRepository } from 'src/repositories';
 import { DeviceTokenRepository } from 'src/repositories';
+import { PROFILE_IMAGE_URL_LIST } from 'src/common/constants';
+import { LoginResDto } from './dto/login-res-dto';
 
 @Injectable()
 export class AuthService {
@@ -15,14 +17,18 @@ export class AuthService {
     private readonly deviceTokenRepository: DeviceTokenRepository
   ) {}
 
-  async login(loginReqDto: LoginReqDto) {
+  async login(loginReqDto: LoginReqDto): Promise<LoginResDto> {
     const { socialId, email, provider, deviceToken } = loginReqDto;
 
     /**
      * 유저가 있으면 업데이트, 없으면 생성
      */
 
-    const userData = { email: email, provider: provider };
+    const userData = {
+      email: email,
+      provider: provider,
+      profileImageUrl: this.getRandomProfileImageURL(),
+    };
 
     const user = await this.userRepository.upsert(socialId, userData);
     const userId = user.id;
@@ -40,13 +46,20 @@ export class AuthService {
     const loginData = { userId, accessToken, refreshToken, deviceToken: savedDeviceToken.deviceToken };
     return loginData;
   }
-  async generateAccessToken(payload: object) {
+
+  private getRandomProfileImageURL(): string {
+    const randomValue = Math.random();
+    return PROFILE_IMAGE_URL_LIST[Math.floor(randomValue * PROFILE_IMAGE_URL_LIST.length)];
+  }
+
+  async generateAccessToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
     });
   }
-  async generateRefreshToken(payload: object) {
+
+  async generateRefreshToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),

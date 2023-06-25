@@ -25,12 +25,12 @@ export class UserRepository {
     return new User(user);
   }
   async upsert(socialId: string, userData: Partial<User>): Promise<User> {
-    const { email, provider } = userData;
+    const { email, provider, profileImageUrl } = userData;
 
     const user = await this.prisma.user.upsert({
       where: { socialId },
       update: { socialId },
-      create: { socialId, email, provider },
+      create: { socialId, email, provider, profileImageUrl },
     });
     return new User(user);
   }

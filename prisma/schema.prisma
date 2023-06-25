@@ -12,24 +12,25 @@ datasource db {
 
 
 model User {
-  id            Int       @id @default(autoincrement())
-  nickname      String?   @db.VarChar(20)
-  email         String?  
-  refreshToken  String?                     @map("refresh_token")
-  socialId      String    @unique           @map("social_id")
-  provider      String    @default("KAKAO")
-  createdAt     DateTime  @default(now())   @map("created_at")
-  updatedAt     DateTime  @updatedAt        @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
-  agreeAlarm    Boolean   @default(false)   @map("agree_alarm")
-  sender        Signal[]  @relation("Sender")
-  receiver      Signal[]  @relation("Receiver")
-  roomUser      RoomUser[]
-  deviceToken   DeviceToken[]
-  send          Chat[]    @relation("Sender")
-  receive       Chat[]    @relation("Receiver")
-  trash         Trash[]
-  keywords      UserKeyword[]
+  id              Int           @id @default(autoincrement())
+  nickname        String?       @db.VarChar(20)
+  email           String?  
+  refreshToken    String?       @map("refresh_token")
+  socialId        String        @unique                   @map("social_id")
+  provider        String        @default("KAKAO")
+  profileImageUrl String        @map("profile_image_url")
+  createdAt       DateTime      @default(now())           @map("created_at")
+  updatedAt       DateTime      @updatedAt                @map("updated_at")
+  deletedAt       DateTime?     @map("deleted_at")
+  agreeAlarm      Boolean       @default(false)           @map("agree_alarm")
+  sender          Signal[]      @relation("Sender")
+  receiver        Signal[]      @relation("Receiver")
+  roomUser        RoomUser[]
+  deviceToken     DeviceToken[]
+  send            Chat[]        @relation("Sender")
+  receive         Chat[]        @relation("Receiver")
+  trash           Trash[]
+  keywords        UserKeyword[]
 
   @@map("user")
 }
