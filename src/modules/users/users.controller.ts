@@ -3,6 +3,7 @@ import { UsersService } from './users.service';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { UserNicknameReqDto } from './dto/user-req-dto';
+import { UserResDto } from './dto/user-res-dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +18,12 @@ export class UsersController {
   @Delete('/:id')
   async deleteUserById(@Param('id') id: string) {
     await this.usersService.deleteById(+id);
+  }
+
+  @Get('/:id')
+  async getUserById(@Param('id') id: string) {
+    const user = await this.usersService.getUserById(+id);
+    return new UserResDto(user);
   }
 
   @UseGuards(AuthGuard)

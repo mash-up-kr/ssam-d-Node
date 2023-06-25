@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
 import { UserRepository } from 'src/repositories';
 import { DeviceTokenRepository } from 'src/repositories';
+import { PROFILE_IMAGE_URL_LIST } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,11 @@ export class AuthService {
      * 유저가 있으면 업데이트, 없으면 생성
      */
 
-    const userData = { email: email, provider: provider };
+    const userData = {
+      email: email,
+      provider: provider,
+      profileImageUrl: PROFILE_IMAGE_URL_LIST[Math.floor(Math.random() * PROFILE_IMAGE_URL_LIST.length)],
+    };
 
     const user = await this.userRepository.upsert(socialId, userData);
     const userId = user.id;
