@@ -4,12 +4,11 @@ import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { UserNicknameReqDto } from './dto/user-req-dto';
 import { UserResDto } from './dto/user-res-dto';
-
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthGuard)
   @Get('/nickname/duplication')
   async isDuplicatedNickname(@AuthUser() userId: number, @Query('nickname') nickname: string) {
     await this.usersService.isDuplicatedNickname(userId, nickname);
@@ -26,13 +25,11 @@ export class UsersController {
     return new UserResDto(user);
   }
 
-  @UseGuards(AuthGuard)
   @Patch('/nickname')
   async updateNickname(@AuthUser() userId: number, @Body() userNicknameDto: UserNicknameReqDto) {
     await this.usersService.updateNickname(userId, userNicknameDto);
   }
 
-  @UseGuards(AuthGuard)
   @Patch('/alarm')
   async updateAgreeAlarm(@AuthUser() userId: number, @Body('agreeAlarm') agreeAlarm: boolean) {
     await this.usersService.updateAgreeAlarm(userId, agreeAlarm);
