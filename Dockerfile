@@ -5,7 +5,7 @@ RUN npm i -g pnpm
 WORKDIR /app
 
 COPY ./package.json /app
-RUN pnpm i
+RUN pnpm i --frozen-lockfile
 
 COPY prisma /app/prisma
 RUN npx prisma generate 

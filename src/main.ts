@@ -14,7 +14,7 @@ async function bootstrap() {
   if (IS_LOCAL) {
     dotenv.config({ path: '.env.local' });
   }
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');
