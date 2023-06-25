@@ -8,9 +8,10 @@ import { UserNicknameReqDto } from './dto/user-req-dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(AuthGuard)
   @Get('/nickname/duplication')
-  async isDuplicatedNickname(@Query('nickname') nickname: string) {
-    await this.usersService.isDuplicatedNickname(nickname);
+  async isDuplicatedNickname(@AuthUser() userId: number, @Query('nickname') nickname: string) {
+    await this.usersService.isDuplicatedNickname(userId, nickname);
   }
 
   @Delete('/:id')
