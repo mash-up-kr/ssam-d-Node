@@ -2,7 +2,13 @@ import { Module } from '@nestjs/common';
 import { SignalService } from './signal.service';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalController } from './signal.controller';
-import { SignalRepository, UserKeywordRepository, UserRepository, KeywordRepository } from 'src/repositories';
+import {
+  SignalRepository,
+  UserKeywordRepository,
+  UserRepository,
+  KeywordRepository,
+  TrashRepository,
+} from 'src/repositories';
 
 @Module({
   controllers: [SignalController],
@@ -14,6 +20,7 @@ import { SignalRepository, UserKeywordRepository, UserRepository, KeywordReposit
     UserKeywordRepository,
     UserRepository,
     KeywordRepository,
+    TrashRepository,
   ],
 })
 export class SignalModule {}
