@@ -3,40 +3,55 @@ import { UsersService } from './users.service';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
 import { KeywordsService } from '../keywords/keywords.service';
-import { UserNotFoundException } from 'src/exceptions';
-import { userDataObject } from 'test/mock/data/user.data.mock';
+import { DuplicatedNicknameException, UserNotFoundException } from 'src/exceptions';
 
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: ReturnType<typeof MockUserRepository>;
-  let userKeywordRepository: ReturnType<typeof MockUserKeywordrRepository>;
-  let keywordRepository: ReturnType<typeof MockKeywordRepository>;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersService,
-        { provide: UserRepository, useValue: MockUserRepository() },
-        { provide: UserKeywordRepository, useValue: MockUserKeywordrRepository() },
-        { provide: KeywordRepository, useValue: MockKeywordRepository() },
-        {
-          provide: KeywordsService,
-          useFactory: keywordRepository => new KeywordsService(keywordRepository),
-          inject: [KeywordRepository],
-        },
-      ],
+      providers: [UsersService, { provide: UserRepository, useValue: MockUserRepository() }],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     userRepository = module.get(UserRepository);
-    userKeywordRepository = module.get(UserKeywordRepository);
-    keywordRepository = module.get(KeywordRepository);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
     expect(userRepository).toBeDefined();
-    expect(userKeywordRepository).toBeDefined();
-    expect(keywordRepository).toBeDefined();
+  });
+
+  describe('닉네임 중복 체크', () => {
+    it('중복된 닉네임을 가진 유저가 없을 때', async () => {
+      userRepository.get.mockResolvedValue(null);
+      const userId = 1,
+        nickname = '쌈디';
+
+      const result = await service.isDuplicatedNickname(userId, nickname);
+      expect(result).toBeUndefined();
+    });
+
+    it('중복된 닉네임을 가진 유저가 있지만 나 자신일 때', async () => {
+      userRepository.get.mockResolvedValue({ id: 1, nickname: '쌈디' });
+      const userId = 1,
+        nickname = '쌈디';
+
+      const result = await service.isDuplicatedNickname(userId, nickname);
+      expect(result).toBeUndefined();
+    });
+
+    it('중복된 닉네임을 가진 다른 유저가 있을 때', async () => {
+      userRepository.get.mockResolvedValue({ id: 2, nickname: '쌈디' });
+      const userId = 1,
+        nickname = '쌈디';
+
+      try {
+        await service.isDuplicatedNickname(userId, nickname);
+      } catch (e) {
+        expect(e).toBeInstanceOf(DuplicatedNicknameException);
+      }
+    });
   });
 
   describe('알람수신 동의 API', () => {
