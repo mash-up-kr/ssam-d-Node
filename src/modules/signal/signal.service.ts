@@ -15,7 +15,7 @@ export class SignalService {
     const { keywords, content } = signalReqDto;
 
     const matchingInfo = await this.keywordsService.matchingUserByKeywords(senderId, keywords);
-    if (matchingInfo.length == 0) {
+    if (matchingInfo.length === 0) {
       const trashData = { userId: senderId, keywords: keywords.join(','), content: content };
       await this.trashRepository.save(trashData);
     } else {
