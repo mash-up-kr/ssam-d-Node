@@ -15,12 +15,12 @@ export class SignalService {
     const { keywords, content } = signalReqDto;
 
     const matchingInfo = await this.keywordsService.matchingUserByKeywords(senderId, keywords);
-    if (!matchingInfo.length) {
+    if (matchingInfo.length == 0) {
       const trashData = { userId: senderId, keywords: keywords.join(','), content: content };
       await this.trashRepository.save(trashData);
     } else {
       /**
-       * TODO:  deviceToken으로 알림하고 시그널 전송하기
+       * TODO:  deviceToken으로 알림하고 시그널 전송하기, + 키워드 개수
        * */
 
       const signalData = matchingInfo.map(matchingData => {
