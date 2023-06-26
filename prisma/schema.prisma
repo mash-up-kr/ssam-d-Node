@@ -28,7 +28,6 @@ model User {
   roomUser        RoomUser[]
   deviceToken     DeviceToken[]
   send            Chat[]        @relation("Sender")
-  receive         Chat[]        @relation("Receiver")
   trash           Trash[]
   keywords        UserKeyword[]
 
@@ -63,8 +62,9 @@ model Signal {
   receiver      User         @relation("Receiver",fields: [receiverId],references: [id])
   senderId      Int          @map("sender_id")
   receiverId    Int          @map("receiver_id")
-  room          Room?         @relation(fields: [roomId],references: [id])
-  roomId        Int?          @map("room_id")
+  room          Room?        @relation(fields: [roomId],references: [id])
+  roomId        Int?         @map("room_id")
+  createdAt     DateTime     @default(now())       @map("created_at")
   deletedAt     DateTime?    @map("deleted_at")   
 
   @@map("signal")
@@ -104,11 +104,10 @@ model DeviceToken {
 model Chat {
   id          Int       @id @default(autoincrement())
   content     String 
+  roomId      Int       @map("room_id")
+  senderId    Int       @map("sender_id")
   createdAt   DateTime  @default(now())       @map("created_at")
   sender      User      @relation("Sender", fields: [senderId],references: [id] )
-  receiver    User      @relation("Receiver",fields: [receiverId],references: [id])
-  senderId    Int       @map("sender_id")
-  receiverId  Int       @map("receiver_id")
 
   @@map("chat")
 }

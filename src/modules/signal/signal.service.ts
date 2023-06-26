@@ -3,6 +3,8 @@ import { SignalRepository, TrashRepository } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import { KeywordsService } from '../keywords/keywords.service';
+import { SignalNotFoundException } from 'src/exceptions';
+
 @Injectable()
 export class SignalService {
   constructor(
@@ -34,5 +36,17 @@ export class SignalService {
 
       await this.signalRepository.save(signalData);
     }
+  }
+
+  async replyFirstSignal(
+    signalId: number,
+    senderId: number,
+    signalReqDto: Pick<SignalReqDto, 'content'>
+  ): Promise<void> {
+    const { content } = signalReqDto;
+    const signal = await this.signalRepository.getById(signalId);
+    if (!signal) throw new SignalNotFoundException();
+
+    this.signalRepository.replyFirstSignal(signalId, senderId, content, signal.keywords);
   }
 }
