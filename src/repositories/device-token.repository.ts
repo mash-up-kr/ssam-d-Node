@@ -19,8 +19,10 @@ export class DeviceTokenRepository {
 
     return new DeviceToken(deviceToken);
   }
-  async upsert(deviceToken: string, userId: number): Promise<DeviceToken> {
-    const savedDeviceToken = await this.prisma.deviceToken.upsert({
+  async upsert(deviceToken: string, userId: number, tx?: PrismaTransaction): Promise<DeviceToken> {
+    const prisma = tx ?? this.prisma;
+
+    const savedDeviceToken = await prisma.deviceToken.upsert({
       where: { deviceToken },
       update: { deviceToken },
       create: { deviceToken, userId },

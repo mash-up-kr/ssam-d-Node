@@ -20,8 +20,9 @@ export class AuthService {
   /**
    * 유저가 있으면 업데이트, 없으면 생성
    */
-  async login(loginReqDto: LoginReqDto): Promise<LoginResDto> {
-    const userId = await this.getSignedUserId(loginReqDto);
+  @Transactional()
+  async login(loginReqDto: LoginReqDto, tx?: PrismaTransaction): Promise<LoginResDto> {
+    const userId = await this.getSignedUserId(loginReqDto, tx);
 
     const payload = { id: userId };
     const accessToken = await this.generateAccessToken(payload);
@@ -52,16 +53,16 @@ export class AuthService {
     });
   }
 
-  private async getSignedUserId(loginDto: LoginReqDto): Promise<number> {
+  private async getSignedUserId(loginDto: LoginReqDto, tx?: PrismaTransaction): Promise<number> {
     const { socialId, provider, email } = loginDto;
 
-    const savedUser = await this.userRepository.get({ socialId, provider });
+    const savedUser = await this.userRepository.get({ socialId, provider }, tx);
     if (savedUser) return savedUser.id;
 
     const profileImageUrl = this.getRandomProfileImageURL();
     const userData = { socialId, provider, email, profileImageUrl };
 
-    const user = await this.userRepository.save(userData);
+    const user = await this.userRepository.save(userData, tx);
     return user.id;
   }
 }
