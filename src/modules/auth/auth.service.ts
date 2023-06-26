@@ -30,8 +30,7 @@ export class AuthService {
     await this.userRepository.update(userId, { refreshToken });
     await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId);
 
-    const loginData = { userId, accessToken, refreshToken };
-    return loginData;
+    return { userId, accessToken, refreshToken };
   }
 
   private getRandomProfileImageURL(): string {
