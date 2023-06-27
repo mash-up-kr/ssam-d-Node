@@ -8,6 +8,8 @@ import { ConfigModule } from '@nestjs/config';
 import { KeywordsModule } from './modules/keywords/keywords.module';
 import { SignalModule } from './modules/signal/signal.module';
 import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
+import { RoomModule } from './modules/room/room.module';
+import { ChatModule } from './modules/chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +21,8 @@ import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
     AuthModule,
     KeywordsModule,
     SignalModule,
+    RoomModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

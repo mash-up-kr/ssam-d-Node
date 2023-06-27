@@ -4,8 +4,8 @@ import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { UserNicknameReqDto } from './dto/user-req-dto';
 import { UserResDto } from './dto/user-res-dto';
-@Controller('users')
 @UseGuards(AuthGuard)
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

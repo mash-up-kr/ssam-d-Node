@@ -8,6 +8,9 @@ import {
   UserKeywordRepository,
   UserRepository,
   TrashRepository,
+  RoomRepository,
+  RoomUserRepository,
+  ChatRepository,
 } from 'src/repositories';
 
 @Module({
@@ -19,6 +22,9 @@ import {
     SignalService,
     SignalRepository,
     TrashRepository,
+    RoomRepository,
+    RoomUserRepository,
+    ChatRepository,
   ],
   controllers: [KeywordsController],
 })
