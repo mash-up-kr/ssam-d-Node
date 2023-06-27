@@ -7,6 +7,8 @@ import { KeywordReqDto } from './dto/keyword-req.dto';
 type KeywordsApiSpec = Tspec.DefineApiSpec<{
   basePath: '/keywords';
   tags: ['키워드'];
+  security: 'jwt';
+
   paths: {
     '/recommend': {
       get: {
@@ -19,7 +21,6 @@ type KeywordsApiSpec = Tspec.DefineApiSpec<{
     };
     '/': {
       post: {
-        security: 'jwt';
         summary: '키워드 유저에게 등록';
         body: KeywordReqDto;
         responses: { 201: ApiResponse };

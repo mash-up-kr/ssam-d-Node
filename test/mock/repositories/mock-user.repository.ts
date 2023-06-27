@@ -5,4 +5,6 @@ import { MockRepository } from './mock.repository';
 export const MockUserRepository = (): MockRepository<UserRepository> => ({
   get: jest.fn().mockResolvedValue(userDataObject[0]),
   delete: jest.fn().mockResolvedValue(null),
+  save: jest.fn(),
+  update: jest.fn(),
 });

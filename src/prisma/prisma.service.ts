@@ -17,7 +17,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
   async enableShutdownHooks(app: INestApplication): Promise<void> {
     this.$on('beforeExit', async () => {
-      await app.close();
+      return await app.close();
     });
   }
 }
@@ -32,35 +32,17 @@ const setSoftDeleteMiddleware = (prisma: PrismaClient) => {
     const models = Prisma.dmmf.datamodel.models;
     const modelNames = models.map(model => model.name);
     if (modelNames.includes(params.model) && isSoftDeleteEnabled(params.model, models)) {
-      if (params.action === 'findUnique' || params.action === 'findFirst') {
-        params.action = 'findFirst';
-        params.args.where['deletedAt'] = null;
-      }
-      if (params.action === 'findMany') {
-        params.args['where'] = { deletedAt: null };
-      }
-      if (params.action == 'update') {
-        params.action = 'updateMany';
-        params.args.where['deletedAt'] = null;
-      }
-      if (params.action == 'updateMany') {
-        if (params.args.where != undefined) {
-          params.args.where['deletedAt'] = null;
-        } else {
-          params.args['where'] = { deletedAt: null };
+      if (['findUnique', 'findFirst', 'update', 'updateMany'].includes(params.action)) {
+        if (params.action === 'update') {
+          params.action = 'updateMany';
         }
-      }
-      if (params.action == 'delete') {
+        params.args.where = { ...params.args.where, deletedAt: null };
+      } else if (params.action === 'delete') {
         params.action = 'update';
         params.args['data'] = { deletedAt: new Date() };
-      }
-      if (params.action == 'deleteMany') {
+      } else if (params.action === 'deleteMany') {
         params.action = 'updateMany';
-        if (params.args.data != undefined) {
-          params.args.data['deletedAt'] = new Date();
-        } else {
-          params.args['data'] = { deletedAt: new Date() };
-        }
+        params.args.data = { ...params.args.data, deletedAt: new Date() };
       }
     }
     return next(params);
