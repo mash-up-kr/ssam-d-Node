@@ -15,16 +15,15 @@ export class SignalRepository {
     });
   }
 
-  async get(signamData: Partial<Signal>): Promise<Signal> {
-    const signal = this.prisma.signal.findFirst({ where: signamData });
-    console.log(signal);
+  async get(signalData: Partial<Signal>): Promise<Signal> {
+    const signal = await this.prisma.signal.findFirst({ where: signalData });
     if (!signal) return null;
     return new Signal(signal);
   }
 
-  async update(id: number, signalData: Partial<Signal>, transaction?: PrismaTransaction): Promise<Signal> {
+  async update(id: number, signalData: Partial<Signal>, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    const signal = await prisma.signal.update({ where: { id }, data: signalData });
-    return new Signal(signal);
+    console.log(signalData);
+    await prisma.signal.update({ where: { id }, data: signalData });
   }
 }

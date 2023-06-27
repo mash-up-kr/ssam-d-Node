@@ -19,3 +19,5 @@ export class DuplicatedNicknameException extends ExceptionOf.USER(
 export class KeywordExtractException extends ExceptionOf.INTERNAL(500, '키워드를 추출할 수 없습니다.' as const) {}
 
 export class SignalNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 시그널입니다.' as const) {}
+
+export class SingalReplyException extends ExceptionOf.USER(500, '시그널 답장 중에 오류가 발생했습니다.' as const) {}

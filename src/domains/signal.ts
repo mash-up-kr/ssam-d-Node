@@ -16,6 +16,7 @@ export class Signal {
     this._senderId = signal.senderId;
     this._receiverId = signal.receiverId;
     this._roomId = signal.roomId;
+    this._createdAt = signal.createdAt;
   }
 
   get id(): number {

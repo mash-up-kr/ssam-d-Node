@@ -9,9 +9,13 @@ import { PrismaTransaction } from 'src/types/common';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async save(chatData: Prisma.ChatUncheckedCreateInput, transaction?: PrismaTransaction): Promise<Chat> {
+  async save(chatData: Prisma.ChatUncheckedCreateInput, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    const chat = prisma.chat.create({ data: chatData });
-    return new Chat(chat);
+    await prisma.chat.create({ data: chatData });
+  }
+
+  async saveAll(chatData: Prisma.ChatUncheckedCreateInput[], transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+    await prisma.chat.createMany({ data: chatData });
   }
 }
