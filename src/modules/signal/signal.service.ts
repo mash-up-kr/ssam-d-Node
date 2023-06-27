@@ -9,7 +9,7 @@ import {
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import { KeywordsService } from '../keywords/keywords.service';
-import { SignalNotFoundException } from 'src/exceptions';
+import { SignalNotFoundException, SingalReplyException } from 'src/exceptions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomUser } from 'src/domains/room-user';
 
@@ -52,25 +52,24 @@ export class SignalService {
 
   async replyFirstSignal(id: number, senderId: number, signalReqDto: Pick<SignalReqDto, 'content'>): Promise<void> {
     const { content } = signalReqDto;
-    console.log(id);
     const firstSignal = await this.signalRepository.get({ id });
-    console.log(firstSignal.receiverId);
 
     if (!firstSignal) throw new SignalNotFoundException();
 
     this.prisma
       .$transaction(async transaction => {
         const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
-        const test = await this.roomRepository.getList([room.id]);
         await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
 
-        const currentReceiverId = firstSignal.senderId;
-        console.log(firstSignal);
+        if (senderId != firstSignal.receiverId) {
+          throw new SingalReplyException();
+        }
+
         await this.roomUserRepository.saveAll(
           [
             {
               roomId: room.id,
-              userId: currentReceiverId,
+              userId: firstSignal.senderId,
             },
             {
               roomId: room.id,
@@ -79,28 +78,25 @@ export class SignalService {
           ],
           transaction
         );
-        await this.chatRepository.save(
-          {
-            roomId: room.id,
-            content: firstSignal.content,
-            senderId: firstSignal.senderId,
-            createdAt: firstSignal.createdAt,
-          },
-          transaction
-        );
-        await this.chatRepository.save(
-          {
-            roomId: room.id,
-            content: firstSignal.content,
-            senderId: firstSignal.senderId,
-            createdAt: firstSignal.createdAt,
-          },
+        await this.chatRepository.saveAll(
+          [
+            {
+              roomId: room.id,
+              content: firstSignal.content,
+              senderId: firstSignal.senderId,
+              createdAt: firstSignal.createdAt,
+            },
+            {
+              roomId: room.id,
+              content: content,
+              senderId: senderId,
+            },
+          ],
           transaction
         );
       })
       .catch(e => {
-        console.log('rrrrrr');
-        console.log(e);
+        throw new SingalReplyException();
       });
   }
 }
