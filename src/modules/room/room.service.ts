@@ -14,7 +14,6 @@ export class RoomService {
     const roomUsers = await this.roomUserRepository.getRoomUsersByUserId(userId);
     const roomIds = roomUsers.map(roomUser => roomUser.roomId);
     const rooms = await this.roomRepository.getList(roomIds);
-    
     // profileImage, 최근시간, recentContent
     // user 조회 , 최근 chat
 

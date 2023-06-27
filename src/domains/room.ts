@@ -6,7 +6,7 @@ export class Room {
 
   constructor(room) {
     this._id = room.id;
-    this._keywords = room.profileImageUrl;
+    this._keywords = room.keywords;
     this._isAlive = room.isAlive;
     this._createdAt = room.createdAt;
   }

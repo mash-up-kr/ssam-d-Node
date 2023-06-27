@@ -8,7 +8,7 @@ import { RoomService } from './room.service';
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
-  @Get('/')
+  @Get('')
   async getRooms(@AuthUser() userId: number) {
     const user = await this.roomService.getRoomsByUserId(userId);
   }
