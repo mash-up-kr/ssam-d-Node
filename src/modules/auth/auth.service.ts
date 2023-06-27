@@ -5,8 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginReqDto } from './dto/login-req-dto';
 import { UserRepository } from 'src/repositories';
 import { DeviceTokenRepository } from 'src/repositories';
-import { PROFILE_IMAGE_URL_LIST } from 'src/common/constants';
 import { LoginResDto } from './dto/login-res-dto';
+import { getRandomProfileImageURL } from 'src/common/util';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +27,7 @@ export class AuthService {
     const userData = {
       email: email,
       provider: provider,
-      profileImageUrl: this.getRandomProfileImageURL(),
+      profileImageUrl: getRandomProfileImageURL(),
     };
 
     const user = await this.userRepository.upsert(socialId, userData);
@@ -45,11 +45,6 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(payload);
     const loginData = { userId, accessToken, refreshToken, deviceToken: savedDeviceToken.deviceToken };
     return loginData;
-  }
-
-  private getRandomProfileImageURL(): string {
-    const randomValue = Math.random();
-    return PROFILE_IMAGE_URL_LIST[Math.floor(randomValue * PROFILE_IMAGE_URL_LIST.length)];
   }
 
   async generateAccessToken(payload: object): Promise<string> {
