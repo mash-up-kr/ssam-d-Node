@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 import { JwtService } from '@nestjs/jwt';
+
+import { DeviceTokenRepository, UserRepository } from 'src/repositories';
+
 import { LoginReqDto } from './dto/login-req-dto';
-import { UserRepository } from 'src/repositories';
-import { DeviceTokenRepository } from 'src/repositories';
 import { LoginResDto } from './dto/login-res-dto';
 import { getRandomProfileImageURL } from 'src/common/util';
 
@@ -17,34 +17,20 @@ export class AuthService {
     private readonly deviceTokenRepository: DeviceTokenRepository
   ) {}
 
+  /**
+   * 유저가 있으면 업데이트, 없으면 생성
+   */
   async login(loginReqDto: LoginReqDto): Promise<LoginResDto> {
-    const { socialId, email, provider, deviceToken } = loginReqDto;
+    const userId = await this.getSignedUserId(loginReqDto);
 
-    /**
-     * 유저가 있으면 업데이트, 없으면 생성
-     */
-
-    const userData = {
-      email: email,
-      provider: provider,
-      profileImageUrl: getRandomProfileImageURL(),
-    };
-
-    const user = await this.userRepository.upsert(socialId, userData);
-    const userId = user.id;
-    /**
-     * 디바이스 토큰 저장
-     */
-
-    const savedDeviceToken = await this.deviceTokenRepository.upsert(deviceToken, userId);
-    const payload = { id: user.id };
-    const refreshToken = await this.generateRefreshToken(payload);
-    const updatedRfreshToken = { refreshToken: refreshToken };
-
-    await this.userRepository.update(userId, updatedRfreshToken);
+    const payload = { id: userId };
     const accessToken = await this.generateAccessToken(payload);
-    const loginData = { userId, accessToken, refreshToken, deviceToken: savedDeviceToken.deviceToken };
-    return loginData;
+    const refreshToken = await this.generateRefreshToken(payload);
+
+    await this.userRepository.update(userId, { refreshToken });
+    await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId);
+
+    return { userId, accessToken, refreshToken };
   }
 
   async generateAccessToken(payload: object): Promise<string> {
@@ -59,5 +45,18 @@ export class AuthService {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
     });
+  }
+
+  private async getSignedUserId(loginDto: LoginReqDto): Promise<number> {
+    const { socialId, provider, email } = loginDto;
+
+    const savedUser = await this.userRepository.get({ socialId, provider });
+    if (savedUser) return savedUser.id;
+
+    const profileImageUrl = getRandomProfileImageURL();
+    const userData = { socialId, provider, email, profileImageUrl };
+
+    const user = await this.userRepository.save(userData);
+    return user.id;
   }
 }

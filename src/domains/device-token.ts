@@ -12,7 +12,7 @@ export class DeviceToken {
   get id(): number {
     return this._id;
   }
-  get deviceToken(): string {
+  get value(): string {
     return this._value;
   }
 

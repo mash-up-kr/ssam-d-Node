@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from 'src/domains/user';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserRepository {
@@ -16,22 +17,13 @@ export class UserRepository {
     await this.prisma.user.delete({ where: { id } });
   }
 
-  async update(id: number, userData: Partial<User>): Promise<User> {
+  async update(id: number, userData: Prisma.UserUpdateInput): Promise<User> {
     const user = await this.prisma.user.update({ where: { id }, data: userData });
     return new User(user);
   }
-  async save(userData: User): Promise<User> {
-    const user = await this.prisma.user.create({ data: userData });
-    return new User(user);
-  }
-  async upsert(socialId: string, userData: Partial<User>): Promise<User> {
-    const { email, provider, profileImageUrl } = userData;
 
-    const user = await this.prisma.user.upsert({
-      where: { socialId },
-      update: { socialId },
-      create: { socialId, email, provider, profileImageUrl },
-    });
+  async save(data: Prisma.UserCreateInput): Promise<User> {
+    const user = await this.prisma.user.create({ data });
     return new User(user);
   }
 }
