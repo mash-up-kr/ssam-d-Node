@@ -4,9 +4,8 @@ import { KeywordsService } from '../keywords/keywords.service';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
-
-@Controller('signal')
 @UseGuards(AuthGuard)
+@Controller('signal')
 export class SignalController {
   constructor(private readonly signalService: SignalService, private readonly keywordService: KeywordsService) {}
 
@@ -18,9 +17,9 @@ export class SignalController {
   @Post('/:id/reply')
   async replyFirstSignal(
     @AuthUser() senderId,
-    @Param('id') signalId: string,
+    @Param('id') id: string,
     @Body() signalReqDto: Pick<SignalReqDto, 'content'>
   ) {
-    await this.signalService.replyFirstSignal(+signalId, senderId, signalReqDto);
+    await this.signalService.replyFirstSignal(+id, senderId, signalReqDto);
   }
 }

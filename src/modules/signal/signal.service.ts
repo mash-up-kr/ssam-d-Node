@@ -1,16 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { SignalRepository, TrashRepository } from 'src/repositories';
+import {
+  ChatRepository,
+  RoomRepository,
+  RoomUserRepository,
+  SignalRepository,
+  TrashRepository,
+} from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalNotFoundException } from 'src/exceptions';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RoomUser } from 'src/domains/room-user';
 
 @Injectable()
 export class SignalService {
   constructor(
     private readonly signalRepository: SignalRepository,
     private readonly trashRepository: TrashRepository,
-    private readonly keywordsService: KeywordsService
+    private readonly keywordsService: KeywordsService,
+    private readonly roomRepository: RoomRepository,
+    private readonly roomUserRepository: RoomUserRepository,
+    private readonly chatRepository: ChatRepository,
+    private readonly prisma: PrismaService
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -38,15 +50,57 @@ export class SignalService {
     }
   }
 
-  async replyFirstSignal(
-    signalId: number,
-    senderId: number,
-    signalReqDto: Pick<SignalReqDto, 'content'>
-  ): Promise<void> {
+  async replyFirstSignal(id: number, senderId: number, signalReqDto: Pick<SignalReqDto, 'content'>): Promise<void> {
     const { content } = signalReqDto;
-    const signal = await this.signalRepository.getById(signalId);
-    if (!signal) throw new SignalNotFoundException();
+    console.log(id);
+    const firstSignal = await this.signalRepository.get({ id });
+    console.log(firstSignal.receiverId);
 
-    this.signalRepository.replyFirstSignal(signalId, senderId, content, signal.keywords);
+    if (!firstSignal) throw new SignalNotFoundException();
+
+    this.prisma
+      .$transaction(async transaction => {
+        const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
+        const test = await this.roomRepository.getList([room.id]);
+        await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
+
+        const currentReceiverId = firstSignal.senderId;
+        console.log(firstSignal);
+        await this.roomUserRepository.saveAll(
+          [
+            {
+              roomId: room.id,
+              userId: currentReceiverId,
+            },
+            {
+              roomId: room.id,
+              userId: senderId,
+            },
+          ],
+          transaction
+        );
+        await this.chatRepository.save(
+          {
+            roomId: room.id,
+            content: firstSignal.content,
+            senderId: firstSignal.senderId,
+            createdAt: firstSignal.createdAt,
+          },
+          transaction
+        );
+        await this.chatRepository.save(
+          {
+            roomId: room.id,
+            content: firstSignal.content,
+            senderId: firstSignal.senderId,
+            createdAt: firstSignal.createdAt,
+          },
+          transaction
+        );
+      })
+      .catch(e => {
+        console.log('rrrrrr');
+        console.log(e);
+      });
   }
 }

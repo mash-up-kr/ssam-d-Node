@@ -8,6 +8,9 @@ import {
   UserRepository,
   KeywordRepository,
   TrashRepository,
+  RoomRepository,
+  ChatRepository,
+  RoomUserRepository,
 } from 'src/repositories';
 
 @Module({
@@ -21,6 +24,9 @@ import {
     UserRepository,
     KeywordRepository,
     TrashRepository,
+    RoomRepository,
+    ChatRepository,
+    RoomUserRepository,
   ],
 })
 export class SignalModule {}
