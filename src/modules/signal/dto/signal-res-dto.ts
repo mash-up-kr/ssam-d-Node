@@ -1,4 +1,3 @@
-import { IsEmail, IsString } from 'class-validator';
 import { Signal } from 'src/domains/signal';
 
 export class SignalResDto {
