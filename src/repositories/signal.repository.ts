@@ -8,7 +8,6 @@ export class SignalRepository {
   async save(signal: Exclude<Signal, 'id'>[]): Promise<void> {
     await this.prisma.signal.createMany({
       data: signal,
-      skipDuplicates: true,
     });
   }
 }

@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class SignalReqDto {
   /**
@@ -15,6 +15,6 @@ export class SignalReqDto {
    * @type {string[]}
    * @example ["종강", "엽떡", "대학생"]
    */
-
+  @IsArray()
   keywords: string[];
 }
