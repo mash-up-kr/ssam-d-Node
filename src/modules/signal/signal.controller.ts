@@ -3,7 +3,6 @@ import { SignalService } from './signal.service';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
-
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 @Controller('signal')
