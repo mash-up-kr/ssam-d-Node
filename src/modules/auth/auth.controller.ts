@@ -14,7 +14,6 @@ export class AuthController {
       userId: loginData.userId,
       accessToken: loginData.accessToken,
       refreshToken: loginData.refreshToken,
-      deviceToken: loginData.deviceToken,
     });
   }
 }

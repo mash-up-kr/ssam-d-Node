@@ -16,7 +16,7 @@ model User {
   nickname        String?       @db.VarChar(20)
   email           String?  
   refreshToken    String?       @map("refresh_token")
-  socialId        String        @unique                   @map("social_id")
+  socialId        String        @map("social_id")
   provider        String        @default("KAKAO")
   profileImageUrl String        @map("profile_image_url")
   createdAt       DateTime      @default(now())           @map("created_at")

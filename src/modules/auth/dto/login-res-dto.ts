@@ -26,17 +26,9 @@ export class LoginResDto {
    */
   readonly refreshToken: string;
 
-  /**
-   *
-   * @readonly
-   * @example dfklaj3849
-   */
-  readonly deviceToken: string;
-
-  constructor({ userId, accessToken, refreshToken, deviceToken }) {
+  constructor({ userId, accessToken, refreshToken }) {
     this.userId = userId;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
-    this.deviceToken = deviceToken;
   }
 }

@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
-import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
-import { KeywordsService } from '../keywords/keywords.service';
+import { UserRepository } from 'src/repositories';
+import { MockUserRepository } from 'test/mock/repositories';
 import { DuplicatedNicknameException, UserNotFoundException } from 'src/exceptions';
 
 describe('UsersService', () => {
