@@ -36,6 +36,6 @@ export class SignalService {
     }
   }
   async getSignalListById(receiverId: number) {
-    return await this.signalRepository.get(receiverId);
+    return await this.signalRepository.getList(receiverId);
   }
 }

@@ -10,7 +10,7 @@ export class SignalRepository {
       data: signal,
     });
   }
-  async get(receiverId: number): Promise<Partial<Signal[]>> {
+  async getList(receiverId: number): Promise<Partial<Signal[]>> {
     const signalListEntities = await this.prisma.signal.findMany({ where: { receiverId: receiverId } });
     return signalListEntities.map(signalEntity => new Signal(signalEntity));
   }
