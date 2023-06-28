@@ -62,7 +62,7 @@ model Signal {
   receiver      User         @relation("Receiver",fields: [receiverId],references: [id])
   senderId      Int          @map("sender_id")
   receiverId    Int          @map("receiver_id")
-  room          Room?        @relation(fields: [roomId],references: [id])
+  // room          Room?        @relation(fields: [roomId],references: [id])
   roomId        Int?         @map("room_id")
   createdAt     DateTime     @default(now())       @map("created_at")
   deletedAt     DateTime?    @map("deleted_at")   
@@ -75,7 +75,8 @@ model Room {
   keywords    String?
   isAlive     Boolean     @map("is_alive")    @default(true)
   createdAt   DateTime    @default(now())     @map("created_at")
-  signal      Signal[]
+  // signal      Signal[]
+  chat        Chat[]      @relation("Chat")
   roomUser    RoomUser[]
 
   @@map("room")
@@ -104,6 +105,7 @@ model DeviceToken {
 model Chat {
   id          Int       @id @default(autoincrement())
   content     String 
+  room        Room      @relation("Chat", fields: [roomId],references: [id] )
   roomId      Int       @map("room_id")
   senderId    Int       @map("sender_id")
   createdAt   DateTime  @default(now())       @map("created_at")
