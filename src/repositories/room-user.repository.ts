@@ -32,10 +32,10 @@ export class RoomUserRepository {
   }
 
   async getMatchingUser(userId: number, roomId: number): Promise<User> {
-    const { user } = this.prisma.roomUser.findFirst({
+    const { user } = await this.prisma.roomUser.findFirst({
       where: {
         roomId,
-        userId: { not: userId },
+        NOT: { userId },
       },
       include: {
         user: true,
