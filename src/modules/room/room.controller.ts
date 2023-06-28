@@ -4,12 +4,17 @@ import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { RoomService } from './room.service';
 
 @UseGuards(AuthGuard)
-@Controller('room')
+@Controller('rooms')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Get('')
-  async getRooms(@AuthUser() userId: number) {
-    const user = await this.roomService.getRoomsByUserId(userId);
+  async getRoomListData(@AuthUser() userId: number) {
+    return await this.roomService.getRoomDataListByUserId(userId);
+  }
+
+  @Get('/:id/chats')
+  async getChatListData(@AuthUser() userId: number, @Param('id') roomId: string) {
+    return await this.roomService.getChatDataList(userId, +roomId);
   }
 }

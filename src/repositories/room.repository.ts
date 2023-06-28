@@ -27,7 +27,25 @@ export class RoomRepository {
 
   async getList(roomIds: number[]): Promise<Room[]> {
     const rooms = await this.prisma.room.findMany({ where: { id: { in: roomIds } } });
-    console.log('rooms: ' + rooms);
     return rooms.map(room => new Room(room));
+  }
+
+  async getRoomWithChatData(id: number): Promise<
+    Prisma.RoomGetPayload<{
+      include: {
+        chat: true;
+      };
+    }>
+  > {
+    return await this.prisma.room.findFirst({
+      where: { id },
+      include: {
+        chat: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
+    });
   }
 }

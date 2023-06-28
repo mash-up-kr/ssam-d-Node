@@ -31,16 +31,22 @@ export class RoomResDto {
   profileImage: string;
 
   /**
-   * @type {string}
+   * @type {number}
    * @example 1687793263959
    */
-  recentSignalMillis: string;
+  recentSignalMillis: number;
+
+  /**
+   *
+   * @TODO room에서 읽은 편지인지 아닌지 여부 필요한지 고민
+   * isRead: boolean;
+   */
 
   constructor({ id, keywords, recentSigalContent, matchingKeywordCount, profileImage, recentSignalMillis }) {
     this.id = id;
     this.keywords = keywords;
-    this.matchingKeywordCount = matchingKeywordCount;
     this.recentSigalContent = recentSigalContent;
+    this.matchingKeywordCount = matchingKeywordCount;
     this.profileImage = profileImage;
     this.recentSignalMillis = recentSignalMillis;
   }

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Signal } from 'src/domains/signal';
 import { RoomUser } from 'src/domains/room-user';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaTransaction } from 'src/types/common';
 import { Prisma } from '@prisma/client';
+import { User } from 'src/domains/user';
 
 @Injectable()
 export class RoomUserRepository {
@@ -17,7 +17,69 @@ export class RoomUserRepository {
   }
 
   async getRoomUsersByUserId(userId: number): Promise<RoomUser[]> {
-    const roomUsers = await this.prisma.roomUser.findMany({ where: { userId }, include: { room: true, user: true } });
+    const roomUsers = await this.prisma.roomUser.findMany({
+      where: {
+        userId,
+        room: {
+          isAlive: true,
+        },
+      },
+      include: {
+        room: true,
+      },
+    });
     return roomUsers.map(roomUser => new RoomUser(roomUser));
+  }
+
+  async getMatchingUser(userId: number, roomId: number): Promise<User> {
+    const { user } = this.prisma.roomUser.findFirst({
+      where: {
+        roomId,
+        userId: { not: userId },
+      },
+      include: {
+        user: true,
+      },
+    });
+    return new User(user);
+  }
+
+  async getRoomListData(
+    userId: number,
+    roomIds: number[]
+  ): Promise<
+    Array<
+      Prisma.RoomUserGetPayload<{
+        include: {
+          user: { select: { profileImageUrl: true } };
+          room: { include: { chat: true } };
+        };
+      }>
+    >
+  > {
+    return await this.prisma.roomUser.findMany({
+      where: {
+        userId: { not: userId },
+        roomId: { in: roomIds },
+        room: { isAlive: true },
+      },
+      include: {
+        user: {
+          select: {
+            profileImageUrl: true,
+          },
+        },
+        room: {
+          include: {
+            chat: {
+              take: 1,
+              orderBy: {
+                createdAt: 'desc',
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }
