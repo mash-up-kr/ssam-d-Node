@@ -1,10 +1,18 @@
-import {Injectable} from '@nestjs/common';
-import {ChatRepository, RoomRepository, RoomUserRepository, SignalRepository, TrashRepository,} from 'src/repositories';
-import {SignalReqDto} from './dto/signal-req-dto';
-import {Signal} from 'src/domains/signal';
-import {KeywordsService} from '../keywords/keywords.service';
-import {SignalNotFoundException, SingalReplyException} from 'src/exceptions';
-import {PrismaService} from 'src/prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
+import {
+  ChatRepository,
+  RoomRepository,
+  RoomUserRepository,
+  SignalRepository,
+  TrashRepository,
+} from 'src/repositories';
+import { SignalReqDto } from './dto/signal-req-dto';
+import { Signal } from 'src/domains/signal';
+import { KeywordsService } from '../keywords/keywords.service';
+import { SignalNotFoundException, SingalReplyException } from 'src/exceptions';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class SignalService {
@@ -14,8 +22,7 @@ export class SignalService {
     private readonly keywordsService: KeywordsService,
     private readonly roomRepository: RoomRepository,
     private readonly roomUserRepository: RoomUserRepository,
-    private readonly chatRepository: ChatRepository,
-    private readonly prisma: PrismaService
+    private readonly chatRepository: ChatRepository
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -49,48 +56,50 @@ export class SignalService {
 
     if (!firstSignal) throw new SignalNotFoundException();
 
-    this.prisma
-      .$transaction(async transaction => {
-        const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
-        await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
+    this.createRoomAndChat(firstSignal, senderId, content);
+  }
 
-        if (senderId !== firstSignal.receiverId) {
-          throw new SingalReplyException();
-        }
-
-        await this.roomUserRepository.saveAll(
-          [
-            {
-              roomId: room.id,
-              userId: firstSignal.senderId,
-            },
-            {
-              roomId: room.id,
-              userId: senderId,
-            },
-          ],
-          transaction
-        );
-        await this.chatRepository.saveAll(
-          [
-            {
-              roomId: room.id,
-              content: firstSignal.content,
-              senderId: firstSignal.senderId,
-              createdAt: firstSignal.createdAt,
-            },
-            {
-              roomId: room.id,
-              content: content,
-              senderId: senderId,
-            },
-          ],
-          transaction
-        );
-      })
-      .catch(e => {
-        throw new SingalReplyException();
-      });
+  @Transactional()
+  async createRoomAndChat(
+    firstSignal: Signal,
+    senderId: number,
+    content: string,
+    transaction: PrismaTransaction = null
+  ): Promise<void> {
+    const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
+    await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
+    if (senderId !== firstSignal.receiverId) {
+      throw new SingalReplyException();
+    }
+    await this.roomUserRepository.saveAll(
+      [
+        {
+          roomId: room.id,
+          userId: firstSignal.senderId,
+        },
+        {
+          roomId: room.id,
+          userId: senderId,
+        },
+      ],
+      transaction
+    );
+    await this.chatRepository.saveAll(
+      [
+        {
+          roomId: room.id,
+          content: firstSignal.content,
+          senderId: firstSignal.senderId,
+          createdAt: firstSignal.createdAt,
+        },
+        {
+          roomId: room.id,
+          content: content,
+          senderId: senderId,
+        },
+      ],
+      transaction
+    );
   }
 
   async getSignalListById(receiverId: number) {

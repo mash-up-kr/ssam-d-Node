@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { Room } from 'src/domains/room';
 import { Signal } from 'src/domains/signal';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaTransaction } from 'src/types/common';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class RoomRepository {

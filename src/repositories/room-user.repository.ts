@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { RoomUser } from 'src/domains/room-user';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaTransaction } from 'src/types/common';
 import { Prisma } from '@prisma/client';
 import { User } from 'src/domains/user';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class RoomUserRepository {

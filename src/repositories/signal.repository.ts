@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Signal } from 'src/domains/signal';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaTransaction } from 'src/types/common';
+import { PrismaTransaction } from 'src/types/prisma.type';
 import { RoomRepository } from './room.repository';
 
 @Injectable()

@@ -8,8 +8,6 @@ export type ApiResponse<T = {}> = {
   data: T;
 };
 
-export type PrismaTransaction = Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>;
-
 export enum ImageColor {
   Orange = 'orange',
   Green = 'green',

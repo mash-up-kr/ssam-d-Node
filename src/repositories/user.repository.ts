@@ -8,8 +8,8 @@ import { PrismaTransaction } from 'src/types/prisma.type';
 export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async get(user: Partial<User>, tx?: PrismaTransaction): Promise<User> {
-    const prisma = tx ?? this.prisma;
+  async get(user: Partial<User>, transaction?: PrismaTransaction): Promise<User> {
+    const prisma = transaction ?? this.prisma;
 
     const userEntity = await prisma.user.findFirst({ where: user });
     if (!userEntity) return null;
@@ -20,15 +20,15 @@ export class UserRepository {
     await this.prisma.user.delete({ where: { id } });
   }
 
-  async update(id: number, userData: Prisma.UserUpdateInput, tx?: PrismaTransaction): Promise<User> {
-    const prisma = tx ?? this.prisma;
+  async update(id: number, userData: Prisma.UserUpdateInput, transaction?: PrismaTransaction): Promise<User> {
+    const prisma = transaction ?? this.prisma;
 
     const user = await prisma.user.update({ where: { id }, data: userData });
     return new User(user);
   }
 
-  async save(data: Prisma.UserCreateInput, tx?: PrismaTransaction): Promise<User> {
-    const prisma = tx ?? this.prisma;
+  async save(data: Prisma.UserCreateInput, transaction?: PrismaTransaction): Promise<User> {
+    const prisma = transaction ?? this.prisma;
 
     const user = await prisma.user.create({ data });
     return new User(user);
