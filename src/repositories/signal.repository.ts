@@ -22,7 +22,6 @@ export class SignalRepository {
 
   async update(id: number, signalData: Partial<Signal>, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    console.log(signalData);
     await prisma.signal.update({ where: { id }, data: signalData });
   }
 
