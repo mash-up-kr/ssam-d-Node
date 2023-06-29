@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { KeywordsModule } from './modules/keywords/keywords.module';
 import { SignalModule } from './modules/signal/signal.module';
 import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
+import { LazyDecoratorModule } from './common/lazy-decorators/lazy-decorators.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +16,7 @@ import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
       envFilePath: `env.${process.env.NODE_ENV}`,
     }),
     PrismaModule,
+    LazyDecoratorModule,
     UsersModule,
     AuthModule,
     KeywordsModule,
