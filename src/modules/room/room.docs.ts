@@ -1,6 +1,7 @@
 import { Tspec } from 'tspec';
 import { ApiResponse } from 'src/types/common';
 import { RoomData, RoomWithChatData } from './room.type';
+import { SignalReqDto } from '../signal/dto/signal-req-dto';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
   basePath: '/rooms';
@@ -17,6 +18,12 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
       get: {
         summary: '채팅방의 채팅 가져오기';
         responses: { 200: ApiResponse<RoomWithChatData> };
+      };
+      post: {
+        path: { id: number };
+        summary: '채팅방에서 챗 보내기';
+        body: Pick<SignalReqDto, 'content'>;
+        responses: { 201: ApiResponse };
       };
     };
   };
