@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DeviceToken } from 'src/domains/device-token';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class DeviceTokenRepository {
@@ -19,7 +20,7 @@ export class DeviceTokenRepository {
 
     return new DeviceToken(deviceToken);
   }
-  async upsert(deviceToken: string, userId: number, tx?: PrismaTransaction): Promise<DeviceToken> {
+  async upsert(deviceToken: string, userId: number, tx: PrismaTransaction = null): Promise<DeviceToken> {
     const prisma = tx ?? this.prisma;
 
     const savedDeviceToken = await prisma.deviceToken.upsert({

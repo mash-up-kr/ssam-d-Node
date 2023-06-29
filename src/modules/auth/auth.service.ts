@@ -7,6 +7,8 @@ import { PROFILE_IMAGE_URL_LIST } from 'src/common/constants';
 
 import { LoginReqDto } from './dto/login-req-dto';
 import { LoginResDto } from './dto/login-res-dto';
+import { PrismaTransaction } from 'src/types/prisma.type';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 
 @Injectable()
 export class AuthService {
@@ -21,15 +23,15 @@ export class AuthService {
    * 유저가 있으면 업데이트, 없으면 생성
    */
   @Transactional()
-  async login(loginReqDto: LoginReqDto, tx?: PrismaTransaction): Promise<LoginResDto> {
+  async login(loginReqDto: LoginReqDto, tx: PrismaTransaction = null): Promise<LoginResDto> {
     const userId = await this.getSignedUserId(loginReqDto, tx);
 
     const payload = { id: userId };
     const accessToken = await this.generateAccessToken(payload);
     const refreshToken = await this.generateRefreshToken(payload);
 
-    await this.userRepository.update(userId, { refreshToken });
-    await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId);
+    await this.userRepository.update(userId, { refreshToken }, tx);
+    await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId, tx);
 
     return { userId, accessToken, refreshToken };
   }
