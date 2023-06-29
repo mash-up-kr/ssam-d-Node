@@ -35,4 +35,7 @@ export class SignalService {
       await this.signalRepository.save(signalData);
     }
   }
+  async getSignalListById(receiverId: number) {
+    return await this.signalRepository.getList(receiverId);
+  }
 }

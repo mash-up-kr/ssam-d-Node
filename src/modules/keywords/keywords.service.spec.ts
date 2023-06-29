@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { KeywordsService } from './keywords.service';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
-import { MockKeywordRepository, MockUserKeywordrRepository, MockUserRepository } from 'test/mock/repositories';
+import { MockKeywordRepository, MockUserKeywordRepository, MockUserRepository } from 'test/mock/repositories';
 import { ConfigModule } from '@nestjs/config';
 
 describe('KeywordsService', () => {
@@ -16,7 +16,7 @@ describe('KeywordsService', () => {
         KeywordsService,
         { provide: UserRepository, useValue: MockUserRepository() },
         { provide: KeywordRepository, useValue: MockKeywordRepository() },
-        { provide: UserKeywordRepository, useValue: MockUserKeywordrRepository() },
+        { provide: UserKeywordRepository, useValue: MockUserKeywordRepository() },
       ],
     }).compile();
 
