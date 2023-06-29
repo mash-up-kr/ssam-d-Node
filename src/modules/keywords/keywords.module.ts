@@ -1,11 +1,25 @@
 import { Module } from '@nestjs/common';
 import { KeywordsController } from './keywords.controller';
 import { KeywordsService } from './keywords.service';
-import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
+import { SignalService } from '../signal/signal.service';
+import {
+  KeywordRepository,
+  SignalRepository,
+  UserKeywordRepository,
+  UserRepository,
+  TrashRepository,
+} from 'src/repositories';
 
 @Module({
-  providers: [KeywordsService, KeywordRepository, UserRepository, UserKeywordRepository],
-  exports: [KeywordsService],
+  providers: [
+    KeywordsService,
+    KeywordRepository,
+    UserRepository,
+    UserKeywordRepository,
+    SignalService,
+    SignalRepository,
+    TrashRepository,
+  ],
   controllers: [KeywordsController],
 })
 export class KeywordsModule {}

@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Keyword } from 'src/domains/keyword';
-import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
-import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
 import { ElasticSearchResponse, KeywordMap } from './keywords.type';
 import { ConfigService } from '@nestjs/config';
+import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
+import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
+import { UserKeyword } from 'src/domains/user-keyword';
 
 @Injectable()
 export class KeywordsService {
@@ -90,5 +91,9 @@ export class KeywordsService {
     } catch (error) {
       throw new KeywordExtractException();
     }
+  }
+  async matchingUserByKeywords(senderId: number, keywords: string[]): Promise<UserKeyword[]> {
+    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
+    return matchingInfo;
   }
 }

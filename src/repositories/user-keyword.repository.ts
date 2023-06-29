@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Keyword } from 'src/domains/keyword';
+import { UserKeyword } from 'src/domains/user-keyword';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -36,5 +37,24 @@ export class UserKeywordRepository {
     `;
 
     return keywords;
+  }
+
+  async getMatchingInfoForSignal(senderId: number, keyword: string[]): Promise<UserKeyword[]> {
+    const joinedKeyword = Prisma.join(keyword);
+    const matchingInfo: UserKeyword[] = await this.prisma.$queryRaw`
+        SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords
+          FROM user_keyword uk
+          JOIN (
+            SELECT *
+            FROM keyword 
+            WHERE name IN (${joinedKeyword})
+          ) k ON uk.keyword_id = k.id
+         WHERE uk.user_id != ${senderId}
+      GROUP BY uk.user_id
+      `;
+
+    const userKeywords: UserKeyword[] = matchingInfo.map(data => new UserKeyword(data));
+
+    return userKeywords;
   }
 }

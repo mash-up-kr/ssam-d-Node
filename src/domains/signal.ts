@@ -1,4 +1,4 @@
-export class signal {
+export class Signal {
   private readonly _id: number;
   private readonly _content: string;
   private readonly _keywords: string;
@@ -32,5 +32,9 @@ export class signal {
   get keywordList(): string[] {
     const keyword = this._keywords.split(',');
     return keyword.map(item => item.trim());
+  }
+
+  get keywordsCount(): number {
+    return this.keywordList.length;
   }
 }
