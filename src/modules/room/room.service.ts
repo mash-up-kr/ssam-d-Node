@@ -20,7 +20,7 @@ export class RoomService {
       .map(roomData => ({
         id: roomData.id,
         keywords: roomData.room.keywords.split(','),
-        recentSigalContent: roomData.room.chat[0].content,
+        recentSignalContent: roomData.room.chat[0].content,
         matchingKeywordCount: roomData.room.keywords.split(',').length,
         profileImage: roomData.user.profileImageUrl,
         recentSignalMillis: new Date(roomData.room.chat[0].createdAt).getTime(),

@@ -3,7 +3,7 @@ import { ImageColor } from 'src/types/common';
 export type RoomData = {
   id: number;
   keywords: string[];
-  recentSigalContent: string;
+  recentSignalContent: string;
   matchingKeywordCount: number;
   profileImage: string;
   recentSignalMillis: number;
