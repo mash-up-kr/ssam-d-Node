@@ -1,30 +1,36 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SignalService } from './signal.service';
-import { KeywordsService } from '../keywords/keywords.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {SignalService} from './signal.service';
+import {KeywordsService} from '../keywords/keywords.service';
 import {
+  ChatRepository,
+  KeywordRepository,
+  RoomRepository,
+  RoomUserRepository,
   SignalRepository,
   TrashRepository,
-  UserRepository,
-  KeywordRepository,
   UserKeywordRepository,
+  UserRepository,
 } from 'src/repositories';
 import {
+  MockKeywordRepository,
   MockSignalRepository,
   MockTrashRepository,
-  MockUserRepository,
-  MockKeywordRepository,
   MockUserKeywordRepository,
+  MockUserRepository,
 } from 'test/mock/repositories';
-import { ConfigModule } from '@nestjs/config';
+import {ConfigModule} from '@nestjs/config';
+import {MockRoomRepository} from "../../../test/mock/repositories/mock-room.repository";
+import {MockRoomUserRepository} from "../../../test/mock/repositories/mock-room-user.repository";
+import {MockChatRepository} from "../../../test/mock/repositories/mock-chat.repository";
 
 describe('SignalService', () => {
   let signalService: SignalService;
   let keywordsService: KeywordsService;
   let signalRepository: ReturnType<typeof MockSignalRepository>;
   let trashRepository: ReturnType<typeof MockTrashRepository>;
-  let userRepository: ReturnType<typeof MockUserRepository>;
-  let keyWordRepository: ReturnType<typeof MockKeywordRepository>;
-  let userKeywordRepository: ReturnType<typeof MockUserKeywordRepository>;
+  let roomRepository: ReturnType<typeof MockRoomRepository>;
+  let roomUserRepository: ReturnType<typeof MockRoomUserRepository>;
+  let chatRepository: ReturnType<typeof MockChatRepository>
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,9 +40,9 @@ describe('SignalService', () => {
         KeywordsService,
         { provide: SignalRepository, useValue: MockSignalRepository() },
         { provide: TrashRepository, useValue: MockTrashRepository() },
-        { provide: UserRepository, useValue: MockUserRepository() },
-        { provide: KeywordRepository, useValue: MockKeywordRepository() },
-        { provide: UserKeywordRepository, useValue: MockUserKeywordRepository() },
+        { provide: RoomRepository, useValue: MockRoomRepository()},
+        { provide: RoomUserRepository, useValue: MockRoomUserRepository()},
+        { provide: ChatRepository, useValue: MockChatRepository()},
       ],
     }).compile();
 
@@ -44,9 +50,10 @@ describe('SignalService', () => {
     keywordsService = module.get(KeywordsService);
     signalRepository = module.get(SignalRepository);
     trashRepository = module.get(TrashRepository);
-    userRepository = module.get(UserRepository);
-    keyWordRepository = module.get(KeywordRepository);
-    userKeywordRepository = module.get(UserKeywordRepository);
+    roomRepository = module.get(RoomRepository);
+    roomUserRepository = module.get(RoomUserRepository);
+    chatRepository = module.get(ChatRepository);
+
   });
 
   it('should be defined', () => {
@@ -54,8 +61,8 @@ describe('SignalService', () => {
     expect(signalRepository).toBeDefined();
     expect(trashRepository).toBeDefined();
     expect(keywordsService).toBeDefined();
-    expect(userRepository).toBeDefined();
-    expect(keyWordRepository).toBeDefined();
-    expect(userKeywordRepository).toBeDefined();
+    expect(roomRepository).toBeDefined()
+    expect(roomUserRepository).toBeDefined()
+    expect(chatRepository).toBeDefined()
   });
 });

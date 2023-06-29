@@ -1,17 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import {
-  ChatRepository,
-  RoomRepository,
-  RoomUserRepository,
-  SignalRepository,
-  TrashRepository,
-} from 'src/repositories';
-import { SignalReqDto } from './dto/signal-req-dto';
-import { Signal } from 'src/domains/signal';
-import { KeywordsService } from '../keywords/keywords.service';
-import { SignalNotFoundException, SingalReplyException } from 'src/exceptions';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { RoomUser } from 'src/domains/room-user';
+import {Injectable} from '@nestjs/common';
+import {ChatRepository, RoomRepository, RoomUserRepository, SignalRepository, TrashRepository,} from 'src/repositories';
+import {SignalReqDto} from './dto/signal-req-dto';
+import {Signal} from 'src/domains/signal';
+import {KeywordsService} from '../keywords/keywords.service';
+import {SignalNotFoundException, SingalReplyException} from 'src/exceptions';
+import {PrismaService} from 'src/prisma/prisma.service';
 
 @Injectable()
 export class SignalService {
@@ -61,7 +54,7 @@ export class SignalService {
         const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
         await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
 
-        if (senderId != firstSignal.receiverId) {
+        if (senderId !== firstSignal.receiverId) {
           throw new SingalReplyException();
         }
 

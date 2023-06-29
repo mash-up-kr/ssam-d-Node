@@ -15,17 +15,14 @@ import {
 
 @Module({
   providers: [
-    KeywordsService,
-    KeywordRepository,
     UserRepository,
+    KeywordRepository,
     UserKeywordRepository,
-    SignalService,
-    SignalRepository,
-    TrashRepository,
-    RoomRepository,
-    RoomUserRepository,
-    ChatRepository,
+    KeywordsService,
   ],
   controllers: [KeywordsController],
+  exports: [
+      KeywordsService
+  ]
 })
 export class KeywordsModule {}
