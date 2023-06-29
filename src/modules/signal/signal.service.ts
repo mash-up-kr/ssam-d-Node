@@ -5,30 +5,31 @@ import {
   RoomUserRepository,
   SignalRepository,
   TrashRepository,
+  UserKeywordRepository,
 } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalNotFoundException, SingalReplyException } from 'src/exceptions';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
+import { UserKeyword } from 'src/domains/user-keyword';
 
 @Injectable()
 export class SignalService {
   constructor(
     private readonly signalRepository: SignalRepository,
     private readonly trashRepository: TrashRepository,
-    private readonly keywordsService: KeywordsService,
     private readonly roomRepository: RoomRepository,
     private readonly roomUserRepository: RoomUserRepository,
-    private readonly chatRepository: ChatRepository
+    private readonly chatRepository: ChatRepository,
+    private readonly userKeywordRepository: UserKeywordRepository
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
     const { keywords, content } = signalReqDto;
 
-    const matchingInfo = await this.keywordsService.matchingUserByKeywords(senderId, keywords);
+    const matchingInfo = await this.getMatchingUserByKeywords(senderId, keywords);
     if (matchingInfo.length === 0) {
       const trashData = { userId: senderId, keywords: keywords.join(','), content: content };
       await this.trashRepository.save(trashData);
@@ -48,6 +49,11 @@ export class SignalService {
 
       await this.signalRepository.save(signalData);
     }
+  }
+
+  async getMatchingUserByKeywords(senderId: number, keywords: string[]): Promise<UserKeyword[]> {
+    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
+    return matchingInfo;
   }
 
   async replyFirstSignal(id: number, senderId: number, signalReqDto: Pick<SignalReqDto, 'content'>): Promise<void> {

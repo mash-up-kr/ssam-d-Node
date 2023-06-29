@@ -3,10 +3,11 @@ import { KeywordsService } from './keywords.service';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { MockKeywordRepository, MockUserKeywordRepository, MockUserRepository } from 'test/mock/repositories';
 import { ConfigModule } from '@nestjs/config';
+import { SignalService } from '../signal/signal.service';
 
 describe('KeywordsService', () => {
-  let service: KeywordsService;
-  let userRepository: ReturnType<typeof MockUserRepository>;
+  let keywordService: KeywordsService;
+  let userRepository: UserRepository;
   let keywordRepository: KeywordRepository;
 
   beforeEach(async () => {
@@ -20,12 +21,13 @@ describe('KeywordsService', () => {
       ],
     }).compile();
 
-    service = module.get<KeywordsService>(KeywordsService);
+    keywordService = module.get(KeywordsService);
+    userRepository = module.get(UserRepository);
     keywordRepository = module.get(KeywordRepository);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(keywordService).toBeDefined();
     expect(keywordRepository).toBeDefined();
   });
 });

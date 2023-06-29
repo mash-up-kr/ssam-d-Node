@@ -92,8 +92,5 @@ export class KeywordsService {
       throw new KeywordExtractException();
     }
   }
-  async matchingUserByKeywords(senderId: number, keywords: string[]): Promise<UserKeyword[]> {
-    const matchingInfo = await this.userKeywordRepository.getMatchingInfoForSignal(senderId, keywords);
-    return matchingInfo;
-  }
+
 }
