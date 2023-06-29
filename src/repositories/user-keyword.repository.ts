@@ -42,7 +42,7 @@ export class UserKeywordRepository {
   async getMatchingInfoForSignal(senderId: number, keyword: string[]): Promise<UserKeyword[]> {
     const joinedKeyword = Prisma.join(keyword);
     const matchingInfo: UserKeyword[] = await this.prisma.$queryRaw`
-        SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords, COUNT(k.name) AS count
+        SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords
           FROM user_keyword uk
           JOIN (
             SELECT *

@@ -11,7 +11,6 @@ export class SignalRepository {
   async save(signal: Exclude<Signal, 'id'>[]): Promise<void> {
     await this.prisma.signal.createMany({
       data: signal,
-      skipDuplicates: true,
     });
   }
 
@@ -25,5 +24,10 @@ export class SignalRepository {
     const prisma = transaction ?? this.prisma;
     console.log(signalData);
     await prisma.signal.update({ where: { id }, data: signalData });
+  }
+
+  async getList(receiverId: number): Promise<Partial<Signal[]>> {
+    const signalListEntities = await this.prisma.signal.findMany({ where: { receiverId: receiverId } });
+    return signalListEntities.map(signalEntity => new Signal(signalEntity));
   }
 }

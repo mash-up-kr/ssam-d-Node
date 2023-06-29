@@ -51,4 +51,8 @@ export class Signal {
     const keyword = this._keywords.split(',');
     return keyword.map(item => item.trim());
   }
+
+  get keywordsCount(): number {
+    return this.keywordList.length;
+  }
 }

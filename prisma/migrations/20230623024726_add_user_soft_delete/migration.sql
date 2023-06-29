@@ -8,4 +8,4 @@
 ALTER TABLE `user` ADD COLUMN `deleted_at` DATETIME(3) NULL;
 
 -- CreateIndex
-CREATE UNIQUE INDEX `device_token_device_token_key` ON `device_token`(`device_token`);
+-- CREATE UNIQUE INDEX `device_token_device_token_key` ON `device_token`(`device_token`);
