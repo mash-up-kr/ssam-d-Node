@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { getImageColor } from 'src/common/util';
-import { RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
+import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
 import { RoomData, RoomWithChatData } from './room.type';
+import { Chat } from 'src/domains/chat';
 
 @Injectable()
 export class RoomService {
   constructor(
     private readonly roomUserRepository: RoomUserRepository,
     private readonly roomRepository: RoomRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly chatRepository: ChatRepository
   ) {}
 
   async getRoomDataListByUserId(userId: number): Promise<RoomData[]> {
@@ -44,5 +46,14 @@ export class RoomService {
         createdAt: new Date(chat.createdAt).getTime(),
       })),
     };
+  }
+
+  async sendChat(senderId: number, roomId: number, content: string) {
+    const chat = new Chat({ senderId, roomId, content });
+    await this.chatRepository.save(chat);
+
+    /**
+     * @todo fcm alarm
+     */
   }
 }

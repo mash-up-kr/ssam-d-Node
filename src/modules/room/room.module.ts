@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { RoomController } from './room.controller';
-import { RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
-import { RoomUser } from 'src/domains/room-user';
+import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
 
 @Module({
   controllers: [RoomController],
-  providers: [RoomService, RoomRepository, RoomUserRepository, UserRepository],
+  providers: [RoomService, RoomRepository, RoomUserRepository, UserRepository, ChatRepository],
 })
 export class RoomModule {}
