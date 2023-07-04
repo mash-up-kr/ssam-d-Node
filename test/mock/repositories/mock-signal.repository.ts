@@ -3,5 +3,6 @@ import { signalDataObject } from '../data/signal.data.mock';
 import { MockRepository } from './mock.repository';
 
 export const MockSignalRepository = (): MockRepository<SignalRepository> => ({
-  getList: jest.fn().mockResolvedValue(signalDataObject[0]),
+  save: jest.fn(),
+  getList: jest.fn(),
 });
