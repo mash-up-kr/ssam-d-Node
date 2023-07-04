@@ -1,10 +1,11 @@
-import { Controller, Post, Body, UseGuards, Param, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SignalService } from './signal.service';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+
 @UseGuards(AuthGuard)
 @Controller('signal')
 export class SignalController {
@@ -25,9 +26,9 @@ export class SignalController {
   @Post('/:id/reply')
   async replyFirstSignal(
     @AuthUser() senderId,
-    @Param('id') id: string,
+    @Param('id') signalId: string,
     @Body() signalReqDto: Pick<SignalReqDto, 'content'>
   ) {
-    await this.signalService.replyFirstSignal(+id, senderId, signalReqDto);
+    await this.signalService.replyFirstSignal(+signalId, senderId, signalReqDto);
   }
 }

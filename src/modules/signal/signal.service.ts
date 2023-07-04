@@ -55,9 +55,13 @@ export class SignalService {
     return matchingInfo;
   }
 
-  async replyFirstSignal(id: number, senderId: number, signalReqDto: Pick<SignalReqDto, 'content'>): Promise<void> {
+  async replyFirstSignal(
+    signalId: number,
+    senderId: number,
+    signalReqDto: Pick<SignalReqDto, 'content'>
+  ): Promise<void> {
     const { content } = signalReqDto;
-    const firstSignal = await this.signalRepository.get({ id });
+    const firstSignal = await this.signalRepository.get({ id: signalId });
     if (!firstSignal) throw new SignalNotFoundException();
 
     if (senderId !== firstSignal.receiverId) {
