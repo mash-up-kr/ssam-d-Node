@@ -16,6 +16,14 @@ export class RoomUserRepository {
     });
   }
 
+  async get(userId: number, roomId: number, transaction?: PrismaTransaction): Promise<RoomUser | null> {
+    const prisma = transaction ?? this.prisma;
+
+    const roomUser = await prisma.roomUser.findFirst({ where: { userId, roomId } });
+    if (!roomUser) return null;
+    return new RoomUser(roomUser);
+  }
+
   async getRoomUsersByUserId(userId: number): Promise<RoomUser[]> {
     const roomUsers = await this.prisma.roomUser.findMany({
       where: {

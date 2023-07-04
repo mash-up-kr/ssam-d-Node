@@ -2,7 +2,7 @@ export class RoomUser {
   private readonly _userId: number;
   private readonly _roomId: number;
 
-  constructor(roomUser) {
+  constructor(roomUser: Partial<RoomUser>) {
     this._userId = roomUser.userId;
     this._roomId = roomUser.roomId;
   }

@@ -3,6 +3,7 @@ import { getImageColor } from 'src/common/util';
 import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
 import { RoomData, RoomWithChat } from './room.type';
 import { Chat } from 'src/domains/chat';
+import { CannotSendChatException } from 'src/exceptions';
 
 @Injectable()
 export class RoomService {
@@ -49,6 +50,9 @@ export class RoomService {
   }
 
   async sendChat(senderId: number, roomId: number, content: string) {
+    const senderInRoom = await this.roomUserRepository.get(senderId, roomId);
+    if (!senderInRoom) throw new CannotSendChatException();
+
     const chat = new Chat({ senderId, roomId, content });
     await this.chatRepository.save(chat);
 
