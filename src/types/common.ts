@@ -1,5 +1,3 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-
 export type ApiResponse<T = {}> = {
   /**
    * @example success
@@ -9,11 +7,11 @@ export type ApiResponse<T = {}> = {
 };
 
 export enum ImageColor {
-  Orange = 'orange',
-  Green = 'green',
-  Pink = 'pink',
-  Mint = 'mint',
-  Purple = 'purple',
+  Orange = 'ORANGE',
+  Green = 'GREEN',
+  Pink = 'PINK',
+  Mint = 'MINT',
+  Purple = 'PURPLE',
 }
 
 export type ProfileImage = {

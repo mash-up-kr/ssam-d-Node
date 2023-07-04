@@ -14,9 +14,8 @@ export class SignalRepository {
     });
   }
 
-  async get(signalData: Partial<Signal>): Promise<Signal> {
+  async get(signalData: Partial<Signal>): Promise<Signal | null> {
     const signal = await this.prisma.signal.findFirst({ where: signalData });
-    if (!signal) return null;
     return new Signal(signal);
   }
 
@@ -25,8 +24,19 @@ export class SignalRepository {
     await prisma.signal.update({ where: { id }, data: signalData });
   }
 
+  async deleteById(id: number): Promise<void> {
+    await this.prisma.signal.delete({ where: { id } });
+  }
+
   async getList(receiverId: number): Promise<Partial<Signal[]>> {
-    const signalListEntities = await this.prisma.signal.findMany({ where: { receiverId: receiverId } });
+    const signalListEntities = await this.prisma.signal.findMany({
+      where: {
+        receiverId: receiverId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
     return signalListEntities.map(signalEntity => new Signal(signalEntity));
   }
 }

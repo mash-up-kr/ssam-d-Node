@@ -1,6 +1,6 @@
 import { Tspec } from 'tspec';
 import { ApiResponse } from 'src/types/common';
-import { RoomData, RoomWithChatData } from './room.type';
+import { RoomData, RoomWithChat } from './room.type';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
   basePath: '/rooms';
@@ -16,7 +16,7 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
     '/{id}/chats': {
       get: {
         summary: '채팅방의 채팅 가져오기';
-        responses: { 200: ApiResponse<RoomWithChatData> };
+        responses: { 200: ApiResponse<RoomWithChat> };
       };
     };
   };

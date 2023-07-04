@@ -20,4 +20,7 @@ export class KeywordExtractException extends ExceptionOf.INTERNAL(500, '키워�
 
 export class SignalNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 시그널입니다.' as const) {}
 
-export class SingalReplyException extends ExceptionOf.USER(500, '시그널 답장 중에 오류가 발생했습니다.' as const) {}
+export class SignalSenderMismatchException extends ExceptionOf.USER(
+  500,
+  '답장하려는 시그널이 올바르지 않습니다.' as const
+) {}

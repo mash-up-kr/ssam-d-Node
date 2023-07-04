@@ -9,8 +9,7 @@ import {
 } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
-import { KeywordsService } from '../keywords/keywords.service';
-import { SignalNotFoundException, SingalReplyException } from 'src/exceptions';
+import { SignalNotFoundException, SignalSenderMismatchException } from 'src/exceptions';
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { UserKeyword } from 'src/domains/user-keyword';
@@ -59,10 +58,12 @@ export class SignalService {
   async replyFirstSignal(id: number, senderId: number, signalReqDto: Pick<SignalReqDto, 'content'>): Promise<void> {
     const { content } = signalReqDto;
     const firstSignal = await this.signalRepository.get({ id });
-
     if (!firstSignal) throw new SignalNotFoundException();
 
-    this.createRoomAndChat(firstSignal, senderId, content);
+    if (senderId !== firstSignal.receiverId) {
+      throw new SignalSenderMismatchException();
+    }
+    await this.createRoomAndChat(firstSignal, senderId, content);
   }
 
   @Transactional()
@@ -74,38 +75,29 @@ export class SignalService {
   ): Promise<void> {
     const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
     await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
-    if (senderId !== firstSignal.receiverId) {
-      throw new SingalReplyException();
-    }
-    await this.roomUserRepository.saveAll(
-      [
-        {
-          roomId: room.id,
-          userId: firstSignal.senderId,
-        },
-        {
-          roomId: room.id,
-          userId: senderId,
-        },
-      ],
-      transaction
-    );
-    await this.chatRepository.saveAll(
-      [
-        {
-          roomId: room.id,
-          content: firstSignal.content,
-          senderId: firstSignal.senderId,
-          createdAt: firstSignal.createdAt,
-        },
-        {
-          roomId: room.id,
-          content: content,
-          senderId: senderId,
-        },
-      ],
-      transaction
-    );
+    await this.signalRepository.deleteById(firstSignal.id);
+    const firstSender = {
+      roomId: room.id,
+      userId: firstSignal.senderId,
+    };
+    const replySender = {
+      userId: senderId,
+      roomId: room.id,
+    };
+    await this.roomUserRepository.saveAll([firstSender, replySender], transaction);
+
+    const firstChat = {
+      roomId: room.id,
+      content: firstSignal.content,
+      senderId: firstSignal.senderId,
+      createdAt: firstSignal.createdAt,
+    };
+    const replyChat = {
+      roomId: room.id,
+      content: content,
+      senderId: senderId,
+    };
+    await this.chatRepository.saveAll([firstChat, replyChat], transaction);
   }
 
   async getSignalListById(receiverId: number) {

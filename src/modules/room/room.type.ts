@@ -9,7 +9,7 @@ export type RoomData = {
   recentSignalMillis: number;
 };
 
-export type RoomWithChatData = {
+export type RoomWithChat = {
   id: number;
   keywords: string[];
   matchingUserName: string;

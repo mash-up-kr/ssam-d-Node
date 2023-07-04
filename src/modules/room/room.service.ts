@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { getImageColor } from 'src/common/util';
 import { RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
-import { RoomData, RoomWithChatData } from './room.type';
+import { RoomData, RoomWithChat } from './room.type';
 
 @Injectable()
 export class RoomService {
@@ -27,17 +27,17 @@ export class RoomService {
       }));
   }
 
-  async getChatDataList(userId: number, roomId: number): Promise<RoomWithChatData> {
+  async getChatDataList(userId: number, roomId: number): Promise<RoomWithChat> {
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     const nowUser = await this.userRepository.get({ id: userId });
-    const roomWithChatData = await this.roomRepository.getRoomWithChatData(roomId);
+    const roomWithChat = await this.roomRepository.getRoomWithChat(roomId);
     return {
       id: roomId,
-      keywords: roomWithChatData.keywords.split(','),
+      keywords: roomWithChat.keywords.split(','),
       matchingUserName: matchingUser.nickname,
       matchingUserProfileImage: matchingUser.profileImageUrl,
       chatColor: getImageColor(matchingUser.profileImageUrl),
-      chat: roomWithChatData.chat.map(chat => ({
+      chat: roomWithChat.chat.map(chat => ({
         id: chat.id,
         content: chat.content,
         senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,

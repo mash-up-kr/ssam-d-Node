@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Room } from 'src/domains/room';
-import { Signal } from 'src/domains/signal';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaTransaction } from 'src/types/prisma.type';
 
@@ -30,7 +29,7 @@ export class RoomRepository {
     return rooms.map(room => new Room(room));
   }
 
-  async getRoomWithChatData(id: number): Promise<
+  async getRoomWithChat(id: number): Promise<
     Prisma.RoomGetPayload<{
       include: {
         chat: true;
