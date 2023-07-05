@@ -9,6 +9,8 @@ import { KeywordsModule } from './modules/keywords/keywords.module';
 import { SignalModule } from './modules/signal/signal.module';
 import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
 import { LazyDecoratorModule } from './common/lazy-decorators/lazy-decorators.module';
+import { RoomModule } from './modules/room/room.module';
+import { ChatModule } from './modules/chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +23,8 @@ import { LazyDecoratorModule } from './common/lazy-decorators/lazy-decorators.mo
     AuthModule,
     KeywordsModule,
     SignalModule,
+    RoomModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

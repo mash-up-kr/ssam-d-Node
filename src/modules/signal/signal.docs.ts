@@ -6,12 +6,20 @@ import { SignalResDto } from './dto/signal-res-dto';
 type SignalApiSpec = Tspec.DefineApiSpec<{
   basePath: '/signal';
   tags: ['시그널'];
+  security: 'jwt';
   paths: {
     '/send': {
       post: {
-        security: 'jwt';
         summary: '시그널 보내기';
         body: SignalReqDto;
+        responses: { 201: ApiResponse };
+      };
+    };
+    '/{id}/reply': {
+      post: {
+        path: { id: number };
+        summary: '첫 시그널 답장';
+        body: Pick<SignalReqDto, 'content'>;
         responses: { 201: ApiResponse };
       };
     };

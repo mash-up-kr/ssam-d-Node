@@ -3,12 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { DeviceTokenRepository, UserRepository } from 'src/repositories';
-import { PROFILE_IMAGE_URL_LIST } from 'src/common/constants';
 
 import { LoginReqDto } from './dto/login-req-dto';
 import { LoginResDto } from './dto/login-res-dto';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { getRandomProfileImageURL } from 'src/common/util';
 
 @Injectable()
 export class AuthService {
@@ -36,11 +36,6 @@ export class AuthService {
     return { userId, accessToken, refreshToken };
   }
 
-  private getRandomProfileImageURL(): string {
-    const randomValue = Math.random();
-    return PROFILE_IMAGE_URL_LIST[Math.floor(randomValue * PROFILE_IMAGE_URL_LIST.length)];
-  }
-
   async generateAccessToken(payload: object): Promise<string> {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
@@ -61,7 +56,7 @@ export class AuthService {
     const savedUser = await this.userRepository.get({ socialId, provider }, tx);
     if (savedUser) return savedUser.id;
 
-    const profileImageUrl = this.getRandomProfileImageURL();
+    const profileImageUrl = getRandomProfileImageURL();
     const userData = { socialId, provider, email, profileImageUrl };
 
     const user = await this.userRepository.save(userData, tx);

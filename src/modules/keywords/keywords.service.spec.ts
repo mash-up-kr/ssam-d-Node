@@ -5,8 +5,8 @@ import { MockKeywordRepository, MockUserKeywordRepository, MockUserRepository } 
 import { ConfigModule } from '@nestjs/config';
 
 describe('KeywordsService', () => {
-  let service: KeywordsService;
-  let userRepository: ReturnType<typeof MockUserRepository>;
+  let keywordService: KeywordsService;
+  let userRepository: UserRepository;
   let keywordRepository: KeywordRepository;
 
   beforeEach(async () => {
@@ -20,12 +20,13 @@ describe('KeywordsService', () => {
       ],
     }).compile();
 
-    service = module.get<KeywordsService>(KeywordsService);
+    keywordService = module.get(KeywordsService);
+    userRepository = module.get(UserRepository);
     keywordRepository = module.get(KeywordRepository);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(keywordService).toBeDefined();
     expect(keywordRepository).toBeDefined();
   });
 });
