@@ -1,5 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { Controller, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { ChatService } from './chat.service';
 

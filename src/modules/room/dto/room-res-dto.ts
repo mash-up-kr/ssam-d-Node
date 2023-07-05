@@ -38,7 +38,7 @@ export class RoomResDto {
 
   /**
    *
-   * @TODO room에서 읽은 편지인지 아닌지 여부 필요한지 고민
+   * TODO: room에서 읽은 편지인지 아닌지 여부 필요한지 고민
    * isRead: boolean;
    */
 

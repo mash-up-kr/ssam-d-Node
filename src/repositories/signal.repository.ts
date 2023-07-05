@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Signal } from 'src/domains/signal';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaTransaction } from 'src/types/prisma.type';
-import { RoomRepository } from './room.repository';
 
 @Injectable()
 export class SignalRepository {
-  constructor(private readonly prisma: PrismaService, private readonly roomRepository: RoomRepository) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async save(signal: Exclude<Signal, 'id'>[]): Promise<void> {
     await this.prisma.signal.createMany({
@@ -16,6 +15,7 @@ export class SignalRepository {
 
   async get(signalData: Partial<Signal>): Promise<Signal | null> {
     const signal = await this.prisma.signal.findFirst({ where: signalData });
+    if (!signal) return null;
     return new Signal(signal);
   }
 

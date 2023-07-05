@@ -1,5 +1,3 @@
-import { throws } from 'assert';
-
 export class Signal {
   private readonly _id: number;
   private readonly _content: string;

@@ -1,6 +1,4 @@
-import {ChatRepository, RoomRepository, SignalRepository} from 'src/repositories';
-import { signalDataObject } from '../data/signal.data.mock';
+import { RoomRepository } from 'src/repositories';
 import { MockRepository } from './mock.repository';
 
-export const MockRoomRepository = (): MockRepository<RoomRepository> => ({
-});
+export const MockRoomRepository = (): MockRepository<RoomRepository> => ({});

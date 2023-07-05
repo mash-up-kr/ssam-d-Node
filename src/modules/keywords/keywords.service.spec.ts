@@ -3,7 +3,6 @@ import { KeywordsService } from './keywords.service';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { MockKeywordRepository, MockUserKeywordRepository, MockUserRepository } from 'test/mock/repositories';
 import { ConfigModule } from '@nestjs/config';
-import { SignalService } from '../signal/signal.service';
 
 describe('KeywordsService', () => {
   let keywordService: KeywordsService;
