@@ -22,6 +22,11 @@ export class SignalNotFoundException extends ExceptionOf.USER(400, '존재하지
 
 export class SingalReplyException extends ExceptionOf.USER(500, '시그널 답장 중에 오류가 발생했습니다.' as const) {}
 
+export class SignalSenderMismatchException extends ExceptionOf.USER(
+  500,
+  '답장하려는 시그널이 올바르지 않습니다.' as const
+) {}
+
 export class CannotSendChatException extends ExceptionOf.USER(
   500,
   '해당 방에서 채팅을 보낼 수 있는 유저가 아닙니다.' as const
