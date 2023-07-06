@@ -5,12 +5,10 @@ import { ExceptionSpecWrap } from 'src/types/tspec';
 import { KeywordReqDto } from './dto/keyword-req.dto';
 
 type KeywordsApiSpec = Tspec.DefineApiSpec<{
-  basePath: '/keywords';
   tags: ['키워드'];
   security: 'jwt';
-
   paths: {
-    '/recommend': {
+    '/keywords/recommend': {
       get: {
         summary: '키워드 추출 및 추천';
         query: {
@@ -19,7 +17,7 @@ type KeywordsApiSpec = Tspec.DefineApiSpec<{
         responses: { 200: ApiResponse; 500: ExceptionSpecWrap<KeywordExtractException> };
       };
     };
-    '/': {
+    '/keywords': {
       post: {
         summary: '키워드 유저에게 등록';
         body: KeywordReqDto;
