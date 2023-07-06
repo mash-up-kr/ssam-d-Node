@@ -1,4 +1,4 @@
-export const signalDataObject = [
+export const mockSignal = [
   {
     id: 1,
     content: '바다가서 칼국수 먹고 싶다. 을왕리가고싶다 조개구이도 먹고 싶다.',
