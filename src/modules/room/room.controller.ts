@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, UseGuards, ParseIntPipe } from '@ne
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { RoomService } from './room.service';
+import { RoomChatReqDto } from './dto/room-req-dto';
 
 @UseGuards(AuthGuard)
 @Controller('rooms')
@@ -22,8 +23,8 @@ export class RoomController {
   async sendChat(
     @AuthUser() userId: number,
     @Param('id', ParseIntPipe) roomId: number,
-    @Body('content') content: string
+    @Body() roomChatReqDto: RoomChatReqDto
   ) {
-    await this.roomService.sendChat(userId, roomId, content);
+    await this.roomService.sendChat(userId, roomId, roomChatReqDto.content);
   }
 }
