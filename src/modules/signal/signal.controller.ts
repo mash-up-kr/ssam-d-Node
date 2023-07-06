@@ -20,7 +20,8 @@ export class SignalController {
   @Get()
   async getSignal(@AuthUser() receiverId) {
     const signalList = await this.signalService.getSignalListById(receiverId);
-    return signalList.map(signal => new SignalResDto(signal));
+    const list = { list: signalList.map(signal => new SignalResDto(signal)) };
+    return list;
   }
 
   @Post('/:id/reply')
