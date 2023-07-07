@@ -9,6 +9,7 @@ import {
   TrashRepository,
   UserKeywordRepository,
 } from 'src/repositories';
+import { PageReqDto } from 'src/common/page/page-req-dto';
 import { KeywordsModule } from '../keywords/keywords.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { KeywordsModule } from '../keywords/keywords.module';
     RoomUserRepository,
     UserKeywordRepository,
     ChatRepository,
+    PageReqDto,
   ],
 })
 export class SignalModule {}

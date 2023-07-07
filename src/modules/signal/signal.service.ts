@@ -13,6 +13,8 @@ import { SignalNotFoundException, SignalSenderMismatchException } from 'src/exce
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { UserKeyword } from 'src/domains/user-keyword';
+import { PageReqDto } from 'src/common/page/page-req-dto';
+import { Page } from 'src/domains/page';
 
 @Injectable()
 export class SignalService {
@@ -104,7 +106,12 @@ export class SignalService {
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
   }
 
-  async getSignalListById(receiverId: number) {
-    return await this.signalRepository.getList(receiverId);
+  async getSignalListById(receiverId: number, PageReqDto: PageReqDto) {
+    const { pageNo, pageLength } = PageReqDto;
+    const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
+    const limit: number = Number(pageLength);
+    const offset = (Number(pageNo) - 1) * Number(pageLength);
+    const signalList: Signal[] = await this.signalRepository.getList(receiverId, limit, offset);
+    return new Page(totalSignalNumber, pageLength, signalList);
   }
 }
