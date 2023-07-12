@@ -6,6 +6,7 @@ import {
   SignalRepository,
   TrashRepository,
   UserKeywordRepository,
+  UserRepository,
 } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
@@ -13,9 +14,9 @@ import { SignalNotFoundException, SignalSenderMismatchException } from 'src/exce
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { UserKeyword } from 'src/domains/user-keyword';
-import { PageReqDto } from 'src/common/page/page-req-dto';
-import { Page } from 'src/domains/page';
-
+import { SignalResDto } from './dto/signal-res-dto';
+import { PageReqDto } from 'src/common/dto/page-req-dto';
+import { PageResDto } from 'src/common/dto/page-res-dto';
 @Injectable()
 export class SignalService {
   constructor(
@@ -24,7 +25,8 @@ export class SignalService {
     private readonly roomRepository: RoomRepository,
     private readonly roomUserRepository: RoomUserRepository,
     private readonly chatRepository: ChatRepository,
-    private readonly userKeywordRepository: UserKeywordRepository
+    private readonly userKeywordRepository: UserKeywordRepository,
+    private readonly userRepository: UserRepository
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -106,12 +108,32 @@ export class SignalService {
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
   }
 
-  async getSignalListById(receiverId: number, PageReqDto: PageReqDto) {
+  async getSignalListById(receiverId: number, PageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
     const { pageNo, pageLength } = PageReqDto;
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
     const limit: number = Number(pageLength);
     const offset = (Number(pageNo) - 1) * Number(pageLength);
-    const signalList: Signal[] = await this.signalRepository.getList(receiverId, limit, offset);
-    return new Page(totalSignalNumber, pageLength, signalList);
+    const signal: Signal[] = await this.signalRepository.getList(receiverId, limit, offset);
+    const senderIds = signal.map(signal => signal.senderId);
+    const userData = await this.userRepository.getUserList(senderIds);
+
+    const signalList = signal
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .map(
+        signalData =>
+          new SignalResDto({
+            signalId: signalData.id,
+            receiverId: signalData.receiverId,
+            senderId: signalData.senderId,
+            senderName: userData.find(user => user.id === signalData.senderId).nickname,
+            senderProfileImageUrl: userData.find(user => user.id === signalData.senderId).profileImageUrl,
+            content: signalData.content,
+            keywords: signalData.keywords.split(','),
+            keywordsCount: signalData.keywords.split(',').length,
+            signalMillis: new Date(signalData.createdAt).getTime(),
+          })
+      );
+    // signalList.map(signal => new SignalResDto(signal));
+    return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 }

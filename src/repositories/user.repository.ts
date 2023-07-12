@@ -33,4 +33,11 @@ export class UserRepository {
     const user = await prisma.user.create({ data });
     return new User(user);
   }
+  async getUserList(userId: number[], transaction?: PrismaTransaction): Promise<User[]> {
+    const prisma = transaction ?? this.prisma;
+
+    const user = await prisma.user.findMany({ where: { id: { in: userId } } });
+
+    return user.map(user => new User(user));
+  }
 }

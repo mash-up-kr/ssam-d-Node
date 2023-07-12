@@ -2,6 +2,10 @@ import { IsOptional, IsString, IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class PageReqDto {
+  /**
+   *@requires false
+   * @type {number}
+   */
   @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsOptional()

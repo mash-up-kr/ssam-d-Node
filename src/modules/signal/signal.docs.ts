@@ -2,6 +2,7 @@ import { Tspec } from 'tspec';
 import { ApiResponse } from 'src/types/common';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
+import { PageResDto } from 'src/common/dto/page-res-dto';
 
 type SignalApiSpec = Tspec.DefineApiSpec<{
   tags: ['시그널'];
@@ -25,7 +26,11 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
     '/signal': {
       get: {
         summary: '시그널 목록 불러오기';
-        responses: { 200: ApiResponse<SignalResDto> };
+        query: {
+          pageNo: number;
+          pageLength: number;
+        };
+        responses: { 200: ApiResponse<PageResDto<SignalResDto>> };
       };
     };
   };

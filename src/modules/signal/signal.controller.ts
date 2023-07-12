@@ -5,7 +5,7 @@ import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
-import { PageReqDto } from 'src/common/page/page-req-dto';
+import { PageReqDto } from 'src/common/dto/page-req-dto';
 
 @UseGuards(AuthGuard)
 @Controller('signal')
@@ -20,11 +20,8 @@ export class SignalController {
   @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  async getSignal(@AuthUser() receiverId, @Query() page: PageReqDto) {
-    const signalInfoList = await this.signalService.getSignalListById(receiverId, page);
-    // signalInfoList.object.map(signal => new SignalResDto(signal)) };
-    const list = { list: signalInfoList }; //signalList.object.map(signal => new SignalResDto(signal)) };
-    return list;
+  async getSignalListDate(@AuthUser() receiverId, @Query() page: PageReqDto) {
+    return await this.signalService.getSignalListById(receiverId, page);
   }
 
   @Post('/:id/reply')

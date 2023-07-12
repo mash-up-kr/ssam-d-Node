@@ -1,62 +1,51 @@
 import { Signal } from 'src/domains/signal';
 
-/**
- * Represents a Signal response DTO.
- * @example
- *  {
- *     "list": [
- *       {
- *         "receiverId": 3,
- *         "content": "수업이 빨리 끝났으면 좋겠어요. 사과 먹고 싶어요",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       },
- *       {
- *         "receiverId": 3,
- *         "content": "케이크 먹고 싶어요, 치즈케이크 TT",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       },
- *       {
- *         "receiverId": 3,
- *         "content": "치즈케이크와 사과를 먹고 싶어요",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       },
- *       {
- *         "receiverId": 3,
- *         "content": "치즈케이크와 사과를 먹고 싶어요",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       },
- *       {
- *         "receiverId": 3,
- *         "content": "치즈케이크와 사과를 먹고 싶어요",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       },
- *       {
- *         "receiverId": 3,
- *         "content": "치즈케이크와 사과를 먹고 싶어요",
- *         "keywords": "사과",
- *         "keywordsCount": 1
- *       }
- *     ]
- *   }
- */
-
 export class SignalResDto {
+  /**
+   * 시그널 id
+   * @readonly
+   * @type {number}
+   * @example 2
+   */
+  readonly signalId: number;
+
   /**
    * 받는 사람 id
    * @readonly
    * @type {number}
+   * @example 1
    */
   readonly receiverId: number;
+
+  /**
+   *보낸 사람 id
+   * @readonly
+   * @type {number}
+   * @example 3
+   */
+  readonly senderId: number;
+
+  /**
+   * 보낸 사람 이름
+   * @readonly
+   * @type {string}
+   * @example 혜온
+   */
+  readonly senderName: string;
+
+  /**
+   * 보낸사람 프로필이미지 링크
+   * @readonly
+   * @type {string}
+   * @example "https://kr.object.ncloudstorage.com/app-images/assets/img_profile_03.png"
+   */
+  readonly senderProfileImageUrl: string;
 
   /**
    *시그널 내용
    * @readonly
    * @type {string}
+   * @example 치즈케이크먹고 싶다. 성수동에 맛있는 카페 있는디
    */
   readonly content: string;
 
@@ -64,20 +53,47 @@ export class SignalResDto {
    *구독한 키워드와 일치한 키워드
    * @readonly
    * @type {string}
+   * @example
+   * [ "성수동","치즈케이크"]
+   *
    */
-  readonly keywords: string;
+  readonly keywords: string[];
 
   /**
    *일치한 키워드 개수
    * @readonly
    * @type {number}
+   * @example 2
    */
   readonly keywordsCount: number;
 
-  constructor(signal: Partial<Signal>) {
-    this.receiverId = signal.receiverId;
-    this.content = signal.content;
-    this.keywords = signal.keywords;
-    this.keywordsCount = signal.keywordsCount;
+  /**
+   *시그널 보낸 일자
+   * @readonly
+   * @type {string}
+   * @example 1688622273578
+   */
+  readonly signalMillis: number;
+
+  constructor({
+    signalId,
+    receiverId,
+    senderId,
+    senderName,
+    senderProfileImageUrl,
+    content,
+    keywords,
+    keywordsCount,
+    signalMillis,
+  }) {
+    this.signalId = signalId;
+    this.receiverId = receiverId;
+    this.senderId = senderId;
+    this.senderName = senderName;
+    this.senderProfileImageUrl = senderProfileImageUrl;
+    this.content = content;
+    this.keywords = keywords;
+    this.keywordsCount = keywordsCount;
+    this.signalMillis = signalMillis;
   }
 }

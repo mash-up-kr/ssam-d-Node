@@ -28,7 +28,7 @@ export class SignalRepository {
     await this.prisma.signal.delete({ where: { id } });
   }
 
-  async getList(receiverId: number, limit: number, offset: number): Promise<Partial<Signal[]>> {
+  async getList(receiverId: number, limit: number, offset: number): Promise<Signal[]> {
     const signalListEntities = await this.prisma.signal.findMany({
       take: limit,
       skip: offset,
