@@ -8,6 +8,7 @@ import {
   SignalRepository,
   TrashRepository,
   UserKeywordRepository,
+  UserRepository,
 } from 'src/repositories';
 import { KeywordsModule } from '../keywords/keywords.module';
 
@@ -22,6 +23,7 @@ import { KeywordsModule } from '../keywords/keywords.module';
     RoomUserRepository,
     UserKeywordRepository,
     ChatRepository,
+    UserRepository,
   ],
 })
 export class SignalModule {}

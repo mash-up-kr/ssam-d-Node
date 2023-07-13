@@ -28,8 +28,10 @@ export class SignalRepository {
     await this.prisma.signal.delete({ where: { id } });
   }
 
-  async getList(receiverId: number): Promise<Partial<Signal[]>> {
+  async getList(receiverId: number, limit: number, offset: number): Promise<Signal[]> {
     const signalListEntities = await this.prisma.signal.findMany({
+      take: limit,
+      skip: offset,
       where: {
         receiverId: receiverId,
       },
@@ -38,5 +40,9 @@ export class SignalRepository {
       },
     });
     return signalListEntities.map(signalEntity => new Signal(signalEntity));
+  }
+
+  async countSignalsById(receiverId: number): Promise<number> {
+    return await this.prisma.signal.count({ where: { receiverId: receiverId } });
   }
 }

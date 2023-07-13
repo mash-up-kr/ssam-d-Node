@@ -7,8 +7,14 @@ import {
   SignalRepository,
   TrashRepository,
   UserKeywordRepository,
+  UserRepository,
 } from 'src/repositories';
-import { MockSignalRepository, MockTrashRepository, MockUserKeywordRepository } from 'test/mock/repositories';
+import {
+  MockSignalRepository,
+  MockTrashRepository,
+  MockUserKeywordRepository,
+  MockUserRepository,
+} from 'test/mock/repositories';
 import { ConfigModule } from '@nestjs/config';
 import { MockRoomRepository } from '../../../test/mock/repositories/mock-room.repository';
 import { MockRoomUserRepository } from '../../../test/mock/repositories/mock-room-user.repository';
@@ -22,6 +28,7 @@ describe('SignalService', () => {
   let roomUserRepository: ReturnType<typeof MockRoomUserRepository>;
   let chatRepository: ReturnType<typeof MockChatRepository>;
   let userKeywordRepository: ReturnType<typeof MockUserKeywordRepository>;
+  let userRepository: ReturnType<typeof MockUserRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,6 +41,7 @@ describe('SignalService', () => {
         { provide: RoomRepository, useValue: MockRoomRepository() },
         { provide: RoomUserRepository, useValue: MockRoomUserRepository() },
         { provide: ChatRepository, useValue: MockChatRepository() },
+        { provide: UserRepository, useValue: MockUserRepository() },
       ],
     }).compile();
 
@@ -44,6 +52,7 @@ describe('SignalService', () => {
     roomUserRepository = module.get(RoomUserRepository);
     chatRepository = module.get(ChatRepository);
     userKeywordRepository = module.get(UserKeywordRepository);
+    userRepository = module.get(UserRepository);
   });
 
   it('should be defined', () => {
@@ -53,5 +62,6 @@ describe('SignalService', () => {
     expect(roomRepository).toBeDefined();
     expect(roomUserRepository).toBeDefined();
     expect(chatRepository).toBeDefined();
+    expect(userRepository).toBeDefined();
   });
 });
