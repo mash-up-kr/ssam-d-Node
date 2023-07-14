@@ -2,6 +2,7 @@ import { Tspec } from 'tspec';
 import { ApiResponse } from 'src/types/common';
 import { RoomData, RoomWithChat } from './room.type';
 import { SignalReqDto } from '../signal/dto/signal-req-dto';
+import { RoomResDto } from './dto/room-res-dto';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
   tags: ['채팅방'];
@@ -24,6 +25,13 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         summary: '채팅방에서 챗 보내기';
         body: Pick<SignalReqDto, 'content'>;
         responses: { 201: ApiResponse };
+      };
+    };
+    '/rooms/{roomId}/chats/{chatId}': {
+      get: {
+        path: { roomId: number; chatId: number };
+        summary: '채팅메시지 상세 조회';
+        responses: { 200: ApiResponse<RoomResDto> };
       };
     };
   };

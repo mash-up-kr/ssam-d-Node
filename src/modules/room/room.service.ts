@@ -3,8 +3,14 @@ import { getImageColor } from 'src/common/util';
 import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
 import { RoomWithChat } from './room.type';
 import { Chat } from 'src/domains/chat';
-import { CannotSendChatException, RoomNotFoundException } from 'src/exceptions';
+import {
+  CannotSendChatException,
+  MatchingUserNotFoundException,
+  RoomNotFoundException,
+  UserNotFoundException,
+} from 'src/exceptions';
 import { RoomResDto } from './dto/room-res-dto';
+import { ChatResDto } from '../chat/dto/chat-res-dto';
 
 @Injectable()
 export class RoomService {
@@ -22,15 +28,18 @@ export class RoomService {
   }
 
   async getChatList(userId: number, roomId: number): Promise<RoomWithChat> {
-    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
-    const nowUser = await this.userRepository.get({ id: userId });
     const room = await this.roomRepository.get({ id: roomId });
-    if (!room) throw RoomNotFoundException;
+    if (!room) throw new RoomNotFoundException();
+    const nowUser = await this.userRepository.get({ id: userId });
+    if (!nowUser) throw new UserNotFoundException();
+    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+
     const chatList = await this.chatRepository.getListByRoomId(roomId);
 
     return {
       id: roomId,
-      keywords: room.keywords.split(','),
+      keywords: room.keywordList,
       matchingUserName: matchingUser.nickname,
       matchingUserProfileImage: matchingUser.profileImageUrl,
       chatColor: getImageColor(matchingUser.profileImageUrl),
@@ -53,5 +62,23 @@ export class RoomService {
     /**
      * @todo fcm alarm
      */
+  }
+  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatResDto> {
+    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+    const chat = await this.chatRepository.get({ id: chatId });
+    if (!chat) throw new UserNotFoundException();
+    const room = await this.roomRepository.get({ id: roomId });
+    if (!room) throw new RoomNotFoundException();
+
+    return new ChatResDto({
+      id: chatId,
+      keywords: room.keywordList,
+      matchingKeywordCount: room.keywordList.length,
+      content: chat.content,
+      profileImage: matchingUser.profileImageUrl,
+      nickname: matchingUser.nickname,
+      receivedTimeMillis: new Date(chat.createdAt).getTime(),
+    });
   }
 }

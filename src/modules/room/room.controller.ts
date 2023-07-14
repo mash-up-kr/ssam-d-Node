@@ -27,4 +27,14 @@ export class RoomController {
   ) {
     await this.roomService.sendChat(userId, roomId, roomChatReqDto.content);
   }
+
+  @Get('/:roomId/chats/:chatId')
+  async getChatDetail(
+    @AuthUser() userId: number,
+    @Param('roomId', ParseIntPipe) roomId: number,
+    @Param('chatId', ParseIntPipe) chatId: number,
+    @Body() roomChatReqDto: RoomChatReqDto
+  ) {
+    return await this.roomService.getChatDetail(userId, roomId, chatId);
+  }
 }

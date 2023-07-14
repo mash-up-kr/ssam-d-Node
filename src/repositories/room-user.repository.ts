@@ -40,8 +40,8 @@ export class RoomUserRepository {
     return roomUsers.map(roomUser => new RoomUser(roomUser));
   }
 
-  async getMatchingUser(userId: number, roomId: number): Promise<User> {
-    const { user } = await this.prisma.roomUser.findFirst({
+  async getMatchingUser(userId: number, roomId: number): Promise<User | null> {
+    const roomUser = await this.prisma.roomUser.findFirst({
       where: {
         roomId,
         NOT: { userId },
@@ -50,7 +50,8 @@ export class RoomUserRepository {
         user: true,
       },
     });
-    return new User(user);
+    if (!roomUser) return null;
+    return new User(roomUser.user);
   }
 
   async getRoomList(userId: number, roomIds: number[]): Promise<RoomResDto[]> {

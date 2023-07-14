@@ -24,8 +24,9 @@ export class SignalRepository {
     await prisma.signal.update({ where: { id }, data: signalData });
   }
 
-  async deleteById(id: number): Promise<void> {
-    await this.prisma.signal.delete({ where: { id } });
+  async deleteById(id: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+    await prisma.signal.delete({ where: { id } });
   }
 
   async getList(receiverId: number): Promise<Partial<Signal[]>> {

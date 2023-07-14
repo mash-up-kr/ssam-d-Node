@@ -8,6 +8,7 @@ const ExceptionOf = {
 };
 
 export class UserNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 유저입니다.' as const) {}
+export class MatchingUserNotFoundException extends ExceptionOf.USER(400, '상대방이 존재하지 않습니다.' as const) {}
 
 export class NeedLoginException extends ExceptionOf.USER(401, '로그인이 필요합니다.' as const) {}
 

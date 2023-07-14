@@ -8,6 +8,13 @@ import { PrismaTransaction } from 'src/types/prisma.type';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async get(chat: Partial<Chat>): Promise<Chat | null> {
+    const chatEntity = await this.prisma.chat.findFirst({ where: chat });
+    if (!chatEntity) return null;
+
+    return new Chat(chatEntity);
+  }
+
   async save(chat: Chat, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
 

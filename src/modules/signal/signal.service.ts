@@ -79,7 +79,7 @@ export class SignalService {
   ): Promise<void> {
     const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
     await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
-    await this.signalRepository.deleteById(firstSignal.id);
+    await this.signalRepository.deleteById(firstSignal.id, transaction);
     const firstSender = {
       roomId: room.id,
       userId: firstSignal.senderId,
