@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { SignalService } from './signal.service';
 import { KeywordsService } from '../keywords/keywords.service';
 import { SignalReqDto } from './dto/signal-req-dto';
@@ -26,9 +26,9 @@ export class SignalController {
   @Post('/:id/reply')
   async replyFirstSignal(
     @AuthUser() senderId,
-    @Param('id') signalId: string,
+    @Param('id', ParseIntPipe) signalId: number,
     @Body() signalReqDto: Pick<SignalReqDto, 'content'>
   ) {
-    await this.signalService.replyFirstSignal(+signalId, senderId, signalReqDto);
+    await this.signalService.replyFirstSignal(signalId, senderId, signalReqDto);
   }
 }

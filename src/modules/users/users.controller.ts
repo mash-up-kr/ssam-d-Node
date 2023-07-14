@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { UserNicknameReqDto } from './dto/user-req-dto';
 import { UserResDto } from './dto/user-res-dto';
+
 @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
@@ -15,13 +16,13 @@ export class UsersController {
   }
 
   @Delete('/:id')
-  async deleteUserById(@Param('id') id: string) {
-    await this.usersService.deleteById(+id);
+  async deleteUserById(@Param('id', ParseIntPipe) id: number) {
+    await this.usersService.deleteById(id);
   }
 
   @Get('/:id')
-  async getUserById(@Param('id') id: string) {
-    const user = await this.usersService.getUserById(+id);
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.getUserById(id);
     return new UserResDto(user);
   }
 

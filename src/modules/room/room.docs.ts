@@ -15,7 +15,8 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
     };
     '/rooms/{id}/chats': {
       get: {
-        summary: '채팅방의 채팅 가져오기';
+        path: { id: number };
+        summary: '채팅방의 채팅목록 가져오기';
         responses: { 200: ApiResponse<RoomWithChat> };
       };
       post: {

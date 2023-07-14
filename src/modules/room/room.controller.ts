@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { RoomService } from './room.service';
@@ -11,12 +11,12 @@ export class RoomController {
 
   @Get('')
   async getRoomListData(@AuthUser() userId: number) {
-    return await this.roomService.getRoomDataListByUserId(userId);
+    return await this.roomService.getRoomListByUserId(userId);
   }
 
   @Get('/:id/chats')
-  async getChatListData(@AuthUser() userId: number, @Param('id') roomId: string) {
-    return await this.roomService.getChatDataList(userId, +roomId);
+  async getChatListData(@AuthUser() userId: number, @Param('id', ParseIntPipe) roomId: number) {
+    return await this.roomService.getChatList(userId, roomId);
   }
 
   @Post('/:id/chats')
