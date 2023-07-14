@@ -24,12 +24,17 @@ export class RoomRepository {
     return new Room(room);
   }
 
+  async get(room: Partial<Room>): Promise<Room | null> {
+    const roomEntity = await this.prisma.room.findFirst({ where: room });
+    if (!roomEntity) return null;
+    return new Room(roomEntity);
+  }
   async getList(roomIds: number[]): Promise<Room[]> {
     const rooms = await this.prisma.room.findMany({ where: { id: { in: roomIds } } });
     return rooms.map(room => new Room(room));
   }
 
-  async getRoomWithChat(id: number): Promise<
+  async getRoomWithChatList(id: number): Promise<
     Prisma.RoomGetPayload<{
       include: {
         chat: true;

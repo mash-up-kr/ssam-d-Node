@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { User } from 'src/domains/user';
 import { PrismaTransaction } from 'src/types/prisma.type';
+import { RoomResDto } from '../modules/room/dto/room-res-dto';
 
 @Injectable()
 export class RoomUserRepository {
@@ -52,20 +53,8 @@ export class RoomUserRepository {
     return new User(user);
   }
 
-  async getRoomListData(
-    userId: number,
-    roomIds: number[]
-  ): Promise<
-    Array<
-      Prisma.RoomUserGetPayload<{
-        include: {
-          user: { select: { profileImageUrl: true } };
-          room: { include: { chat: true } };
-        };
-      }>
-    >
-  > {
-    return await this.prisma.roomUser.findMany({
+  async getRoomList(userId: number, roomIds: number[]): Promise<RoomResDto[]> {
+    const roomUsers = await this.prisma.roomUser.findMany({
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },
@@ -89,5 +78,16 @@ export class RoomUserRepository {
         },
       },
     });
+    return roomUsers.map(
+      roomUser =>
+        new RoomResDto({
+          id: roomUser.id,
+          keywords: roomUser.room.keywords.split(','),
+          recentSignalContent: roomUser.room.chat[0].content,
+          matchingKeywordCount: roomUser.room.keywords.split(',').length,
+          profileImage: roomUser.user.profileImageUrl,
+          recentSignalMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+        })
+    );
   }
 }

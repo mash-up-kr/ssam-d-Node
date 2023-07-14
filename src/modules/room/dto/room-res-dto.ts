@@ -16,7 +16,7 @@ export class RoomResDto {
    * @type {string}
    * @example 안녕하세요. 반갑습니다. 저는 시그널입니다.
    */
-  recentSigalContent: string;
+  recentSignalContent: string;
 
   /**
    * @type {number}
@@ -42,10 +42,10 @@ export class RoomResDto {
    * isRead: boolean;
    */
 
-  constructor({ id, keywords, recentSigalContent, matchingKeywordCount, profileImage, recentSignalMillis }) {
+  constructor({ id, keywords, recentSignalContent, matchingKeywordCount, profileImage, recentSignalMillis }) {
     this.id = id;
     this.keywords = keywords;
-    this.recentSigalContent = recentSigalContent;
+    this.recentSignalContent = recentSignalContent;
     this.matchingKeywordCount = matchingKeywordCount;
     this.profileImage = profileImage;
     this.recentSignalMillis = recentSignalMillis;

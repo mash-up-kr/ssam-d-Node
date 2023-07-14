@@ -18,4 +18,14 @@ export class ChatRepository {
     const prisma = transaction ?? this.prisma;
     await prisma.chat.createMany({ data: chatData });
   }
+
+  async getListByRoomId(roomId: number): Promise<Chat[]> {
+    const chats = await this.prisma.chat.findMany({
+      where: { roomId },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+    return chats.map(chat => new Chat(chat));
+  }
 }
