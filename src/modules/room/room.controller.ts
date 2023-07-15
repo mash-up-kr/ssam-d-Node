@@ -14,6 +14,11 @@ export class RoomController {
     return await this.roomService.getRoomListByUserId(userId);
   }
 
+  @Get('/:id')
+  async getRoom(@AuthUser() userId: number, @Param('id', ParseIntPipe) roomId: number) {
+    return await this.roomService.getRoomDetail(userId, roomId);
+  }
+
   @Get('/:id/chats')
   async getChatListData(@AuthUser() userId: number, @Param('id', ParseIntPipe) roomId: number) {
     return await this.roomService.getChatList(userId, roomId);

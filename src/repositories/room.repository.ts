@@ -16,14 +16,6 @@ export class RoomRepository {
     return new Room(room);
   }
 
-  async saveAll(roomData: Prisma.RoomCreateInput[], transaction?: PrismaTransaction): Promise<Room> {
-    const prisma = transaction ?? this.prisma;
-    const room = await prisma.room.createMany({
-      data: roomData,
-    });
-    return new Room(room);
-  }
-
   async get(room: Partial<Room>): Promise<Room | null> {
     const roomEntity = await this.prisma.room.findFirst({ where: room });
     if (!roomEntity) return null;

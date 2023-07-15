@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getImageColor } from 'src/common/util';
 import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
-import { RoomWithChat } from './room.type';
 import { Chat } from 'src/domains/chat';
 import {
   CannotSendChatException,
@@ -10,7 +9,9 @@ import {
   UserNotFoundException,
 } from 'src/exceptions';
 import { RoomResDto } from './dto/room-res-dto';
+import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { ChatResDto } from '../chat/dto/chat-res-dto';
+import { RoomDetailResDto } from './dto/room-detail-res-dto';
 
 @Injectable()
 export class RoomService {
@@ -27,29 +28,37 @@ export class RoomService {
     return await this.roomUserRepository.getRoomList(userId, roomIds);
   }
 
-  async getChatList(userId: number, roomId: number): Promise<RoomWithChat> {
+  async getRoomDetail(userId: number, roomId: number): Promise<RoomDetailResDto> {
     const room = await this.roomRepository.get({ id: roomId });
     if (!room) throw new RoomNotFoundException();
+    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+
+    return new RoomDetailResDto({
+      id: roomId,
+      keywords: room.keywordList,
+      matchingUserName: matchingUser.nickname,
+      matchingUserProfileImage: matchingUser.profileImageUrl,
+      chatColor: getImageColor(matchingUser.profileImageUrl),
+    });
+  }
+
+  async getChatList(userId: number, roomId: number): Promise<ChatResDto[]> {
     const nowUser = await this.userRepository.get({ id: userId });
     if (!nowUser) throw new UserNotFoundException();
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
     const chatList = await this.chatRepository.getListByRoomId(roomId);
-
-    return {
-      id: roomId,
-      keywords: room.keywordList,
-      matchingUserName: matchingUser.nickname,
-      matchingUserProfileImage: matchingUser.profileImageUrl,
-      chatColor: getImageColor(matchingUser.profileImageUrl),
-      chat: chatList.map(chat => ({
-        id: chat.id,
-        content: chat.content,
-        senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,
-        createdAt: new Date(chat.createdAt).getTime(),
-      })),
-    };
+    return chatList.map(
+      chat =>
+        new ChatResDto({
+          id: chat.id,
+          content: chat.content,
+          senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,
+          receivedTimeMillis: new Date(chat.createdAt).getTime(),
+        })
+    );
   }
 
   async sendChat(senderId: number, roomId: number, content: string) {
@@ -63,7 +72,7 @@ export class RoomService {
      * @todo fcm alarm
      */
   }
-  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatResDto> {
+  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
     const chat = await this.chatRepository.get({ id: chatId });
@@ -71,7 +80,7 @@ export class RoomService {
     const room = await this.roomRepository.get({ id: roomId });
     if (!room) throw new RoomNotFoundException();
 
-    return new ChatResDto({
+    return new ChatDetailResDto({
       id: chatId,
       keywords: room.keywordList,
       matchingKeywordCount: room.keywordList.length,
