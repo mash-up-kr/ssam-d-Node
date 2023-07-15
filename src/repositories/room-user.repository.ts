@@ -54,8 +54,10 @@ export class RoomUserRepository {
     return new User(roomUser.user);
   }
 
-  async getRoomList(userId: number, roomIds: number[]): Promise<RoomResDto[]> {
+  async getRoomList(userId: number, roomIds: number[], limit: number, offset: number): Promise<RoomResDto[]> {
     const roomUsers = await this.prisma.roomUser.findMany({
+      take: limit,
+      skip: offset,
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },

@@ -5,6 +5,7 @@ import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { ChatResDto } from '../chat/dto/chat-res-dto';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { RoomResDto } from './dto/room-res-dto';
+import { PageResDto } from '../../common/dto/page-res-dto';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
   tags: ['채팅방'];
@@ -13,21 +14,29 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
     '/rooms': {
       get: {
         summary: '채팅방 리스트 가져오기';
-        responses: { 200: ApiResponse<RoomResDto[]> };
+        query: {
+          pageNo: number;
+          pageLength: number;
+        };
+        responses: { 200: ApiResponse<PageResDto<RoomResDto>> };
       };
     };
     '/rooms/{id}': {
       get: {
         path: { id: number };
         summary: '채팅방 정보 가져오기';
-        responses: { 200: ApiResponse<RoomDetailResDto[]> };
+        responses: { 200: ApiResponse<RoomDetailResDto> };
       };
     };
     '/rooms/{id}/chats': {
       get: {
         path: { id: number };
+        query: {
+          pageNo: number;
+          pageLength: number;
+        };
         summary: '채팅방의 채팅목록 가져오기';
-        responses: { 200: ApiResponse<ChatResDto> };
+        responses: { 200: ApiResponse<PageResDto<ChatResDto>> };
       };
       post: {
         path: { id: number };

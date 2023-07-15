@@ -26,7 +26,7 @@ export class ChatRepository {
     await prisma.chat.createMany({ data: chatData });
   }
 
-  async getListByRoomId(roomId: number): Promise<Chat[]> {
+  async getListByRoomId(roomId: number, limit: number, offset: number): Promise<Chat[]> {
     const chats = await this.prisma.chat.findMany({
       where: { roomId },
       orderBy: {
@@ -34,5 +34,9 @@ export class ChatRepository {
       },
     });
     return chats.map(chat => new Chat(chat));
+  }
+
+  async countChatByRoomId(roomId: number): Promise<number> {
+    return await this.prisma.chat.count({ where: { roomId } });
   }
 }
