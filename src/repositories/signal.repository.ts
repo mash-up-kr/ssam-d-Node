@@ -13,10 +13,10 @@ export class SignalRepository {
     });
   }
 
-  async get(signalData: Partial<Signal>): Promise<Signal | null> {
-    const signal = await this.prisma.signal.findFirst({ where: signalData });
-    if (!signal) return null;
-    return new Signal(signal);
+  async get(signal: Partial<Signal>): Promise<Signal | null> {
+    const signalEntity = await this.prisma.signal.findFirst({ where: signal });
+    if (!signalEntity) return null;
+    return new Signal(signalEntity);
   }
 
   async update(id: number, signalData: Partial<Signal>, transaction?: PrismaTransaction): Promise<void> {

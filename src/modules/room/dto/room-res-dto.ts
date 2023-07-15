@@ -34,7 +34,13 @@ export class RoomResDto {
    * @type {number}
    * @example 1687793263959
    */
-  recentSignalMillis: number;
+  recentSignalReceivedTimeMillis: number;
+
+  /**
+   * @type {boolean}
+   * @example true
+   */
+  isAlive: number;
 
   /**
    *
@@ -42,12 +48,21 @@ export class RoomResDto {
    * isRead: boolean;
    */
 
-  constructor({ id, keywords, recentSignalContent, matchingKeywordCount, profileImage, recentSignalMillis }) {
+  constructor({
+    id,
+    keywords,
+    recentSignalContent,
+    matchingKeywordCount,
+    profileImage,
+    recentSignalReceivedTimeMillis,
+    isAlive,
+  }) {
     this.id = id;
     this.keywords = keywords;
     this.recentSignalContent = recentSignalContent;
     this.matchingKeywordCount = matchingKeywordCount;
     this.profileImage = profileImage;
-    this.recentSignalMillis = recentSignalMillis;
+    this.recentSignalReceivedTimeMillis = recentSignalReceivedTimeMillis;
+    this.isAlive = isAlive;
   }
 }

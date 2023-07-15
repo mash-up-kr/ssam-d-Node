@@ -61,7 +61,6 @@ export class RoomUserRepository {
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },
-        room: { isAlive: true },
       },
       include: {
         user: {
@@ -89,7 +88,8 @@ export class RoomUserRepository {
           recentSignalContent: roomUser.room.chat[0].content,
           matchingKeywordCount: roomUser.room.keywords.split(',').length,
           profileImage: roomUser.user.profileImageUrl,
-          recentSignalMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+          recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+          isAlive: roomUser.room.isAlive,
         })
     );
   }

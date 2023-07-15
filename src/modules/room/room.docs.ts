@@ -1,11 +1,12 @@
 import { Tspec } from 'tspec';
-import { ApiResponse } from 'src/types/common';
+import { ApiPageResponse, ApiResponse } from 'src/types/common';
 import { SignalReqDto } from '../signal/dto/signal-req-dto';
 import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { ChatResDto } from '../chat/dto/chat-res-dto';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { RoomResDto } from './dto/room-res-dto';
-import { PageResDto } from '../../common/dto/page-res-dto';
+import { MatchingUserNotFoundException, RoomNotFoundException, UserNotFoundException } from '../../exceptions';
+import { ExceptionSpecWrap } from '../../types/tspec';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
   tags: ['채팅방'];
@@ -16,16 +17,16 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         summary: '채팅방 리스트 가져오기';
         query: {
           pageNo: number;
-          pageLength: number;
+          pageLength?: number;
         };
-        responses: { 200: ApiResponse<PageResDto<RoomResDto>> };
+        responses: { 200: ApiPageResponse<RoomResDto>; 400: ExceptionSpecWrap<MatchingUserNotFoundException> };
       };
     };
     '/rooms/{id}': {
       get: {
         path: { id: number };
         summary: '채팅방 정보 가져오기';
-        responses: { 200: ApiResponse<RoomDetailResDto> };
+        responses: { 200: ApiResponse<RoomDetailResDto>; 400: ExceptionSpecWrap<RoomNotFoundException> };
       };
     };
     '/rooms/{id}/chats': {
@@ -33,10 +34,10 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         path: { id: number };
         query: {
           pageNo: number;
-          pageLength: number;
+          pageLength?: number;
         };
         summary: '채팅방의 채팅목록 가져오기';
-        responses: { 200: ApiResponse<PageResDto<ChatResDto>> };
+        responses: { 200: ApiPageResponse<ChatResDto>; 400: ExceptionSpecWrap<MatchingUserNotFoundException> };
       };
       post: {
         path: { id: number };
@@ -49,7 +50,10 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
       get: {
         path: { roomId: number; chatId: number };
         summary: '채팅메시지 상세 조회';
-        responses: { 200: ApiResponse<ChatDetailResDto> };
+        responses: {
+          200: ApiResponse<ChatDetailResDto>;
+          400: [MatchingUserNotFoundException, ExceptionSpecWrap<UserNotFoundException>];
+        };
       };
     };
   };

@@ -129,7 +129,7 @@ export class SignalService {
             content: signalData.content,
             keywords: signalData.keywords.split(','),
             keywordsCount: signalData.keywords.split(',').length,
-            signalMillis: new Date(signalData.createdAt).getTime(),
+            receivedTimeMillis: new Date(signalData.createdAt).getTime(),
           })
       );
     return new PageResDto(totalSignalNumber, pageLength, signalList);

@@ -1,5 +1,3 @@
-import { Signal } from 'src/domains/signal';
-
 export class SignalResDto {
   /**
    * 시그널 id
@@ -73,7 +71,7 @@ export class SignalResDto {
    * @type {string}
    * @example 1688622273578
    */
-  readonly signalMillis: number;
+  readonly receivedTimeMillis: number;
 
   constructor({
     signalId,
@@ -84,7 +82,7 @@ export class SignalResDto {
     content,
     keywords,
     keywordsCount,
-    signalMillis,
+    receivedTimeMillis,
   }) {
     this.signalId = signalId;
     this.receiverId = receiverId;
@@ -94,6 +92,6 @@ export class SignalResDto {
     this.content = content;
     this.keywords = keywords;
     this.keywordsCount = keywordsCount;
-    this.signalMillis = signalMillis;
+    this.receivedTimeMillis = receivedTimeMillis;
   }
 }
