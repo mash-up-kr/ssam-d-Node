@@ -89,7 +89,6 @@ export class RoomUserRepository {
           matchingKeywordCount: roomUser.room.keywords.split(',').length,
           profileImage: roomUser.user.profileImageUrl,
           recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
-          isAlive: roomUser.room.isAlive,
         })
     );
   }

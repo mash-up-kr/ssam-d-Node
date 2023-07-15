@@ -30,11 +30,18 @@ export class RoomDetailResDto {
    */
   matchingUserProfileImage: string;
 
-  constructor({ id, keywords, matchingUserName, chatColor, matchingUserProfileImage }) {
+  /**
+   * @type {boolean}
+   * @example true
+   */
+  isAlive: number;
+
+  constructor({ id, keywords, matchingUserName, chatColor, matchingUserProfileImage, isAlive }) {
     this.id = id;
     this.keywords = keywords;
     this.matchingUserName = matchingUserName;
     this.chatColor = chatColor;
     this.matchingUserProfileImage = matchingUserProfileImage;
+    this.isAlive = isAlive;
   }
 }

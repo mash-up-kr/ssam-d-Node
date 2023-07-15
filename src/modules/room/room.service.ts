@@ -25,6 +25,7 @@ export class RoomService {
   ) {}
   async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
     const roomUsers = await this.roomUserRepository.getRoomUsersByUserId(userId);
+    console.log(roomUsers);
     const roomIds = roomUsers.map(roomUser => roomUser.roomId);
     const totalRoomNumber = roomIds.length;
     const roomResDtoList = await this.roomUserRepository.getRoomList(
@@ -48,6 +49,7 @@ export class RoomService {
       matchingUserName: matchingUser.nickname,
       matchingUserProfileImage: matchingUser.profileImageUrl,
       chatColor: getImageColor(matchingUser.profileImageUrl),
+      isAlive: room.isAlive,
     });
   }
 
