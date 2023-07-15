@@ -4,11 +4,11 @@ export class Room {
   readonly isAlive: boolean;
   readonly createdAt: Date;
 
-  constructor(room) {
-    this.id = room.id;
-    this.keywords = room.keywords;
-    this.isAlive = room.isAlive;
-    this.createdAt = room.createdAt;
+  constructor({ id, keywords, isAlive, createdAt }) {
+    this.id = id;
+    this.keywords = keywords;
+    this.isAlive = isAlive;
+    this.createdAt = createdAt;
   }
 
   get keywordList(): string[] {

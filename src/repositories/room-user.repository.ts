@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { User } from 'src/domains/user';
 import { PrismaTransaction } from 'src/types/prisma.type';
+import { RoomResDto } from '../modules/room/dto/room-res-dto';
 
 @Injectable()
 export class RoomUserRepository {
@@ -39,8 +40,8 @@ export class RoomUserRepository {
     return roomUsers.map(roomUser => new RoomUser(roomUser));
   }
 
-  async getMatchingUser(userId: number, roomId: number): Promise<User> {
-    const { user } = await this.prisma.roomUser.findFirst({
+  async getMatchingUser(userId: number, roomId: number): Promise<User | null> {
+    const roomUser = await this.prisma.roomUser.findFirst({
       where: {
         roomId,
         NOT: { userId },
@@ -49,27 +50,17 @@ export class RoomUserRepository {
         user: true,
       },
     });
-    return new User(user);
+    if (!roomUser) return null;
+    return new User(roomUser.user);
   }
 
-  async getRoomListData(
-    userId: number,
-    roomIds: number[]
-  ): Promise<
-    Array<
-      Prisma.RoomUserGetPayload<{
-        include: {
-          user: { select: { profileImageUrl: true } };
-          room: { include: { chat: true } };
-        };
-      }>
-    >
-  > {
-    return await this.prisma.roomUser.findMany({
+  async getRoomList(userId: number, roomIds: number[], limit: number, offset: number): Promise<RoomResDto[]> {
+    const roomUsers = await this.prisma.roomUser.findMany({
+      take: limit,
+      skip: offset,
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },
-        room: { isAlive: true },
       },
       include: {
         user: {
@@ -89,5 +80,16 @@ export class RoomUserRepository {
         },
       },
     });
+    return roomUsers.map(
+      roomUser =>
+        new RoomResDto({
+          id: roomUser.id,
+          keywords: roomUser.room.keywords.split(','),
+          recentSignalContent: roomUser.room.chat[0].content,
+          matchingKeywordCount: roomUser.room.keywords.split(',').length,
+          profileImage: roomUser.user.profileImageUrl,
+          recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+        })
+    );
   }
 }

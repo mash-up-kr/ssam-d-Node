@@ -17,6 +17,7 @@ import { UserKeyword } from 'src/domains/user-keyword';
 import { SignalResDto } from './dto/signal-res-dto';
 import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
+
 @Injectable()
 export class SignalService {
   constructor(
@@ -83,7 +84,7 @@ export class SignalService {
   ): Promise<void> {
     const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
     await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
-    await this.signalRepository.deleteById(firstSignal.id);
+    await this.signalRepository.deleteById(firstSignal.id, transaction);
     const firstSender = {
       roomId: room.id,
       userId: firstSignal.senderId,
@@ -128,11 +129,9 @@ export class SignalService {
             content: signalData.content,
             keywords: signalData.keywords.split(','),
             keywordsCount: signalData.keywords.split(',').length,
-            signalMillis: new Date(signalData.createdAt).getTime(),
+            receivedTimeMillis: new Date(signalData.createdAt).getTime(),
           })
       );
-    // signalList.map(signal => new SignalResDto(signal));
-    console.log(totalSignalNumber + '   ' + pageLength);
     return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 }

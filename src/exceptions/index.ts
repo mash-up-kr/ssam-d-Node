@@ -8,6 +8,7 @@ const ExceptionOf = {
 };
 
 export class UserNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 유저입니다.' as const) {}
+export class MatchingUserNotFoundException extends ExceptionOf.USER(400, '상대방이 존재하지 않습니다.' as const) {}
 
 export class NeedLoginException extends ExceptionOf.USER(401, '로그인이 필요합니다.' as const) {}
 
@@ -20,7 +21,9 @@ export class KeywordExtractException extends ExceptionOf.INTERNAL(500, '키워�
 
 export class SignalNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 시그널입니다.' as const) {}
 
-export class SingalReplyException extends ExceptionOf.USER(500, '시그널 답장 중에 오류가 발생했습니다.' as const) {}
+export class RoomNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 채팅방입니다.' as const) {}
+
+export class SignalReplyException extends ExceptionOf.USER(500, '시그널 답장 중에 오류가 발생했습니다.' as const) {}
 
 export class SignalSenderMismatchException extends ExceptionOf.USER(
   500,

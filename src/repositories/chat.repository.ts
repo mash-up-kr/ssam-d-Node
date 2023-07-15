@@ -8,6 +8,13 @@ import { PrismaTransaction } from 'src/types/prisma.type';
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async get(chat: Partial<Chat>): Promise<Chat | null> {
+    const chatEntity = await this.prisma.chat.findFirst({ where: chat });
+    if (!chatEntity) return null;
+
+    return new Chat(chatEntity);
+  }
+
   async save(chat: Chat, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
 
@@ -17,5 +24,19 @@ export class ChatRepository {
   async saveAll(chatData: Prisma.ChatUncheckedCreateInput[], transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
     await prisma.chat.createMany({ data: chatData });
+  }
+
+  async getListByRoomId(roomId: number, limit: number, offset: number): Promise<Chat[]> {
+    const chats = await this.prisma.chat.findMany({
+      where: { roomId },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+    return chats.map(chat => new Chat(chat));
+  }
+
+  async countChatByRoomId(roomId: number): Promise<number> {
+    return await this.prisma.chat.count({ where: { roomId } });
   }
 }
