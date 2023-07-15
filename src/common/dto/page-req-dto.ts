@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsNotEmpty } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class PageReqDto {
@@ -8,11 +8,30 @@ export class PageReqDto {
    */
   @Transform(({ value }) => parseInt(value))
   @IsNumber()
-  @IsOptional()
-  pageNo: number = 1;
+  @IsNotEmpty()
+  pageNo: number;
 
   @IsNumber()
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10))
-  pageLength?: number = 3;
+  @Transform(({ value }) => parseInt(value))
+  pageLength?: number;
+
+  offset(): number {
+    if (this.pageLength < 1 || this.pageLength === null || this.pageLength === undefined) {
+      this.pageLength = 10;
+    }
+
+    return (Number(this.pageNo) - 1) * Number(this.pageLength);
+  }
+
+  limit(): number {
+    if (this.pageLength < 1 || this.pageLength === null || this.pageLength === undefined) {
+      this.pageLength = 10;
+    }
+    return Number(this.pageLength);
+  }
+  constructor(pageNo: number, pageLength: number) {
+    this.pageNo = pageNo;
+    this.pageLength = pageLength ?? 10;
+  }
 }

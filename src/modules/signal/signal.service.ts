@@ -108,12 +108,10 @@ export class SignalService {
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
   }
 
-  async getSignalListById(receiverId: number, PageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
-    const { pageNo, pageLength } = PageReqDto;
+  async getSignalListById(receiverId: number, pageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
+    const { pageLength } = pageReqDto;
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
-    const limit: number = Number(pageLength);
-    const offset = (Number(pageNo) - 1) * Number(pageLength);
-    const signal: Signal[] = await this.signalRepository.getList(receiverId, limit, offset);
+    const signal: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
     const senderIds = signal.map(signal => signal.senderId);
     const userData = await this.userRepository.getUserList(senderIds);
 
@@ -134,6 +132,7 @@ export class SignalService {
           })
       );
     // signalList.map(signal => new SignalResDto(signal));
+    console.log(totalSignalNumber + '   ' + pageLength);
     return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 }
