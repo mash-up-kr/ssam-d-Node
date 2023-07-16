@@ -3,12 +3,14 @@ export class Room {
   readonly keywords: string;
   readonly isAlive: boolean;
   readonly createdAt: Date;
+  readonly deleatedAt: Date;
 
   constructor(room) {
     this.id = room.id;
     this.keywords = room.keywords;
     this.isAlive = room.isAlive;
     this.createdAt = room.createdAt;
+    this.deleatedAt = room.deletedAt;
   }
 
   get keywordList(): string[] {
