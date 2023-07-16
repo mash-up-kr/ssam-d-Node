@@ -15,6 +15,7 @@ import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { PageReqDto } from '../../common/dto/page-req-dto';
 import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 
 @Injectable()
 export class RoomService {
@@ -82,5 +83,18 @@ export class RoomService {
     /**
      * @todo fcm alarm
      */
+  }
+
+  @Transactional()
+  async deleteRoom(userId: number, roomId: number) {
+    //is_alive 바꾸기
+    const room = await this.roomRepository.getRoom(roomId);
+    if (room.isAlive) {
+      await this.roomRepository.updateIsAlive(roomId);
+    } else {
+      await this.roomRepository.deleteRoom(roomId);
+    }
+    //deletedAt에 시간 넣어주기
+    await this.roomUserRepository.delete(roomId, userId);
   }
 }

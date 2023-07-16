@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Delete,
+  Delete,
   Post,
   Query,
   UseGuards,
@@ -52,5 +53,9 @@ export class RoomController {
     @Body() roomChatReqDto: RoomChatReqDto
   ) {
     await this.roomService.sendChat(userId, roomId, roomChatReqDto.content);
+  }
+  @Delete('/:id')
+  async delete(@AuthUser() userId: number, @Param('id', ParseIntPipe) roomId: number) {
+    await this.roomService.deleteRoom(userId, roomId);
   }
 }
