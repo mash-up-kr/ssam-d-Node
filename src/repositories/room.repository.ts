@@ -44,4 +44,16 @@ export class RoomRepository {
       },
     });
   }
+  async deleteRoom(roomId: number): Promise<void> {
+    await this.prisma.room.delete({ where: { id: roomId } });
+  }
+
+  async updateIsAlive(roomId: number): Promise<void> {
+    await this.prisma.room.update({ where: { id: roomId }, data: { isAlive: false } });
+  }
+
+  async getRoom(roomId: number): Promise<Room> {
+    const room = await this.prisma.room.findFirst({ where: { id: roomId } });
+    return new Room(room);
+  }
 }
