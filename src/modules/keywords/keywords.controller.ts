@@ -9,6 +9,12 @@ import { KeywordReqDto } from './dto/keyword-req.dto';
 export class KeywordsController {
   constructor(private readonly keywordsService: KeywordsService) {}
 
+  @Get()
+  async getSubscribingKeywords(@AuthUser() userId: number) {
+    const keywords = await this.keywordsService.getSubscribingKeywords(userId);
+    return keywords;
+  }
+
   @Get('/recommend')
   async recommend(@Query('content') content: string) {
     const keywords = await this.keywordsService.recommend(content);

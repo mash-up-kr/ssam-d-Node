@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { Keyword } from 'src/domains/keyword';
 import { UserKeyword } from 'src/domains/user-keyword';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class UserKeywordRepository {
@@ -42,7 +43,7 @@ export class UserKeywordRepository {
   async getMatchingInfoForSignal(senderId: number, keyword: string[]): Promise<UserKeyword[]> {
     const joinedKeyword = Prisma.join(keyword);
     const matchingInfo: UserKeyword[] = await this.prisma.$queryRaw`
-        SELECT uk.user_id AS id , GROUP_CONCAT(k.name) AS keywords
+        SELECT uk.user_id as userId, GROUP_CONCAT(k.name) AS keywords
           FROM user_keyword uk
           JOIN (
             SELECT *
@@ -56,5 +57,12 @@ export class UserKeywordRepository {
     const userKeywords: UserKeyword[] = matchingInfo.map(data => new UserKeyword(data));
 
     return userKeywords;
+  }
+
+  async getSubscribingKeywords(userId: number, transaction?: PrismaTransaction): Promise<string[]> {
+    const prisma = transaction ?? this.prisma;
+
+    const userKeywords = await prisma.userKeyword.findMany({ include: { keyword: true }, where: { userId } });
+    return userKeywords.map(userKeyword => userKeyword.keyword.name);
   }
 }

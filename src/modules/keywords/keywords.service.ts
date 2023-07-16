@@ -25,6 +25,11 @@ export class KeywordsService {
     private readonly userKeywordRepository: UserKeywordRepository
   ) {}
 
+  async getSubscribingKeywords(userId: number) {
+    const keywords = await this.userKeywordRepository.getSubscribingKeywords(userId);
+    return keywords;
+  }
+
   async addUserKeywords(userId: number, plainKeywords: string[]): Promise<void> {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
@@ -92,5 +97,4 @@ export class KeywordsService {
       throw new KeywordExtractException();
     }
   }
-
 }
