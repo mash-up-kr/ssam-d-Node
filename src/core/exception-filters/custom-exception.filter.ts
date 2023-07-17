@@ -1,8 +1,14 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { IS_LOCAL } from 'src/common/constants';
 import { BaseException } from 'src/exceptions/exception.abstract';
+
+type ResponseBody = {
+  statusCode: number;
+  message: string;
+  error?: string;
+};
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
@@ -14,7 +20,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
-    const responseBody = {
+    const responseBody: ResponseBody = {
       statusCode: 500,
       message: '예상치 못한 에러가 발생했습니다. 노드팀을 채찍질 해주세요',
     };
@@ -22,9 +28,14 @@ export class CustomExceptionFilter implements ExceptionFilter {
     if (exception instanceof BaseException) {
       responseBody.statusCode = exception.statusCode;
       responseBody.message = exception.composedMessage ?? exception.message;
+    } else if (exception instanceof HttpException) {
+      const httpExceptionResponse = exception.getResponse() as string | ResponseBody;
+      responseBody.statusCode = exception.getStatus();
+      responseBody.message =
+        typeof httpExceptionResponse === 'string' ? httpExceptionResponse : httpExceptionResponse.message;
     }
 
-    if (exception instanceof Error) {
+    if (exception instanceof Error && responseBody.statusCode === 500) {
       this.logger.error(`api : ${request.method} ${request.url} message : ${exception.message}`);
       if (!IS_LOCAL) {
         await this.handle(request, exception);
