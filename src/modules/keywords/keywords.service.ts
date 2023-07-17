@@ -5,6 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
 import { UserKeyword } from 'src/domains/user-keyword';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class KeywordsService {
@@ -25,28 +27,37 @@ export class KeywordsService {
     private readonly userKeywordRepository: UserKeywordRepository
   ) {}
 
-  async addUserKeywords(userId: number, plainKeywords: string[]): Promise<void> {
+  async getSubscribingKeywords(userId: number) {
+    const keywords = await this.userKeywordRepository.getSubscribingKeywords(userId);
+    return keywords;
+  }
+
+  /**
+   * @description
+   * 2023.07.17
+   * 기존 유저 키워드 삭제 후 전달받은 plain keyword로 갈아치움
+   */
+  @Transactional()
+  async addUserKeywords(userId: number, plainKeywords: string[], transaction: PrismaTransaction = null): Promise<void> {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
 
-    await this.add(plainKeywords);
+    await this.add(plainKeywords, transaction);
 
-    const keywords = await this.getList(plainKeywords);
+    const keywords = await this.getList(plainKeywords, transaction);
     const keywordIds = keywords.map(keyword => keyword.id);
 
-    const unregisteredKeywords = await this.userKeywordRepository.getUnregisterdKeywords(userId, keywordIds);
-    const unregisteredKeywordIds = unregisteredKeywords.map(keyword => keyword.id);
-
-    await this.userKeywordRepository.add(userId, unregisteredKeywordIds);
+    await this.userKeywordRepository.delete(userId, transaction);
+    await this.userKeywordRepository.add(userId, keywordIds, transaction);
   }
 
-  async add(plainKeywords: string[]): Promise<void> {
+  async add(plainKeywords: string[], transaction: PrismaTransaction = null): Promise<void> {
     const keywordData = plainKeywords.map(keyword => ({ name: keyword }));
-    await this.keywordRepository.add(keywordData);
+    await this.keywordRepository.add(keywordData, transaction);
   }
 
-  async getList(plainKeywords: string[]): Promise<Keyword[]> {
-    const keywords = await this.keywordRepository.getList(plainKeywords);
+  async getList(plainKeywords: string[], transaction: PrismaTransaction = null): Promise<Keyword[]> {
+    const keywords = await this.keywordRepository.getList(plainKeywords, transaction);
     return keywords;
   }
 
@@ -92,5 +103,4 @@ export class KeywordsService {
       throw new KeywordExtractException();
     }
   }
-
 }
