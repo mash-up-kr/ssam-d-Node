@@ -20,7 +20,7 @@ type KeywordsApiSpec = Tspec.DefineApiSpec<{
     '/keywords': {
       get: {
         summary: '내가 등록한 키워드 목록';
-        responses: { 201: ApiResponse };
+        responses: { 201: ApiResponse<string[]> };
       };
       post: {
         summary: '키워드 유저에게 등록';

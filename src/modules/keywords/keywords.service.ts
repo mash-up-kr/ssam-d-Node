@@ -35,7 +35,7 @@ export class KeywordsService {
   /**
    * @description
    * 2023.07.17
-   * 기존 유저 키워드 삭제 후 ㅊ전달받은 plain keyword로 갈아치움
+   * 기존 유저 키워드 삭제 후 전달받은 plain keyword로 갈아치움
    */
   @Transactional()
   async addUserKeywords(userId: number, plainKeywords: string[], transaction: PrismaTransaction = null): Promise<void> {
