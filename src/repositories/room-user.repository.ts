@@ -101,22 +101,4 @@ export class RoomUserRepository {
       },
     });
   }
-
-  async delete(roomId: number, userId: number): Promise<void> {
-    await this.prisma.roomUser.deleteMany({
-      where: {
-        roomId: roomId,
-        userId: userId,
-      },
-    });
-  }
-
-  async delete(roomId: number, userId: number): Promise<void> {
-    await this.prisma.roomUser.deleteMany({
-      where: {
-        roomId: roomId,
-        userId: userId,
-      },
-    });
-  }
 }
