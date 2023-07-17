@@ -5,13 +5,13 @@ import {
   RoomRepository,
   RoomUserRepository,
   SignalRepository,
-  TrashRepository,
+  CrashRepository,
   UserKeywordRepository,
   UserRepository,
 } from 'src/repositories';
 import {
   MockSignalRepository,
-  MockTrashRepository,
+  MockCrashRepository,
   MockUserKeywordRepository,
   MockUserRepository,
 } from 'test/mock/repositories';
@@ -23,7 +23,7 @@ import { MockChatRepository } from '../../../test/mock/repositories/mock-chat.re
 describe('SignalService', () => {
   let signalService: SignalService;
   let signalRepository: ReturnType<typeof MockSignalRepository>;
-  let trashRepository: ReturnType<typeof MockTrashRepository>;
+  let trashRepository: ReturnType<typeof MockCrashRepository>;
   let roomRepository: ReturnType<typeof MockRoomRepository>;
   let roomUserRepository: ReturnType<typeof MockRoomUserRepository>;
   let chatRepository: ReturnType<typeof MockChatRepository>;
@@ -37,7 +37,7 @@ describe('SignalService', () => {
         SignalService,
         { provide: UserKeywordRepository, useValue: MockUserKeywordRepository() },
         { provide: SignalRepository, useValue: MockSignalRepository() },
-        { provide: TrashRepository, useValue: MockTrashRepository() },
+        { provide: CrashRepository, useValue: MockCrashRepository() },
         { provide: RoomRepository, useValue: MockRoomRepository() },
         { provide: RoomUserRepository, useValue: MockRoomUserRepository() },
         { provide: ChatRepository, useValue: MockChatRepository() },
@@ -47,7 +47,7 @@ describe('SignalService', () => {
 
     signalService = module.get<SignalService>(SignalService);
     signalRepository = module.get(SignalRepository);
-    trashRepository = module.get(TrashRepository);
+    trashRepository = module.get(CrashRepository);
     roomRepository = module.get(RoomRepository);
     roomUserRepository = module.get(RoomUserRepository);
     chatRepository = module.get(ChatRepository);
