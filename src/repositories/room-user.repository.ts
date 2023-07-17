@@ -83,7 +83,7 @@ export class RoomUserRepository {
     return roomUsers.map(
       roomUser =>
         new RoomResDto({
-          id: roomUser.id,
+          id: roomUser.room.id,
           keywords: roomUser.room.keywords.split(','),
           recentSignalContent: roomUser.room.chat[0].content,
           matchingKeywordCount: roomUser.room.keywords.split(',').length,
