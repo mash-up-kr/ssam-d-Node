@@ -1,9 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { getImageColor } from 'src/common/util';
 import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } from 'src/repositories';
-import { RoomData, RoomWithChat } from './room.type';
 import { Chat } from 'src/domains/chat';
-import { CannotSendChatException } from 'src/exceptions';
+import {
+  CannotSendChatException,
+  MatchingUserNotFoundException,
+  RoomNotFoundException,
+  UserNotFoundException,
+} from 'src/exceptions';
+import { RoomResDto } from './dto/room-res-dto';
+import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
+import { ChatResDto } from '../chat/dto/chat-res-dto';
+import { RoomDetailResDto } from './dto/room-detail-res-dto';
+import { PageReqDto } from '../../common/dto/page-req-dto';
+import { PageResDto } from '../../common/dto/page-res-dto';
 
 @Injectable()
 export class RoomService {
@@ -13,40 +23,52 @@ export class RoomService {
     private readonly userRepository: UserRepository,
     private readonly chatRepository: ChatRepository
   ) {}
-
-  async getRoomDataListByUserId(userId: number): Promise<RoomData[]> {
+  async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
     const roomUsers = await this.roomUserRepository.getRoomUsersByUserId(userId);
     const roomIds = roomUsers.map(roomUser => roomUser.roomId);
-    const roomListData = await this.roomUserRepository.getRoomListData(userId, roomIds);
-    return roomListData
-      .sort((a, b) => new Date(a.room.chat[0].createdAt).getTime() - new Date(b.room.chat[0].createdAt).getTime())
-      .map(roomData => ({
-        id: roomData.id,
-        keywords: roomData.room.keywords.split(','),
-        recentSignalContent: roomData.room.chat[0].content,
-        matchingKeywordCount: roomData.room.keywords.split(',').length,
-        profileImage: roomData.user.profileImageUrl,
-        recentSignalMillis: new Date(roomData.room.chat[0].createdAt).getTime(),
-      }));
+    const totalRoomNumber = roomIds.length;
+    const roomResDtoList = await this.roomUserRepository.getRoomList(
+      userId,
+      roomIds,
+      pageReqDto.limit(),
+      pageReqDto.offset()
+    );
+    return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
 
-  async getChatDataList(userId: number, roomId: number): Promise<RoomWithChat> {
+  async getRoomDetail(userId: number, roomId: number): Promise<RoomDetailResDto> {
+    const room = await this.roomRepository.get({ id: roomId });
+    if (!room) throw new RoomNotFoundException();
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
-    const nowUser = await this.userRepository.get({ id: userId });
-    const roomWithChat = await this.roomRepository.getRoomWithChat(roomId);
-    return {
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+
+    return new RoomDetailResDto({
       id: roomId,
-      keywords: roomWithChat.keywords.split(','),
+      keywords: room.keywordList,
       matchingUserName: matchingUser.nickname,
       matchingUserProfileImage: matchingUser.profileImageUrl,
       chatColor: getImageColor(matchingUser.profileImageUrl),
-      chat: roomWithChat.chat.map(chat => ({
-        id: chat.id,
-        content: chat.content,
-        senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,
-        createdAt: new Date(chat.createdAt).getTime(),
-      })),
-    };
+      isAlive: room.isAlive,
+    });
+  }
+
+  async getChatList(userId: number, roomId: number, pageReqDto: PageReqDto): Promise<PageResDto<ChatResDto>> {
+    const nowUser = await this.userRepository.get({ id: userId });
+    if (!nowUser) throw new UserNotFoundException();
+    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+    const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
+    const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
+    const chatResDtoList = chatList.map(
+      chat =>
+        new ChatResDto({
+          id: chat.id,
+          content: chat.content,
+          senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,
+          receivedTimeMillis: new Date(chat.createdAt).getTime(),
+        })
+    );
+    return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
   async sendChat(senderId: number, roomId: number, content: string) {
@@ -59,5 +81,23 @@ export class RoomService {
     /**
      * @todo fcm alarm
      */
+  }
+  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
+    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
+    if (!matchingUser) throw new MatchingUserNotFoundException();
+    const chat = await this.chatRepository.get({ id: chatId });
+    if (!chat) throw new UserNotFoundException();
+    const room = await this.roomRepository.get({ id: roomId });
+    if (!room) throw new RoomNotFoundException();
+
+    return new ChatDetailResDto({
+      id: chatId,
+      keywords: room.keywordList,
+      matchingKeywordCount: room.keywordList.length,
+      content: chat.content,
+      profileImage: matchingUser.profileImageUrl,
+      nickname: matchingUser.nickname,
+      receivedTimeMillis: new Date(chat.createdAt).getTime(),
+    });
   }
 }

@@ -1,7 +1,9 @@
 import { Tspec } from 'tspec';
-import { ApiResponse } from 'src/types/common';
+import { ApiPageResponse, ApiResponse } from 'src/types/common';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
+import { ExceptionSpecWrap } from '../../types/tspec';
+import { SignalNotFoundException, SignalSenderMismatchException } from '../../exceptions';
 
 type SignalApiSpec = Tspec.DefineApiSpec<{
   tags: ['시그널'];
@@ -25,7 +27,15 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
     '/signal': {
       get: {
         summary: '시그널 목록 불러오기';
-        responses: { 200: ApiResponse<SignalResDto> };
+        query: {
+          pageNo: number;
+          pageLength?: number;
+        };
+        responses: {
+          200: ApiPageResponse<SignalResDto>;
+          400: ExceptionSpecWrap<SignalNotFoundException>;
+          500: ExceptionSpecWrap<SignalSenderMismatchException>;
+        };
       };
     };
   };
