@@ -16,6 +16,7 @@ import { PageReqDto } from '../../common/dto/page-req-dto';
 import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 
 @Injectable()
 export class RoomService {

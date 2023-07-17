@@ -10,7 +10,7 @@ export class Room {
     this.keywords = keywords;
     this.isAlive = isAlive;
     this.createdAt = createdAt;
-    this.deleatedAt = deleatedAt;
+    this.deleatedAt = room.deletedAt;
   }
 
   get keywordList(): string[] {

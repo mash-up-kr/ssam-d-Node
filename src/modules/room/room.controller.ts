@@ -11,6 +11,7 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
