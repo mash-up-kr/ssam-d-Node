@@ -9,13 +9,22 @@ import { PrismaTransaction } from 'src/types/prisma.type';
 export class UserKeywordRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async add(userId: number, keywordIds: number[]): Promise<void> {
+  async add(userId: number, keywordIds: number[], transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+
     const data = keywordIds.map(keywordId => ({ userId, keywordId }));
-    await this.prisma.userKeyword.createMany({ data });
+    await prisma.userKeyword.createMany({ data });
+  }
+
+  async delete(userId: number, transaction?: PrismaTransaction) {
+    const prisma = transaction ?? this.prisma;
+
+    await prisma.userKeyword.deleteMany({ where: { userId } });
   }
 
   /**
    * @todo raw query 안쓰게 바꿔보기
+   * @deprecated 2023.07.17 키워드 추가 로직 변경으로 사용 안함
    */
   async getUnregisterdKeywords(userId: number, keywordIds: number[]): Promise<Pick<Keyword, 'id'>[]> {
     const joinedKeywordIds = Prisma.join(keywordIds);
