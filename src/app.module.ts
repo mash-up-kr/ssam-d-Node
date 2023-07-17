@@ -32,6 +32,7 @@ import { join } from 'path';
     SignalModule,
     RoomModule,
     ChatModule,
+    FcmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

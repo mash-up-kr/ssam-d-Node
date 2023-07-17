@@ -46,3 +46,6 @@ lerna-debug.log*
 #env
 .env.*
 !.env.template
+
+#fcm
+keylink-8e3fa-firebase-adminsdk-s00x9-c4b9633db0.json
