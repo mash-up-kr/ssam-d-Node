@@ -4,8 +4,6 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Delete,
-  Delete,
   Post,
   Query,
   UseGuards,
