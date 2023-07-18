@@ -77,6 +77,10 @@ export class RoomUserRepository {
                 createdAt: 'desc',
               },
             },
+            roomUser: {
+              where: { userId },
+              select: { isChatRead: true },
+            },
           },
         },
       },
@@ -90,9 +94,17 @@ export class RoomUserRepository {
           matchingKeywordCount: roomUser.room.keywords.split(',').length,
           nickname: roomUser.user.nickname,
           profileImage: roomUser.user.profileImageUrl,
+          isChatRead: roomUser.room.roomUser[0].isChatRead,
           recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
         })
     );
+  }
+
+  async updateIsChatRead(userId: number, roomId: number, isChatRead: boolean): Promise<void> {
+    await this.prisma.roomUser.update({
+      where: { userId_roomId: { userId, roomId } },
+      data: { isChatRead },
+    });
   }
 
   async delete(roomId: number, userId: number, transaction?: PrismaTransaction): Promise<void> {

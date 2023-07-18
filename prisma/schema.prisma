@@ -80,15 +80,17 @@ model Room {
 }
 
 model RoomUser {
-  id        Int       @id @default(autoincrement())
-  deletedAt DateTime? @map("deleted_at")
-  userId    Int       @map("user_id")
-  roomId    Int       @map("room_id")
-  room      Room      @relation(fields: [roomId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  id         Int       @id @default(autoincrement())
+  deletedAt  DateTime? @map("deleted_at")
+  userId     Int       @map("user_id")
+  roomId     Int       @map("room_id")
+  isChatRead Boolean   @default(false) @map("is_chat_read")
+  room       Room      @relation(fields: [roomId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
   @@index([roomId], map: "room_user_room_id_fkey")
   @@index([userId], map: "room_user_user_id_fkey")
+  @@unique([userId, roomId], map: "room_user_user_id_room_id_key")
   @@map("room_user")
 }
 

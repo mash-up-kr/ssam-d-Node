@@ -37,16 +37,16 @@ export class RoomResDto {
   profileImage: string;
 
   /**
+   * @type {boolean}
+   * @example true
+   */
+  isChatRead: boolean;
+
+  /**
    * @type {number}
    * @example 1687793263959
    */
   recentSignalReceivedTimeMillis: number;
-
-  /**
-   *
-   * TODO: room에서 읽은 편지인지 아닌지 여부 필요한지 고민
-   * isRead: boolean;
-   */
 
   constructor({
     id,
@@ -55,6 +55,7 @@ export class RoomResDto {
     matchingKeywordCount,
     nickname,
     profileImage,
+    isChatRead,
     recentSignalReceivedTimeMillis,
   }) {
     this.id = id;
@@ -63,6 +64,7 @@ export class RoomResDto {
     this.matchingKeywordCount = matchingKeywordCount;
     this.nickname = nickname;
     this.profileImage = profileImage;
+    this.isChatRead = isChatRead;
     this.recentSignalReceivedTimeMillis = recentSignalReceivedTimeMillis;
   }
 }
