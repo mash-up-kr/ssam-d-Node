@@ -26,6 +26,12 @@ export class RoomResDto {
 
   /**
    * @type {string}
+   * @example 닉네임
+   */
+  nickname: string;
+
+  /**
+   * @type {string}
    * @example https://kr.object.ncloudstorage.com/app-images/assets/img_profile_01.png
    */
   profileImage: string;
@@ -47,6 +53,7 @@ export class RoomResDto {
     keywords,
     recentSignalContent,
     matchingKeywordCount,
+    nickname,
     profileImage,
     recentSignalReceivedTimeMillis,
   }) {
@@ -54,6 +61,7 @@ export class RoomResDto {
     this.keywords = keywords;
     this.recentSignalContent = recentSignalContent;
     this.matchingKeywordCount = matchingKeywordCount;
+    this.nickname = nickname;
     this.profileImage = profileImage;
     this.recentSignalReceivedTimeMillis = recentSignalReceivedTimeMillis;
   }

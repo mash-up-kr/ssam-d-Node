@@ -66,6 +66,7 @@ export class RoomUserRepository {
         user: {
           select: {
             profileImageUrl: true,
+            nickname: true,
           },
         },
         room: {
@@ -87,6 +88,7 @@ export class RoomUserRepository {
           keywords: roomUser.room.keywords.split(','),
           recentSignalContent: roomUser.room.chat[0].content,
           matchingKeywordCount: roomUser.room.keywords.split(',').length,
+          nickname: roomUser.user.nickname,
           profileImage: roomUser.user.profileImageUrl,
           recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
         })
