@@ -56,5 +56,14 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         };
       };
     };
+    '/rooms/{roomId}': {
+      delete: {
+        path: { roomId: number };
+        summary: '채팅방 나가기';
+        responses: {
+          200: ApiResponse;
+        };
+      };
+    };
   };
 }>;
