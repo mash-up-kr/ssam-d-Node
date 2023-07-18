@@ -94,4 +94,14 @@ export class RoomUserRepository {
         })
     );
   }
+
+  async delete(roomId: number, userId: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+    await this.prisma.roomUser.deleteMany({
+      where: {
+        roomId: roomId,
+        userId: userId,
+      },
+    });
+  }
 }

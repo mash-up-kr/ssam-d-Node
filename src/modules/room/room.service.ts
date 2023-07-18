@@ -14,6 +14,8 @@ import { ChatResDto } from '../chat/dto/chat-res-dto';
 import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { PageReqDto } from '../../common/dto/page-req-dto';
 import { PageResDto } from '../../common/dto/page-res-dto';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class RoomService {
@@ -82,22 +84,15 @@ export class RoomService {
      * @todo fcm alarm
      */
   }
-  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
-    const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
-    if (!matchingUser) throw new MatchingUserNotFoundException();
-    const chat = await this.chatRepository.get({ id: chatId });
-    if (!chat) throw new UserNotFoundException();
-    const room = await this.roomRepository.get({ id: roomId });
-    if (!room) throw new RoomNotFoundException();
 
-    return new ChatDetailResDto({
-      id: chatId,
-      keywords: room.keywordList,
-      matchingKeywordCount: room.keywordList.length,
-      content: chat.content,
-      profileImage: matchingUser.profileImageUrl,
-      nickname: matchingUser.nickname,
-      receivedTimeMillis: new Date(chat.createdAt).getTime(),
-    });
+  @Transactional()
+  async deleteRoom(userId: number, roomId: number, transaction: PrismaTransaction = null) {
+    const room = await this.roomRepository.get({ id: roomId }, transaction);
+    if (room.isAlive) {
+      await this.roomRepository.setIsAliveFalse(roomId, transaction);
+    } else {
+      await this.roomRepository.deleteRoom(roomId, transaction);
+    }
+    await this.roomUserRepository.delete(roomId, userId, transaction);
   }
 }
