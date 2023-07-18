@@ -85,19 +85,21 @@ export class RoomUserRepository {
         },
       },
     });
-    return roomUsers.map(
-      roomUser =>
-        new RoomResDto({
-          id: roomUser.room.id,
-          keywords: roomUser.room.keywords.split(','),
-          recentSignalContent: roomUser.room.chat[0].content,
-          matchingKeywordCount: roomUser.room.keywords.split(',').length,
-          nickname: roomUser.user.nickname,
-          profileImage: roomUser.user.profileImageUrl,
-          isChatRead: roomUser.room.roomUser[0].isChatRead,
-          recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
-        })
-    );
+    return roomUsers
+      .sort((a, b) => new Date(a.room.chat[0].createdAt).getTime() - new Date(b.room.chat[0].createdAt).getTime())
+      .map(
+        roomUser =>
+          new RoomResDto({
+            id: roomUser.room.id,
+            keywords: roomUser.room.keywords.split(','),
+            recentSignalContent: roomUser.room.chat[0].content,
+            matchingKeywordCount: roomUser.room.keywords.split(',').length,
+            nickname: roomUser.user.nickname,
+            profileImage: roomUser.user.profileImageUrl,
+            isChatRead: roomUser.room.roomUser[0].isChatRead,
+            recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+          })
+      );
   }
 
   async updateIsChatRead(userId: number, roomId: number, isChatRead: boolean): Promise<void> {
