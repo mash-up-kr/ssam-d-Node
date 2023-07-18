@@ -16,7 +16,7 @@ export class RoomRepository {
     return new Room(room);
   }
 
-  async get(room: Partial<Room>): Promise<Room | null> {
+  async get(room: Partial<Room>, transaction?: PrismaTransaction): Promise<Room | null> {
     const roomEntity = await this.prisma.room.findFirst({ where: room });
     if (!roomEntity) return null;
     return new Room(roomEntity);
@@ -44,16 +44,13 @@ export class RoomRepository {
       },
     });
   }
-  async deleteRoom(roomId: number): Promise<void> {
+  async deleteRoom(roomId: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
     await this.prisma.room.delete({ where: { id: roomId } });
   }
 
-  async updateIsAlive(roomId: number): Promise<void> {
+  async setIsAliveFalse(roomId: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
     await this.prisma.room.update({ where: { id: roomId }, data: { isAlive: false } });
-  }
-
-  async getRoom(roomId: number): Promise<Room> {
-    const room = await this.prisma.room.findFirst({ where: { id: roomId } });
-    return new Room(room);
   }
 }

@@ -15,6 +15,7 @@ import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { PageReqDto } from '../../common/dto/page-req-dto';
 import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { PrismaTransaction } from 'src/types/prisma.type';
 
 @Injectable()
 export class RoomService {
@@ -85,15 +86,13 @@ export class RoomService {
   }
 
   @Transactional()
-  async deleteRoom(userId: number, roomId: number) {
-    //is_alive 바꾸기
-    const room = await this.roomRepository.getRoom(roomId);
+  async deleteRoom(userId: number, roomId: number, transaction: PrismaTransaction = null) {
+    const room = await this.roomRepository.get({ id: roomId }, transaction);
     if (room.isAlive) {
-      await this.roomRepository.updateIsAlive(roomId);
+      await this.roomRepository.setIsAliveFalse(roomId, transaction);
     } else {
-      await this.roomRepository.deleteRoom(roomId);
+      await this.roomRepository.deleteRoom(roomId, transaction);
     }
-    //deletedAt에 시간 넣어주기
-    await this.roomUserRepository.delete(roomId, userId);
+    await this.roomUserRepository.delete(roomId, userId, transaction);
   }
 }
