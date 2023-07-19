@@ -9,7 +9,6 @@ import {
   UserNotFoundException,
 } from 'src/exceptions';
 import { RoomResDto } from './dto/room-res-dto';
-import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { ChatResDto } from '../chat/dto/chat-res-dto';
 import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { PageReqDto } from '../../common/dto/page-req-dto';
@@ -41,6 +40,7 @@ export class RoomService {
   async getRoomDetail(userId: number, roomId: number): Promise<RoomDetailResDto> {
     const room = await this.roomRepository.get({ id: roomId });
     if (!room) throw new RoomNotFoundException();
+
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
@@ -57,6 +57,8 @@ export class RoomService {
   async getChatList(userId: number, roomId: number, pageReqDto: PageReqDto): Promise<PageResDto<ChatResDto>> {
     const nowUser = await this.userRepository.get({ id: userId });
     if (!nowUser) throw new UserNotFoundException();
+    await this.roomUserRepository.updateIsChatRead(userId, roomId, true);
+
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
@@ -80,9 +82,17 @@ export class RoomService {
     const chat = new Chat({ senderId, roomId, content });
     await this.chatRepository.save(chat);
 
+    await this.setUnreadForReceiverRoom(senderId, roomId);
+
     /**
      * @todo fcm alarm
      */
+  }
+
+  async setUnreadForReceiverRoom(senderId: number, roomId: number): Promise<void> {
+    const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
+    if (!receiver) throw new MatchingUserNotFoundException();
+    await this.roomUserRepository.updateIsChatRead(receiver.id, roomId, false);
   }
 
   @Transactional()
