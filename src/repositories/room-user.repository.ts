@@ -102,16 +102,16 @@ export class RoomUserRepository {
       );
   }
 
-  async updateIsChatRead(userId: number, roomId: number, isChatRead: boolean): Promise<void> {
+  async updateIsChatRead(id: number, isChatRead: boolean): Promise<void> {
     await this.prisma.roomUser.update({
-      where: { userId_roomId: { userId, roomId } },
+      where: { id },
       data: { isChatRead },
     });
   }
 
   async delete(roomId: number, userId: number, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    await this.prisma.roomUser.deleteMany({
+    await prisma.roomUser.deleteMany({
       where: {
         roomId: roomId,
         userId: userId,
