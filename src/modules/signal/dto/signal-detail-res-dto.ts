@@ -1,4 +1,4 @@
-export class ChatDetailResDto {
+export class SignalDetailResDto {
   /**
    * @type {number}
    * @example 1
@@ -37,42 +37,18 @@ export class ChatDetailResDto {
   nickname: string;
 
   /**
-   * @type {boolean}
-   * @example true
-   */
-  isAlive: number;
-
-  /**
-   * @type {boolean}
-   * @example true
-   */
-  isMine: number;
-
-  /**
    * @type {number}
    * @example 1687793263959
    */
   receivedTimeMillis: number;
 
-  constructor({
-    id,
-    keywords,
-    matchingKeywordCount,
-    content,
-    profileImage,
-    nickname,
-    isAlive,
-    isMine,
-    receivedTimeMillis,
-  }) {
+  constructor({ id, keywords, matchingKeywordCount, content, profileImage, nickname, receivedTimeMillis }) {
     this.id = id;
     this.keywords = keywords;
     this.matchingKeywordCount = matchingKeywordCount;
     this.content = content;
     this.profileImage = profileImage;
     this.nickname = nickname;
-    this.isAlive = isAlive;
-    this.isMine = isMine;
     this.receivedTimeMillis = receivedTimeMillis;
   }
 }

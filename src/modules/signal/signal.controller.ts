@@ -34,6 +34,12 @@ export class SignalController {
     return await this.signalService.getSignalListById(receiverId, page);
   }
 
+  @Get('/:id')
+  async getSignalDetail(@AuthUser() userId, @Param('id', ParseIntPipe) signalId: number) {
+    console.log(signalId + ' ' + userId);
+    return await this.signalService.getSignalDetail(userId, signalId);
+  }
+
   @Post('/:id/reply')
   async replyFirstSignal(
     @AuthUser() senderId,

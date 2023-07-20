@@ -4,6 +4,7 @@ import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } fr
 import { Chat } from 'src/domains/chat';
 import {
   CannotSendChatException,
+  ChatNotFoundException,
   MatchingUserNotFoundException,
   RoomNotFoundException,
   UserNotFoundException,
@@ -15,6 +16,7 @@ import { PageReqDto } from '../../common/dto/page-req-dto';
 import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
+import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 
 @Injectable()
 export class RoomService {
@@ -99,6 +101,27 @@ export class RoomService {
     if (!receiverInRoom) throw new CannotSendChatException();
 
     await this.roomUserRepository.updateIsChatRead(receiverInRoom.id, false);
+  }
+
+  async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
+    const chat = await this.chatRepository.get({ id: chatId });
+    if (!chat) throw new ChatNotFoundException();
+    const sender = await this.userRepository.get({ id: chat.senderId });
+    if (!sender) throw new UserNotFoundException();
+    const room = await this.roomRepository.get({ id: roomId });
+    if (!room) throw new RoomNotFoundException();
+
+    return new ChatDetailResDto({
+      id: chatId,
+      keywords: room.keywordList,
+      matchingKeywordCount: room.keywordList.length,
+      content: chat.content,
+      profileImage: sender.profileImageUrl,
+      nickname: sender.nickname,
+      isAlive: room.isAlive,
+      isMine: chat.senderId === userId,
+      receivedTimeMillis: new Date(chat.createdAt).getTime(),
+    });
   }
 
   @Transactional()
