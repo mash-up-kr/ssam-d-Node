@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as firebaseAdmin from 'firebase-admin';
-
+import { DeviceTokenNotFoundException } from 'src/exceptions';
+import { ConfigService } from '@nestjs/config';
 export interface ISendFirebaseMessages {
   token: string;
   title?: string;
@@ -9,78 +10,82 @@ export interface ISendFirebaseMessages {
 
 @Injectable()
 export class NotificationService {
-  constructor(private readonly logger: Logger) {
-    // For simplicity these credentials are just stored in the environment
-    // However these should be stored in a key management system
-    const firebaseCredentials = JSON.parse(process.env.FIREBASE_CREDENTIAL_JSON);
+  constructor(private readonly configService: ConfigService) {
     firebaseAdmin.initializeApp({
-      credential: firebaseAdmin.credential.cert(firebaseCredentials),
+      credential: firebaseAdmin.credential.cert({
+        projectId: this.configService.get('FIREBASE_PROJECT_ID'),
+        clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
+        privateKey: this.configService.get('FIREBASE_PRIVATE_KEY').replace(/\\n/gm, '\n'),
+      }),
     });
   }
-
   async sendNotification(
-    deviceIds: Array<string>,
+    deviceTokenIds: Array<string>,
     payload: firebaseAdmin.messaging.MessagingPayload,
-    silent: boolean,
     imageUrl?: string
   ) {
-    if (deviceIds.length == 0) {
-      throw new Error('You provide an empty device ids list!');
+    if (deviceTokenIds.length === 0) {
+      throw new DeviceTokenNotFoundException();
     }
-
-    const body: firebaseAdmin.messaging.MulticastMessage = {
-      tokens: deviceIds,
-      data: payload?.data,
-      notification: {
-        title: payload?.notification?.title,
-        body: payload?.notification?.body,
-        imageUrl,
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: payload?.notification?.sound,
-            contentAvailable: silent ? true : false,
-            mutableContent: true,
-          },
-        },
-        fcmOptions: {
-          imageUrl,
-        },
-      },
-      android: {
-        priority: 'high',
-        ttl: 60 * 60 * 24,
-        notification: {
-          sound: payload?.notification?.sound,
-        },
-      },
-    };
-
-    let result = null;
+    /**
+     * sendMulticast는 최대 500개 전송 가능.
+     */
+    const MAX_BATCH_SIZE = 500;
+    const totalDeviceCount = deviceTokenIds.length;
     let failureCount = 0;
     let successCount = 0;
     const failedDeviceIds = [];
 
-    while (deviceIds.length) {
+    for (let i = 0; i < totalDeviceCount; i += MAX_BATCH_SIZE) {
+      const batchDeviceIds = deviceTokenIds.slice(i, i + MAX_BATCH_SIZE);
+
+      const body: firebaseAdmin.messaging.MulticastMessage = {
+        tokens: batchDeviceIds,
+        data: payload?.data,
+        notification: {
+          title: payload?.notification?.title,
+          body: payload?.notification?.body,
+          imageUrl,
+        },
+
+        android: {
+          priority: 'high',
+          ttl: 60 * 60 * 24,
+          notification: {
+            sound: payload?.notification?.sound,
+          },
+        },
+      };
+
       try {
-        result = await firebaseAdmin.messaging().sendMulticast({ ...body, tokens: deviceIds.splice(0, 500) }, false);
+        const result = await firebaseAdmin.messaging().sendMulticast(body, false);
         if (result.failureCount > 0) {
           const failedTokens = [];
           result.responses.forEach((resp, id) => {
             if (!resp.success) {
-              failedTokens.push(deviceIds[id]);
+              failedTokens.push(batchDeviceIds[id]);
             }
           });
           failedDeviceIds.push(...failedTokens);
         }
+
         failureCount += result.failureCount;
         successCount += result.successCount;
+
+        /**
+         * 클라이언트 구현 전까지 임시로 보기 위해서
+         *
+         */
+        console.log('failureCount' + failureCount);
+        console.log('successCount' + successCount);
       } catch (error) {
-        this.logger.error(error.message, error.stackTrace, 'nestjs-fcm');
+        /**
+         * Todo: Logger ,error
+         */
         throw error;
       }
     }
+
     return { failureCount, successCount, failedDeviceIds };
   }
 }

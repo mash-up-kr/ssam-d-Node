@@ -28,6 +28,7 @@
     "prisma:deploy": "pnpm dotenv -e .env.local npx prisma migrate deploy"
   },
   "dependencies": {
+    "@firebase/rules-unit-testing": "^3.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.0.0",

@@ -49,3 +49,4 @@ lerna-debug.log*
 
 #fcm
 keylink-8e3fa-firebase-adminsdk-s00x9-c4b9633db0.json
+fcm.data.mock.ts
