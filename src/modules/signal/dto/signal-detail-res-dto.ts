@@ -3,7 +3,7 @@ export class SignalDetailResDto {
    * @type {number}
    * @example 1
    */
-  id: number;
+  signalId: number;
 
   /**
    * @type {string[]}
@@ -42,8 +42,8 @@ export class SignalDetailResDto {
    */
   receivedTimeMillis: number;
 
-  constructor({ id, keywords, matchingKeywordCount, content, profileImage, nickname, receivedTimeMillis }) {
-    this.id = id;
+  constructor({ signalId, keywords, matchingKeywordCount, content, profileImage, nickname, receivedTimeMillis }) {
+    this.signalId = signalId;
     this.keywords = keywords;
     this.matchingKeywordCount = matchingKeywordCount;
     this.content = content;
