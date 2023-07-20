@@ -30,7 +30,7 @@ export class SignalReplyException extends ExceptionOf.USER(501, '시그널을 �
 
 export class SignalSenderMismatchException extends ExceptionOf.USER(
   501,
-  '시그널을 보낼 수 없는 유저입니다.' as const
+  '답장하려는 시그널이 올바르지 않습니다.' as const
 ) {}
 export class CannotSendChatException extends ExceptionOf.USER(
   501,
