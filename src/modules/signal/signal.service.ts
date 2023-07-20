@@ -10,13 +10,19 @@ import {
 } from 'src/repositories';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
-import { SignalNotFoundException, SignalSenderMismatchException } from 'src/exceptions';
+import {
+  SignalNotFoundException,
+  SignalReplyException,
+  SignalSenderMismatchException,
+  UserNotFoundException,
+} from 'src/exceptions';
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { UserKeyword } from 'src/domains/user-keyword';
 import { SignalResDto } from './dto/signal-res-dto';
 import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
+import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 
 @Injectable()
 export class SignalService {
@@ -60,6 +66,23 @@ export class SignalService {
     return matchingInfo;
   }
 
+  async getSignalDetail(userId: number, signalId: number) {
+    const signal = await this.signalRepository.get({ id: signalId });
+    if (!signal) throw new SignalNotFoundException();
+    const sender = await this.userRepository.get({ id: signal.senderId });
+    if (!sender) throw new UserNotFoundException();
+
+    return new SignalDetailResDto({
+      id: signal.id,
+      keywords: signal.keywordList,
+      matchingKeywordCount: signal.keywordList.length,
+      content: signal.content,
+      profileImage: sender.profileImageUrl,
+      nickname: sender.nickname,
+      receivedTimeMillis: new Date(signal.createdAt).getTime(),
+    });
+  }
+
   async replyFirstSignal(
     signalId: number,
     senderId: number,
@@ -72,7 +95,12 @@ export class SignalService {
     if (senderId !== firstSignal.receiverId) {
       throw new SignalSenderMismatchException();
     }
-    await this.createRoomAndChat(firstSignal, senderId, content);
+
+    try {
+      await this.createRoomAndChat(firstSignal, senderId, content);
+    } catch (e) {
+      throw new SignalReplyException();
+    }
   }
 
   @Transactional()
