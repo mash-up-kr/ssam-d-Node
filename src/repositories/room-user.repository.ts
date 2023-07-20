@@ -29,9 +29,6 @@ export class RoomUserRepository {
     const roomUsers = await this.prisma.roomUser.findMany({
       where: {
         userId,
-        room: {
-          isAlive: true,
-        },
       },
       include: {
         room: true,
@@ -61,6 +58,7 @@ export class RoomUserRepository {
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },
+        room: { isAlive: true },
       },
       include: {
         user: {
