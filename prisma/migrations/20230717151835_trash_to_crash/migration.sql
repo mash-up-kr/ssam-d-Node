@@ -8,9 +8,6 @@
 -- DropForeignKey
 ALTER TABLE `trash` DROP FOREIGN KEY `trash_user_id_fkey`;
 
--- DropIndex
-DROP INDEX `signal_room_id_fkey` ON `signal`;
-
 -- DropTable
 DROP TABLE `trash`;
 
@@ -23,9 +20,6 @@ CREATE TABLE `crash` (
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateIndex
-CREATE UNIQUE INDEX `device_token_device_token_key` ON `device_token`(`device_token`);
 
 -- AddForeignKey
 ALTER TABLE `crash` ADD CONSTRAINT `crash_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
