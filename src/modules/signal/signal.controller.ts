@@ -36,7 +36,6 @@ export class SignalController {
 
   @Get('/:id')
   async getSignalDetail(@AuthUser() userId, @Param('id', ParseIntPipe) signalId: number) {
-    console.log(signalId + ' ' + userId);
     return await this.signalService.getSignalDetail(userId, signalId);
   }
 
