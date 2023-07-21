@@ -109,12 +109,11 @@ export class RoomUserRepository {
     });
   }
 
-  async delete(roomId: number, userId: number, transaction?: PrismaTransaction): Promise<void> {
+  async delete(roomId: number, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
     await prisma.roomUser.deleteMany({
       where: {
         roomId: roomId,
-        userId: userId,
       },
     });
   }

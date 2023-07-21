@@ -85,8 +85,9 @@ export class RoomService {
     if (!senderInRoom) throw new CannotSendChatException();
 
     const chat = new Chat({ senderId, roomId, content });
+    const room = await this.roomRepository.get({ id: roomId });
+    if (!room.isAlive) throw new CannotSendChatException();
     await this.chatRepository.save(chat);
-
     await this.setUnreadForReceiverRoom(senderId, roomId);
 
     /**
@@ -131,7 +132,7 @@ export class RoomService {
       await this.roomRepository.setIsAliveFalse(roomId, transaction);
     } else {
       await this.roomRepository.deleteRoom(roomId, transaction);
+      await this.roomUserRepository.delete(roomId, transaction);
     }
-    await this.roomUserRepository.delete(roomId, userId, transaction);
   }
 }

@@ -13,6 +13,7 @@ import { Signal } from 'src/domains/signal';
 import {
   SignalNotFoundException,
   SignalReplyException,
+  SignalSendException,
   SignalSenderMismatchException,
   UserNotFoundException,
 } from 'src/exceptions';
@@ -42,12 +43,15 @@ export class SignalService {
     const matchingInfo = await this.getMatchingUserByKeywords(senderId, keywords);
     if (matchingInfo.length === 0) {
       const trashData = { userId: senderId, keywords: keywords.join(','), content: content };
-      await this.trashRepository.save(trashData);
+      try {
+        await this.trashRepository.save(trashData);
+      } catch (e) {
+        throw new SignalSendException();
+      }
     } else {
       /**
        * TODO:  deviceToken으로 알림하고 시그널 전송하기, + 키워드 개수
        * */
-
       const signalData = matchingInfo.map(matchingData => {
         return {
           senderId: senderId,
@@ -56,8 +60,11 @@ export class SignalService {
           content: content,
         } as unknown as Exclude<Signal, 'id'>;
       });
-
-      await this.signalRepository.save(signalData);
+      try {
+        await this.signalRepository.save(signalData);
+      } catch (e) {
+        throw new SignalSendException();
+      }
     }
   }
 

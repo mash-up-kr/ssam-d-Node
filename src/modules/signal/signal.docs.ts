@@ -3,7 +3,12 @@ import { ApiPageResponse, ApiResponse } from 'src/types/common';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
 import { ExceptionSpecWrap } from '../../types/tspec';
-import { SignalNotFoundException, SignalReplyException, SignalSenderMismatchException } from '../../exceptions';
+import {
+  SignalNotFoundException,
+  SignalReplyException,
+  SignalSendException,
+  SignalSenderMismatchException,
+} from '../../exceptions';
 import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 
 type SignalApiSpec = Tspec.DefineApiSpec<{
@@ -14,7 +19,7 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
       post: {
         summary: '시그널 보내기';
         body: SignalReqDto;
-        responses: { 201: ApiResponse };
+        responses: { 201: ApiResponse; 500: ExceptionSpecWrap<SignalSendException> };
       };
     };
     '/signal/{id}/reply': {
