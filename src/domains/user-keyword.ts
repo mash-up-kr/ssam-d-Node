@@ -1,11 +1,9 @@
 export class UserKeyword {
   readonly userId: number;
   readonly keywords: string;
-  readonly count: string;
 
   constructor(userKeyword) {
-    this.userId = userKeyword.id;
+    this.userId = userKeyword.userId;
     this.keywords = userKeyword.keywords;
-    this.count = userKeyword.count;
   }
 }
