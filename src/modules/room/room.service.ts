@@ -59,6 +59,7 @@ export class RoomService {
   async getChatList(userId: number, roomId: number, pageReqDto: PageReqDto): Promise<PageResDto<ChatResDto>> {
     const nowUser = await this.userRepository.get({ id: userId });
     if (!nowUser) throw new UserNotFoundException();
+    console.log(nowUser);
     const userInRoom = await this.roomUserRepository.get(userId, roomId);
     if (!userInRoom) throw new RoomNotFoundException();
 
@@ -68,6 +69,7 @@ export class RoomService {
     if (!matchingUser) throw new MatchingUserNotFoundException();
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
     const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
+    console.log(matchingUser);
     const chatResDtoList = chatList.map(
       chat =>
         new ChatResDto({
@@ -75,6 +77,11 @@ export class RoomService {
           content: chat.content,
           senderName: chat.senderId == matchingUser.id ? matchingUser.nickname : nowUser.nickname,
           receivedTimeMillis: new Date(chat.createdAt).getTime(),
+          chatColor:
+            chat.senderId === matchingUser.id
+              ? getImageColor(matchingUser.profileImageUrl)
+              : getImageColor(nowUser.profileImageUrl),
+          isMine: chat.senderId === userId,
         })
     );
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
