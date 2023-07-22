@@ -30,7 +30,7 @@ export class ChatRepository {
     const chats = await this.prisma.chat.findMany({
       where: { roomId },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     });
     return chats.map(chat => new Chat(chat));

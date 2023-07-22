@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,24 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id              Int           @id @default(autoincrement())
   nickname        String?       @db.VarChar(20)
-  email           String?  
+  email           String?
   refreshToken    String?       @map("refresh_token")
   socialId        String        @map("social_id")
   provider        String        @default("KAKAO")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  agreeAlarm      Boolean       @default(false) @map("agree_alarm")
   profileImageUrl String        @map("profile_image_url")
-  createdAt       DateTime      @default(now())           @map("created_at")
-  updatedAt       DateTime      @updatedAt                @map("updated_at")
   deletedAt       DateTime?     @map("deleted_at")
-  agreeAlarm      Boolean       @default(false)           @map("agree_alarm")
-  sender          Signal[]      @relation("Sender")
-  receiver        Signal[]      @relation("Receiver")
-  roomUser        RoomUser[]
-  deviceToken     DeviceToken[]
   send            Chat[]        @relation("Sender")
+  deviceToken     DeviceToken[]
+  roomUser        RoomUser[]
+  receiver        Signal[]      @relation("Receiver")
+  sender          Signal[]      @relation("Sender")
   crash           Crash[]
   keywords        UserKeyword[]
 
@@ -35,78 +31,89 @@ model User {
 }
 
 model Keyword {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique
+  id    Int           @id @default(autoincrement())
+  name  String        @unique
   users UserKeyword[]
 
   @@map("keyword")
 }
 
 model UserKeyword {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @map("user_id")
-  keywordId Int       @map("keyword_id")
-  user      User      @relation(fields: [userId], references: [id])
-  keyword   Keyword   @relation(fields: [keywordId], references: [id])
+  id        Int     @id @default(autoincrement())
+  userId    Int     @map("user_id")
+  keywordId Int     @map("keyword_id")
+  keyword   Keyword @relation(fields: [keywordId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
 
+  @@index([keywordId], map: "user_keyword_keyword_id_fkey")
+  @@index([userId], map: "user_keyword_user_id_fkey")
   @@map("user_keyword")
 }
 
 model Signal {
-  id            Int          @id @default(autoincrement())
-  content       String 
-  keywords      String
-  sender        User         @relation("Sender", fields: [senderId],references: [id] )
-  receiver      User         @relation("Receiver", fields: [receiverId],references: [id])
-  senderId      Int          @map("sender_id")
-  receiverId    Int          @map("receiver_id")
-  roomId        Int?         @map("room_id")
-  createdAt     DateTime     @default(now())       @map("created_at")
-  deletedAt     DateTime?    @map("deleted_at")   
+  id         Int       @id @default(autoincrement())
+  content    String
+  keywords   String
+  senderId   Int       @map("sender_id")
+  receiverId Int       @map("receiver_id")
+  roomId     Int?      @map("room_id")
+  deletedAt  DateTime? @map("deleted_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  receiver   User      @relation("Receiver", fields: [receiverId], references: [id])
+  sender     User      @relation("Sender", fields: [senderId], references: [id])
 
+  @@index([receiverId], map: "signal_receiver_id_fkey")
+  @@index([senderId], map: "signal_sender_id_fkey")
   @@map("signal")
 }
 
 model Room {
-  id          Int         @id @default(autoincrement())
-  keywords    String?
-  isAlive     Boolean     @map("is_alive")    @default(true)
-  createdAt   DateTime    @default(now())     @map("created_at")
-  chat        Chat[]      @relation("Chat")
-  roomUser    RoomUser[]
+  id        Int        @id @default(autoincrement())
+  keywords  String?
+  isAlive   Boolean    @default(true) @map("is_alive")
+  createdAt DateTime   @default(now()) @map("created_at")
+  deletedAt DateTime?  @map("deleted_at")
+  chat      Chat[]     @relation("Chat")
+  roomUser  RoomUser[]
 
   @@map("room")
 }
 
-model RoomUser{
-  id          Int       @id @default(autoincrement())
-  deletedAt   DateTime? @map("deleted_at") 
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int       @map("user_id")
-  room        Room      @relation(fields: [roomId], references: [id])
-  roomId      Int       @map("room_id")
+model RoomUser {
+  id         Int       @id @default(autoincrement())
+  deletedAt  DateTime? @map("deleted_at")
+  userId     Int       @map("user_id")
+  roomId     Int       @map("room_id")
+  isChatRead Boolean   @default(false) @map("is_chat_read")
+  room       Room      @relation(fields: [roomId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
+  @@index([roomId], map: "room_user_room_id_fkey")
+  @@index([userId], map: "room_user_user_id_fkey")
   @@map("room_user")
 }
 
 model DeviceToken {
-  id            Int     @id @default(autoincrement())
-  deviceToken   String  @map("device_token") @unique
-  user          User    @relation(fields: [userId], references: [id])
-  userId        Int     @map("user_id")
+  id          Int    @id @default(autoincrement())
+  deviceToken String @unique @map("device_token")
+  userId      Int    @map("user_id")
+  user        User   @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "device_token_user_id_fkey")
   @@map("device_token")
 }
 
 model Chat {
-  id          Int       @id @default(autoincrement())
-  content     String 
-  room        Room      @relation("Chat", fields: [roomId], references: [id] )
-  roomId      Int       @map("room_id")
-  senderId    Int       @map("sender_id")
-  createdAt   DateTime  @default(now())       @map("created_at")
-  sender      User      @relation("Sender", fields: [senderId], references: [id] )
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  senderId  Int      @map("sender_id")
+  roomId    Int      @map("room_id")
+  room      Room     @relation("Chat", fields: [roomId], references: [id])
+  sender    User     @relation("Sender", fields: [senderId], references: [id])
 
+  @@index([roomId], map: "chat_room_id_fkey")
+  @@index([senderId], map: "chat_sender_id_fkey")
   @@map("chat")
 }
 
@@ -117,6 +124,6 @@ model Crash {
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @map("user_id")
 
+  @@index([userId], map: "trash_user_id_fkey")
   @@map("crash")
 }
-

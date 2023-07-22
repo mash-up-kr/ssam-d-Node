@@ -5,7 +5,12 @@ import { RoomDetailResDto } from './dto/room-detail-res-dto';
 import { ChatResDto } from '../chat/dto/chat-res-dto';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { RoomResDto } from './dto/room-res-dto';
-import { MatchingUserNotFoundException, RoomNotFoundException, UserNotFoundException } from '../../exceptions';
+import {
+  CannotSendChatException,
+  MatchingUserNotFoundException,
+  RoomNotFoundException,
+  UserNotFoundException,
+} from '../../exceptions';
 import { ExceptionSpecWrap } from '../../types/tspec';
 
 type RoomApiSpec = Tspec.DefineApiSpec<{
@@ -43,7 +48,7 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         path: { id: number };
         summary: '채팅방에서 챗 보내기';
         body: Pick<SignalReqDto, 'content'>;
-        responses: { 201: ApiResponse };
+        responses: { 201: ApiResponse; 501: ExceptionSpecWrap<CannotSendChatException> };
       };
     };
     '/rooms/{roomId}/chats/{chatId}': {
@@ -53,6 +58,15 @@ type RoomApiSpec = Tspec.DefineApiSpec<{
         responses: {
           200: ApiResponse<ChatDetailResDto>;
           400: [MatchingUserNotFoundException, ExceptionSpecWrap<UserNotFoundException>];
+        };
+      };
+    };
+    '/rooms/{roomId}': {
+      delete: {
+        path: { roomId: number };
+        summary: '채팅방 나가기';
+        responses: {
+          200: ApiResponse;
         };
       };
     };

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -61,5 +62,10 @@ export class RoomController {
     @Body() roomChatReqDto: RoomChatReqDto
   ) {
     return await this.roomService.getChatDetail(userId, roomId, chatId);
+  }
+
+  @Delete('/:id')
+  async delete(@AuthUser() userId: number, @Param('id', ParseIntPipe) roomId: number) {
+    await this.roomService.deleteRoom(userId, roomId);
   }
 }

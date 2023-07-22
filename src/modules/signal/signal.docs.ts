@@ -3,7 +3,13 @@ import { ApiPageResponse, ApiResponse } from 'src/types/common';
 import { SignalReqDto } from './dto/signal-req-dto';
 import { SignalResDto } from './dto/signal-res-dto';
 import { ExceptionSpecWrap } from '../../types/tspec';
-import { SignalNotFoundException, SignalSenderMismatchException } from '../../exceptions';
+import {
+  SignalNotFoundException,
+  SignalReplyException,
+  SignalSendException,
+  SignalSenderMismatchException,
+} from '../../exceptions';
+import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 
 type SignalApiSpec = Tspec.DefineApiSpec<{
   tags: ['시그널'];
@@ -13,7 +19,7 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
       post: {
         summary: '시그널 보내기';
         body: SignalReqDto;
-        responses: { 201: ApiResponse };
+        responses: { 201: ApiResponse; 500: ExceptionSpecWrap<SignalSendException> };
       };
     };
     '/signal/{id}/reply': {
@@ -21,7 +27,7 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
         path: { id: number };
         summary: '첫 시그널 답장';
         body: Pick<SignalReqDto, 'content'>;
-        responses: { 201: ApiResponse };
+        responses: { 201: ApiResponse; 500: ExceptionSpecWrap<SignalReplyException> };
       };
     };
     '/signal': {
@@ -34,7 +40,17 @@ type SignalApiSpec = Tspec.DefineApiSpec<{
         responses: {
           200: ApiPageResponse<SignalResDto>;
           400: ExceptionSpecWrap<SignalNotFoundException>;
-          500: ExceptionSpecWrap<SignalSenderMismatchException>;
+          501: ExceptionSpecWrap<SignalSenderMismatchException>;
+        };
+      };
+    };
+    '/signal/{id}': {
+      get: {
+        path: { id: number };
+        summary: '시그널 상세 조회';
+        responses: {
+          200: ApiResponse<SignalDetailResDto>;
+          400: ExceptionSpecWrap<SignalNotFoundException>;
         };
       };
     };

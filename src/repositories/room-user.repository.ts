@@ -66,6 +66,7 @@ export class RoomUserRepository {
         user: {
           select: {
             profileImageUrl: true,
+            nickname: true,
           },
         },
         room: {
@@ -76,20 +77,44 @@ export class RoomUserRepository {
                 createdAt: 'desc',
               },
             },
+            roomUser: {
+              where: { userId },
+              select: { isChatRead: true },
+            },
           },
         },
       },
     });
-    return roomUsers.map(
-      roomUser =>
-        new RoomResDto({
-          id: roomUser.room.id,
-          keywords: roomUser.room.keywords.split(','),
-          recentSignalContent: roomUser.room.chat[0].content,
-          matchingKeywordCount: roomUser.room.keywords.split(',').length,
-          profileImage: roomUser.user.profileImageUrl,
-          recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
-        })
-    );
+    return roomUsers
+      .sort((a, b) => new Date(a.room.chat[0].createdAt).getTime() - new Date(b.room.chat[0].createdAt).getTime())
+      .map(
+        roomUser =>
+          new RoomResDto({
+            id: roomUser.room.id,
+            keywords: roomUser.room.keywords.split(','),
+            recentSignalContent: roomUser.room.chat[0].content,
+            matchingKeywordCount: roomUser.room.keywords.split(',').length,
+            nickname: roomUser.user.nickname,
+            profileImage: roomUser.user.profileImageUrl,
+            isChatRead: roomUser.room.roomUser[0].isChatRead,
+            recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+          })
+      );
+  }
+
+  async updateIsChatRead(id: number, isChatRead: boolean): Promise<void> {
+    await this.prisma.roomUser.update({
+      where: { id },
+      data: { isChatRead },
+    });
+  }
+
+  async delete(roomId: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+    await prisma.roomUser.deleteMany({
+      where: {
+        roomId: roomId,
+      },
+    });
   }
 }

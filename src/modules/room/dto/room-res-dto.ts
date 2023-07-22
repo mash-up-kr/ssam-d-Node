@@ -26,9 +26,21 @@ export class RoomResDto {
 
   /**
    * @type {string}
+   * @example 닉네임
+   */
+  nickname: string;
+
+  /**
+   * @type {string}
    * @example https://kr.object.ncloudstorage.com/app-images/assets/img_profile_01.png
    */
   profileImage: string;
+
+  /**
+   * @type {boolean}
+   * @example true
+   */
+  isChatRead: boolean;
 
   /**
    * @type {number}
@@ -36,25 +48,23 @@ export class RoomResDto {
    */
   recentSignalReceivedTimeMillis: number;
 
-  /**
-   *
-   * TODO: room에서 읽은 편지인지 아닌지 여부 필요한지 고민
-   * isRead: boolean;
-   */
-
   constructor({
     id,
     keywords,
     recentSignalContent,
     matchingKeywordCount,
+    nickname,
     profileImage,
+    isChatRead,
     recentSignalReceivedTimeMillis,
   }) {
     this.id = id;
     this.keywords = keywords;
     this.recentSignalContent = recentSignalContent;
     this.matchingKeywordCount = matchingKeywordCount;
+    this.nickname = nickname;
     this.profileImage = profileImage;
+    this.isChatRead = isChatRead;
     this.recentSignalReceivedTimeMillis = recentSignalReceivedTimeMillis;
   }
 }
