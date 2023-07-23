@@ -74,7 +74,7 @@ export class SignalResDto {
   readonly receivedTimeMillis: number;
 
   constructor({
-    id,
+    signalId,
     receiverId,
     senderId,
     senderName,
@@ -84,7 +84,7 @@ export class SignalResDto {
     keywordsCount,
     receivedTimeMillis,
   }) {
-    this.id = id;
+    this.id = signalId;
     this.receiverId = receiverId;
     this.senderId = senderId;
     this.senderName = senderName;

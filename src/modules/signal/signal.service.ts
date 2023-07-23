@@ -154,7 +154,7 @@ export class SignalService {
     const signalList = signals.map(
       signal =>
         new SignalResDto({
-          id: signal.id,
+          signalId: signal.id,
           receiverId: signal.receiverId,
           senderId: signal.senderId,
           senderName: userData.find(user => user.id === signal.senderId).nickname,
