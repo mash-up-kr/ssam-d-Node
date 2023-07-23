@@ -40,6 +40,12 @@ export class RoomResDto {
    * @type {boolean}
    * @example true
    */
+  isAlive: boolean;
+
+  /**
+   * @type {boolean}
+   * @example true
+   */
   isChatRead: boolean;
 
   /**
@@ -55,6 +61,7 @@ export class RoomResDto {
     matchingKeywordCount,
     nickname,
     profileImage,
+    isAlive,
     isChatRead,
     recentSignalReceivedTimeMillis,
   }) {
@@ -64,6 +71,7 @@ export class RoomResDto {
     this.matchingKeywordCount = matchingKeywordCount;
     this.nickname = nickname;
     this.profileImage = profileImage;
+    this.isAlive = isAlive;
     this.isChatRead = isChatRead;
     this.recentSignalReceivedTimeMillis = recentSignalReceivedTimeMillis;
   }
