@@ -28,6 +28,8 @@ export class ChatRepository {
 
   async getListByRoomId(roomId: number, limit: number, offset: number): Promise<Chat[]> {
     const chats = await this.prisma.chat.findMany({
+      take: limit,
+      skip: offset,
       where: { roomId },
       orderBy: {
         createdAt: 'desc',
