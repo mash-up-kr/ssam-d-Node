@@ -82,8 +82,10 @@ export class RoomService {
               ? getImageColor(matchingUser.profileImageUrl)
               : getImageColor(nowUser.profileImageUrl),
           isMine: chat.senderId === userId,
+          isReplyable: false,
         })
     );
+    chatResDtoList[0].isReplyable = true;
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
