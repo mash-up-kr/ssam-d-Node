@@ -41,4 +41,14 @@ export class ChatRepository {
   async countChatByRoomId(roomId: number): Promise<number> {
     return await this.prisma.chat.count({ where: { roomId } });
   }
+  async getMostRecentChat(roomId: number): Promise<Chat> {
+    return await this.prisma.chat.findFirst({
+      where: {
+        roomId: roomId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 }
