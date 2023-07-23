@@ -1,5 +1,3 @@
-import { User } from 'src/domains/user';
-
 export const userDataObject = [
   {
     id: 1,

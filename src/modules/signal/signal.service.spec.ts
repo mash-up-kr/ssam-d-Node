@@ -2,16 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SignalService } from './signal.service';
 import {
   ChatRepository,
+  CrashRepository,
   RoomRepository,
   RoomUserRepository,
   SignalRepository,
-  CrashRepository,
   UserKeywordRepository,
   UserRepository,
 } from 'src/repositories';
 import {
-  MockSignalRepository,
   MockCrashRepository,
+  MockSignalRepository,
   MockUserKeywordRepository,
   MockUserRepository,
 } from 'test/mock/repositories';
@@ -27,7 +27,6 @@ describe('SignalService', () => {
   let roomRepository: ReturnType<typeof MockRoomRepository>;
   let roomUserRepository: ReturnType<typeof MockRoomUserRepository>;
   let chatRepository: ReturnType<typeof MockChatRepository>;
-  let userKeywordRepository: ReturnType<typeof MockUserKeywordRepository>;
   let userRepository: ReturnType<typeof MockUserRepository>;
 
   beforeEach(async () => {
@@ -51,7 +50,6 @@ describe('SignalService', () => {
     roomRepository = module.get(RoomRepository);
     roomUserRepository = module.get(RoomUserRepository);
     chatRepository = module.get(ChatRepository);
-    userKeywordRepository = module.get(UserKeywordRepository);
     userRepository = module.get(UserRepository);
   });
 

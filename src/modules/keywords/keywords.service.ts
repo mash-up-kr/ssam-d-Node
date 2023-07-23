@@ -4,7 +4,6 @@ import { ElasticSearchResponse, KeywordMap } from './keywords.type';
 import { ConfigService } from '@nestjs/config';
 import { KeywordRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 import { KeywordExtractException, UserNotFoundException } from 'src/exceptions';
-import { UserKeyword } from 'src/domains/user-keyword';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 
