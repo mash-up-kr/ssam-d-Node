@@ -18,7 +18,6 @@ import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
-import { Room } from 'src/domains/room';
 
 @Injectable()
 export class RoomService {
