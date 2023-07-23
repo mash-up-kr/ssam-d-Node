@@ -126,6 +126,11 @@ export class RoomService {
   async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
     const chat = await this.chatRepository.get({ id: chatId });
     if (!chat) throw new ChatNotFoundException();
+
+    let isReplyable: boolean = false;
+    const recentChat = await this.chatRepository.getMostRecentChat(roomId);
+    if (chat.id === recentChat.id && chat.senderId !== userId) isReplyable = true;
+
     const sender = await this.userRepository.get({ id: chat.senderId });
     if (!sender) throw new UserNotFoundException();
     const room = await this.roomRepository.get({ id: roomId });
@@ -141,6 +146,7 @@ export class RoomService {
       isAlive: room.isAlive,
       isMine: chat.senderId === userId,
       receivedTimeMillis: new Date(chat.createdAt).getTime(),
+      isReplyable: isReplyable,
     });
   }
 
