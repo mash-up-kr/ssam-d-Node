@@ -100,7 +100,7 @@ export class RoomService {
 
     const chatEntity = await this.chatRepository.save(chat, transaction);
     await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
-    await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt });
+    await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt }, transaction);
     /**
      * @todo fcm alarm
      */
