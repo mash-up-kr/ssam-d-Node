@@ -47,9 +47,11 @@ describe('RoomService', () => {
     const roomId = 1;
     const content = 'content';
     it('성공', async () => {
+      const room = { id: roomId, isAlive: true };
+
       roomUserRepository.get.mockResolvedValue(new RoomUser({ userId: senderId, roomId }));
       roomUserRepository.getMatchingUser.mockResolvedValue(new User({ id: receiverId }));
-
+      roomRepository.get.mockResolvedValue(room);
       const result = await roomService.sendChat(senderId, roomId, content);
       expect(result).toBeUndefined();
     });

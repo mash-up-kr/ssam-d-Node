@@ -54,6 +54,12 @@ export class ChatDetailResDto {
    */
   receivedTimeMillis: number;
 
+  /**
+   * 답장할 수 있는지 여부
+   * @type {boolean}
+   */
+  isReplyable: boolean;
+
   constructor({
     id,
     keywords,
@@ -64,6 +70,7 @@ export class ChatDetailResDto {
     isAlive,
     isMine,
     receivedTimeMillis,
+    isReplyable,
   }) {
     this.id = id;
     this.keywords = keywords;
@@ -74,5 +81,6 @@ export class ChatDetailResDto {
     this.isAlive = isAlive;
     this.isMine = isMine;
     this.receivedTimeMillis = receivedTimeMillis;
+    this.isReplyable = isReplyable;
   }
 }

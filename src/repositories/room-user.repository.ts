@@ -27,20 +27,28 @@ export class RoomUserRepository {
 
   async getRoomUsersByUserId(userId: number): Promise<RoomUser[]> {
     const roomUsers = await this.prisma.roomUser.findMany({
-      where: {
-        userId,
-      },
-      include: {
-        room: true,
-      },
+      where: { userId },
+      include: { room: true },
     });
     return roomUsers.map(roomUser => new RoomUser(roomUser));
   }
 
-  async getMatchingUser(userId: number, roomId: number): Promise<User | null> {
-    const roomUser = await this.prisma.roomUser.findFirst({
+  async getRoomUsersByRoomId(roomId: number, transaction?: PrismaTransaction): Promise<RoomUser[]> {
+    const prisma = transaction ?? this.prisma;
+
+    const roomUsers = await prisma.roomUser.findMany({
+      where: { roomId, deletedAt: undefined },
+    });
+    return roomUsers.map(roomUser => new RoomUser(roomUser));
+  }
+
+  async getMatchingUser(userId: number, roomId: number, transaction: PrismaTransaction = null): Promise<User | null> {
+    const prisma = transaction ?? this.prisma;
+
+    const roomUser = await prisma.roomUser.findFirst({
       where: {
         roomId,
+        deletedAt: undefined,
         NOT: { userId },
       },
       include: {
@@ -58,7 +66,7 @@ export class RoomUserRepository {
       where: {
         userId: { not: userId },
         roomId: { in: roomIds },
-        room: { isAlive: true },
+        deletedAt: undefined,
       },
       include: {
         user: {
@@ -94,26 +102,24 @@ export class RoomUserRepository {
             matchingKeywordCount: roomUser.room.keywords.split(',').length,
             nickname: roomUser.user.nickname,
             profileImage: roomUser.user.profileImageUrl,
+            isAlive: roomUser.room.isAlive,
             isChatRead: roomUser.room.roomUser[0].isChatRead,
             recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
           })
       );
   }
 
-  async updateIsChatRead(id: number, isChatRead: boolean): Promise<void> {
-    await this.prisma.roomUser.update({
+  async updateIsChatRead(id: number, isChatRead: boolean, transaction: PrismaTransaction = null): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+
+    await prisma.roomUser.update({
       where: { id },
       data: { isChatRead },
     });
   }
 
-  async delete(roomId: number, userId: number, transaction?: PrismaTransaction): Promise<void> {
+  async delete(userId: number, roomId: number, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    await prisma.roomUser.deleteMany({
-      where: {
-        roomId: roomId,
-        userId: userId,
-      },
-    });
+    await prisma.roomUser.deleteMany({ where: { userId, roomId } });
   }
 }

@@ -23,10 +23,34 @@ export class ChatResDto {
    */
   receivedTimeMillis: number;
 
-  constructor({ id, content, senderName, receivedTimeMillis }) {
+  /**
+   *
+   *챗 컬러
+   * @type {string}
+   * @example MINT
+   */
+  chatColor: string;
+
+  /**
+   *
+   * @type {boolean}
+   * @example true
+   */
+  isMine: boolean;
+
+  /**
+   * 답장할 수 있는지 여부
+   * @type {boolean}
+   */
+  isReplyable: boolean;
+
+  constructor({ id, content, senderName, receivedTimeMillis, chatColor, isMine, isReplyable }) {
     this.id = id;
     this.content = content;
     this.senderName = senderName;
     this.receivedTimeMillis = receivedTimeMillis;
+    this.chatColor = chatColor;
+    this.isMine = isMine;
+    this.isReplyable = isReplyable;
   }
 }

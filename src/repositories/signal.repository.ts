@@ -35,6 +35,7 @@ export class SignalRepository {
       skip: offset,
       where: {
         receiverId: receiverId,
+        deletedAt: null,
       },
       orderBy: {
         createdAt: 'desc',
