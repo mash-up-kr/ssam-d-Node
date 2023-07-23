@@ -24,6 +24,7 @@ import { SignalResDto } from './dto/signal-res-dto';
 import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
 import { SignalDetailResDto } from './dto/signal-detail-res-dto';
+import { DELETED_USER_NICKNAME } from 'src/common/constants';
 
 @Injectable()
 export class SignalService {
@@ -149,22 +150,22 @@ export class SignalService {
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
     const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
     const senderIds = signals.map(signal => signal.senderId);
-    const userData = await this.userRepository.getUserList(senderIds);
+    const userList = await this.userRepository.getUserList(senderIds);
 
-    const signalList = signals.map(
-      signal =>
-        new SignalResDto({
-          signalId: signal.id,
-          receiverId: signal.receiverId,
-          senderId: signal.senderId,
-          senderName: userData.find(user => user.id === signal.senderId).nickname,
-          senderProfileImageUrl: userData.find(user => user.id === signal.senderId).profileImageUrl,
-          content: signal.content,
-          keywords: signal.keywords.split(','),
-          keywordsCount: signal.keywords.split(',').length,
-          receivedTimeMillis: new Date(signal.createdAt).getTime(),
-        })
-    );
+    const signalList = signals.map(signal => {
+      const sender = userList.find(user => user.id === signal.senderId);
+      return new SignalResDto({
+        signalId: signal.id,
+        receiverId: signal.receiverId,
+        senderId: signal.senderId,
+        senderName: sender?.nickname ?? DELETED_USER_NICKNAME,
+        senderProfileImageUrl: sender?.profileImageUrl,
+        content: signal.content,
+        keywords: signal.keywords.split(','),
+        keywordsCount: signal.keywords.split(',').length,
+        receivedTimeMillis: new Date(signal.createdAt).getTime(),
+      });
+    });
     return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 }
