@@ -84,13 +84,8 @@ export class RoomService {
               ? getImageColor(matchingUser.profileImageUrl)
               : getImageColor(nowUser.profileImageUrl),
           isMine: chat.senderId === userId,
-          isReplyEnable: false,
         })
     );
-    // 첫 페이지의 첫번째 채팅메시지는 답장이 가능하다.
-    if (pageReqDto.pageNo === 1) {
-      chatResDtoList[0].isReplyEnable = true;
-    }
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
@@ -134,7 +129,7 @@ export class RoomService {
     const room = await this.roomRepository.get({ id: roomId });
     if (!room) throw new RoomNotFoundException();
 
-    const isReplyEnable = await this.checkIsReplyEnable(chat, roomId, userId);
+    const isReplyable = room.isAlive && (await this.checkIsReplyable(chat, roomId, userId));
 
     return new ChatDetailResDto({
       id: chatId,
@@ -146,11 +141,11 @@ export class RoomService {
       isAlive: room.isAlive,
       isMine: chat.senderId === userId,
       receivedTimeMillis: new Date(chat.createdAt).getTime(),
-      isReplyEnable: isReplyEnable,
+      isReplyable: isReplyable,
     });
   }
 
-  async checkIsReplyEnable(chat: Chat, roomId: number, userId: number): Promise<boolean> {
+  async checkIsReplyable(chat: Chat, roomId: number, userId: number): Promise<boolean> {
     if (!chat) return false;
     const recentChat = await this.chatRepository.getLatestChat(roomId);
     return chat.id === recentChat.id && chat.senderId !== userId;
