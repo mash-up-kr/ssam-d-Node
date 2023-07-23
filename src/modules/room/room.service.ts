@@ -38,11 +38,6 @@ export class RoomService {
       pageReqDto.limit(),
       pageReqDto.offset()
     );
-    roomResDtoList.forEach(roomResDto => {
-      if (!roomResDto.isAlive) {
-        roomResDto.recentSignalContent = '상대방이 연결을 끊었습니다.';
-      }
-    });
     return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
 
