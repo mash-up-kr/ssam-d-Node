@@ -41,6 +41,9 @@ dependencies:
   cross-env:
     specifier: ^7.0.3
     version: 7.0.3
+  moment-timezone:
+    specifier: ^0.5.43
+    version: 0.5.43
   passport-jwt:
     specifier: ^4.0.1
     version: 4.0.1
@@ -4362,6 +4365,16 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
+
+  /moment-timezone@0.5.43:
+    resolution: {integrity: sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==}
+    dependencies:
+      moment: 2.29.4
+    dev: false
+
+  /moment@2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+    dev: false
 
   /ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
