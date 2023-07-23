@@ -80,7 +80,7 @@ export class SignalService {
     if (!sender) throw new UserNotFoundException();
 
     return new SignalDetailResDto({
-      signalId: signal.id,
+      id: signal.id,
       keywords: signal.keywordList,
       matchingKeywordCount: signal.keywordList.length,
       content: signal.content,
