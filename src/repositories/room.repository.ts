@@ -23,6 +23,7 @@ export class RoomRepository {
     if (!roomEntity) return null;
     return new Room(roomEntity);
   }
+
   async getList(roomIds: number[]): Promise<Room[]> {
     const rooms = await this.prisma.room.findMany({ where: { id: { in: roomIds } } });
     return rooms.map(room => new Room(room));

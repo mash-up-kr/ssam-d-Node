@@ -32,17 +32,17 @@ const setSoftDeleteMiddleware = (prisma: PrismaClient) => {
     const models = Prisma.dmmf.datamodel.models;
     const modelNames = models.map(model => model.name);
     if (modelNames.includes(params.model) && isSoftDeleteEnabled(params.model, models)) {
-      if (['findUnique', 'findFirst', 'update', 'updateMany'].includes(params.action)) {
+      if (['findMany', 'findUnique', 'findFirst', 'update', 'updateMany'].includes(params.action)) {
         if (params.action === 'update') {
           params.action = 'updateMany';
         }
-        params.args.where = { ...params.args.where, deletedAt: null };
+        params.args.where = { deletedAt: null, ...params.args.where };
       } else if (params.action === 'delete') {
         params.action = 'update';
         params.args['data'] = { deletedAt: new Date() };
       } else if (params.action === 'deleteMany') {
         params.action = 'updateMany';
-        params.args.data = { ...params.args.data, deletedAt: new Date() };
+        params.args.data = { deletedAt: new Date(), ...params.args.data };
       }
     }
     return next(params);

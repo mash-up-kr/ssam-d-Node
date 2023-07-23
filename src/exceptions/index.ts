@@ -36,4 +36,7 @@ export class CannotSendChatException extends ExceptionOf.USER(
   501,
   '해당 방에서 채팅을 보낼 수 있는 유저가 아닙니다.' as const
 ) {}
+
+export class RoomIsDeadException extends ExceptionOf.USER(400, '상대방이 연결이 끊은 방입니다.' as const) {}
+
 export class SignalSendException extends ExceptionOf.USER(500, '시그널을 보낼 수 없습니다.' as const) {}

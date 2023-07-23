@@ -6,6 +6,7 @@ import {
   CannotSendChatException,
   ChatNotFoundException,
   MatchingUserNotFoundException,
+  RoomIsDeadException,
   RoomNotFoundException,
   UserNotFoundException,
 } from 'src/exceptions';
@@ -26,6 +27,7 @@ export class RoomService {
     private readonly userRepository: UserRepository,
     private readonly chatRepository: ChatRepository
   ) {}
+
   async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
     const roomUsers = await this.roomUserRepository.getRoomUsersByUserId(userId);
     const roomIds = roomUsers.map(roomUser => roomUser.roomId);
@@ -59,7 +61,7 @@ export class RoomService {
   async getChatList(userId: number, roomId: number, pageReqDto: PageReqDto): Promise<PageResDto<ChatResDto>> {
     const nowUser = await this.userRepository.get({ id: userId });
     if (!nowUser) throw new UserNotFoundException();
-    console.log(nowUser);
+
     const userInRoom = await this.roomUserRepository.get(userId, roomId);
     if (!userInRoom) throw new RoomNotFoundException();
 
@@ -67,9 +69,10 @@ export class RoomService {
 
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
+
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
     const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
-    console.log(matchingUser);
+
     const chatResDtoList = chatList.map(
       chat =>
         new ChatResDto({
@@ -89,28 +92,35 @@ export class RoomService {
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
-  async sendChat(senderId: number, roomId: number, content: string) {
-    const senderInRoom = await this.roomUserRepository.get(senderId, roomId);
+  @Transactional()
+  async sendChat(senderId: number, roomId: number, content: string, transaction: PrismaTransaction = null) {
+    const senderInRoom = await this.roomUserRepository.get(senderId, roomId, transaction);
     if (!senderInRoom) throw new CannotSendChatException();
 
     const chat = new Chat({ senderId, roomId, content });
-    const room = await this.roomRepository.get({ id: roomId });
-    if (!room.isAlive) throw new CannotSendChatException();
-    await this.chatRepository.save(chat);
-    await this.setUnreadForReceiverRoom(senderId, roomId);
+    const room = await this.roomRepository.get({ id: roomId }, transaction);
+    if (!room.isAlive) throw new RoomIsDeadException();
+
+    await this.chatRepository.save(chat, transaction);
+    await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
 
     /**
      * @todo fcm alarm
      */
   }
 
-  async setUnreadForReceiverRoom(senderId: number, roomId: number): Promise<void> {
-    const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
+  private async setUnreadForReceiverRoom(
+    senderId: number,
+    roomId: number,
+    transaction: PrismaTransaction
+  ): Promise<void> {
+    const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId, transaction);
     if (!receiver) throw new MatchingUserNotFoundException();
-    const receiverInRoom = await this.roomUserRepository.get(receiver.id, roomId);
+
+    const receiverInRoom = await this.roomUserRepository.get(receiver.id, roomId, transaction);
     if (!receiverInRoom) throw new CannotSendChatException();
 
-    await this.roomUserRepository.updateIsChatRead(receiverInRoom.id, false);
+    await this.roomUserRepository.updateIsChatRead(receiverInRoom.id, false, transaction);
   }
 
   async getChatDetail(userId: number, roomId: number, chatId: number): Promise<ChatDetailResDto> {
@@ -137,11 +147,18 @@ export class RoomService {
   @Transactional()
   async deleteRoom(userId: number, roomId: number, transaction: PrismaTransaction = null) {
     const room = await this.roomRepository.get({ id: roomId }, transaction);
+    if (!room) throw new RoomNotFoundException();
+
     if (room.isAlive) {
-      await this.roomRepository.setIsAliveFalse(roomId, transaction);
-    } else {
-      await this.roomRepository.deleteRoom(roomId, transaction);
-      await this.roomUserRepository.delete(roomId, transaction);
+      await this.roomRepository.setIsAliveFalse(room.id, transaction);
+    }
+
+    await this.roomUserRepository.delete(userId, roomId, transaction);
+
+    const roomUsers = await this.roomUserRepository.getRoomUsersByRoomId(roomId, transaction);
+    const allUserExit = roomUsers.every(roomUser => roomUser.deletedAt);
+    if (allUserExit) {
+      await this.roomRepository.deleteRoom(room.id, transaction);
     }
   }
 }
