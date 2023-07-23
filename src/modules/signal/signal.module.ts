@@ -6,7 +6,7 @@ import {
   RoomRepository,
   RoomUserRepository,
   SignalRepository,
-  TrashRepository,
+  CrashRepository,
   UserKeywordRepository,
   UserRepository,
 } from 'src/repositories';
@@ -18,7 +18,7 @@ import { KeywordsModule } from '../keywords/keywords.module';
   providers: [
     SignalService,
     SignalRepository,
-    TrashRepository,
+    CrashRepository,
     RoomRepository,
     RoomUserRepository,
     UserKeywordRepository,
