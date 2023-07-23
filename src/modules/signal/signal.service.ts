@@ -4,7 +4,7 @@ import {
   RoomRepository,
   RoomUserRepository,
   SignalRepository,
-  TrashRepository,
+  CrashRepository,
   UserKeywordRepository,
   UserRepository,
 } from 'src/repositories';
@@ -29,7 +29,7 @@ import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 export class SignalService {
   constructor(
     private readonly signalRepository: SignalRepository,
-    private readonly trashRepository: TrashRepository,
+    private readonly trashRepository: CrashRepository,
     private readonly roomRepository: RoomRepository,
     private readonly roomUserRepository: RoomUserRepository,
     private readonly chatRepository: ChatRepository,
