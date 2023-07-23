@@ -5,7 +5,7 @@ export class SignalResDto {
    * @type {number}
    * @example 2
    */
-  readonly id: number;
+  readonly signalId: number;
 
   /**
    * 받는 사람 id
@@ -84,7 +84,7 @@ export class SignalResDto {
     keywordsCount,
     receivedTimeMillis,
   }) {
-    this.id = signalId;
+    this.signalId = signalId;
     this.receiverId = receiverId;
     this.senderId = senderId;
     this.senderName = senderName;
