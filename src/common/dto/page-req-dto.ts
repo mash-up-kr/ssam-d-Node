@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class PageReqDto {

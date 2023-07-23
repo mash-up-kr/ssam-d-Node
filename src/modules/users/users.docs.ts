@@ -3,7 +3,6 @@ import { UserNicknameReqDto } from './dto/user-req-dto';
 import { ApiResponse } from 'src/types/common';
 import { UserNotFoundException } from 'src/exceptions';
 import { ExceptionSpecWrap, QuerySpecWrap } from 'src/types/tspec';
-import { User } from 'src/domains/user';
 import { UserResDto } from './dto/user-res-dto';
 
 type UsersApiSpec = Tspec.DefineApiSpec<{
