@@ -7,6 +7,7 @@ import { MockRoomUserRepository } from '../../../test/mock/repositories/mock-roo
 import { RoomUser } from 'src/domains/room-user';
 import { CannotSendChatException } from 'src/exceptions';
 import { User } from '../../domains/user';
+import { Chat } from '../../domains/chat';
 
 describe('RoomService', () => {
   let roomService: RoomService;
@@ -42,16 +43,21 @@ describe('RoomService', () => {
   });
 
   describe('채팅방에서 채팅 보내기', () => {
+    const chatId = 1;
     const senderId = 1;
     const receiverId = 2;
     const roomId = 1;
     const content = 'content';
+    const chatCreatedAt = new Date();
     it('성공', async () => {
       const room = { id: roomId, isAlive: true };
 
+      chatRepository.save.mockResolvedValue(new Chat({ id: chatId, createdAt: chatCreatedAt }));
       roomUserRepository.get.mockResolvedValue(new RoomUser({ userId: senderId, roomId }));
       roomUserRepository.getMatchingUser.mockResolvedValue(new User({ id: receiverId }));
       roomRepository.get.mockResolvedValue(room);
+      roomRepository.update.mockResolvedValue(undefined);
+
       const result = await roomService.sendChat(senderId, roomId, content);
       expect(result).toBeUndefined();
     });
