@@ -15,10 +15,11 @@ export class ChatRepository {
     return new Chat(chatEntity);
   }
 
-  async save(chat: Chat, transaction?: PrismaTransaction): Promise<void> {
+  async save(chat: Chat, transaction?: PrismaTransaction): Promise<Chat> {
     const prisma = transaction ?? this.prisma;
 
-    await prisma.chat.create({ data: chat });
+    const chatEntity = await prisma.chat.create({ data: chat });
+    return new Chat(chatEntity);
   }
 
   async saveAll(chatData: Prisma.ChatUncheckedCreateInput[], transaction?: PrismaTransaction): Promise<void> {
@@ -41,7 +42,7 @@ export class ChatRepository {
   async countChatByRoomId(roomId: number): Promise<number> {
     return await this.prisma.chat.count({ where: { roomId } });
   }
-  async getMostRecentChat(roomId: number): Promise<Chat> {
+  async getLatestChat(roomId: number): Promise<Chat> {
     return await this.prisma.chat.findFirst({
       where: {
         roomId: roomId,

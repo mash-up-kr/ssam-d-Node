@@ -19,9 +19,9 @@ export class SignalRepository {
     return new Signal(signalEntity);
   }
 
-  async update(id: number, signalData: Partial<Signal>, transaction?: PrismaTransaction): Promise<void> {
+  async update(id: number, signal: Partial<Signal>, transaction?: PrismaTransaction): Promise<void> {
     const prisma = transaction ?? this.prisma;
-    await prisma.signal.update({ where: { id }, data: signalData });
+    await prisma.signal.update({ where: { id }, data: signal });
   }
 
   async deleteById(id: number, transaction?: PrismaTransaction): Promise<void> {

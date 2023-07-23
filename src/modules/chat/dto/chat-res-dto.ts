@@ -41,16 +41,17 @@ export class ChatResDto {
   /**
    * 답장할 수 있는지 여부
    * @type {boolean}
+   * @example true
    */
-  isReplyable: boolean;
+  isReplyEnable: boolean;
 
-  constructor({ id, content, senderName, receivedTimeMillis, chatColor, isMine, isReplyable }) {
+  constructor({ id, content, senderName, receivedTimeMillis, chatColor, isMine, isReplyEnable }) {
     this.id = id;
     this.content = content;
     this.senderName = senderName;
     this.receivedTimeMillis = receivedTimeMillis;
     this.chatColor = chatColor;
     this.isMine = isMine;
-    this.isReplyable = isReplyable;
+    this.isReplyEnable = isReplyEnable;
   }
 }
