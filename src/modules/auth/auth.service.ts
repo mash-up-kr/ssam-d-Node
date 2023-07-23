@@ -1,52 +1,65 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 import { JwtService } from '@nestjs/jwt';
-import { LoginReqDto } from './dto/login-req-dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { User } from 'src/domains/user';
-import { UserRepository } from 'src/repositories';
 
+import { DeviceTokenRepository, UserRepository } from 'src/repositories';
+
+import { LoginReqDto } from './dto/login-req-dto';
 import { LoginResDto } from './dto/login-res-dto';
+import { PrismaTransaction } from 'src/types/prisma.type';
+import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
+import { getRandomProfileImageURL } from 'src/common/util';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly deviceTokenRepository: DeviceTokenRepository
   ) {}
 
-  async login(loginReqDto: LoginReqDto) {
-    const { socialId, email, provider } = loginReqDto;
+  /**
+   * 유저가 있으면 업데이트, 없으면 생성
+   */
+  @Transactional()
+  async login(loginReqDto: LoginReqDto, tx: PrismaTransaction = null): Promise<LoginResDto> {
+    const userId = await this.getSignedUserId(loginReqDto, tx);
 
-    /**
-     * 유저가 있으면 업데이트, 없으면 생성
-     */
+    const payload = { id: userId };
+    const accessToken = await this.generateAccessToken(payload);
+    const refreshToken = await this.generateRefreshToken(payload);
 
-    const userData = { email: email, provider: provider };
-    const user = await this.userRepository.upsert(socialId, userData);
-    const userId = user.id;
+    await this.userRepository.update(userId, { refreshToken }, tx);
+    await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId, tx);
 
-    const payload = { id: user.id };
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
-    });
-    //db에 refreshToken 저장
+    return { userId, accessToken, refreshToken };
+  }
 
-    const updatedRfreshToken = { refreshToken: refreshToken };
-
-    await this.userRepository.update(userId, updatedRfreshToken);
-
-    const accessToken = await this.jwtService.signAsync(payload, {
+  async generateAccessToken(payload: object): Promise<string> {
+    return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: this.configService.get('TOKEN_EXPRED_TIME'),
     });
-    return new LoginResDto({
-      userId,
-      accessToken,
-      refreshToken,
+  }
+
+  async generateRefreshToken(payload: object): Promise<string> {
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get('REFRESH_TOKEN_EXPRED_TIME'),
     });
+  }
+
+  private async getSignedUserId(loginDto: LoginReqDto, tx?: PrismaTransaction): Promise<number> {
+    const { socialId, provider, email } = loginDto;
+
+    const savedUser = await this.userRepository.get({ socialId, provider }, tx);
+    if (savedUser) return savedUser.id;
+
+    const profileImageUrl = getRandomProfileImageURL();
+    const userData = { socialId, provider, email, profileImageUrl };
+
+    const user = await this.userRepository.save(userData, tx);
+    return user.id;
   }
 }

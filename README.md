@@ -45,6 +45,16 @@ $ pnpm run start:dev
 $ pnpm run start:prod
 ```
 
+## Docker Setting
+
+```bash
+# Local ELK Setting Init
+$ docker buildx build -t ssamd-elasticsearch-with-nori -f Dockerfile.es-nori .
+
+# Local ELK Run
+$ docker-compose up --build
+```
+
 ## Test
 
 ```bash

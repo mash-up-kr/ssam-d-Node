@@ -26,11 +26,6 @@ export class LoginResDto {
    */
   readonly refreshToken: string;
 
-  /**
-   *
-   * @todo user 포함해서 반환
-   */
-
   constructor({ userId, accessToken, refreshToken }) {
     this.userId = userId;
     this.accessToken = accessToken;

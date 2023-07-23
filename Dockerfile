@@ -1,18 +1,15 @@
-FROM node:16-alpine
+FROM node:18-alpine
 
 RUN npm install -g npm@9.6.7
 RUN npm i -g pnpm
 WORKDIR /app
 
 COPY ./package.json /app
-RUN pnpm i
-
-# RUN chmod +x ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
-# RUN ./node_modules/.pnpm/mecab-ya@0.1.1/node_modules/mecab-ya/bin/install-mecab
+COPY ./pnpm-lock.yaml /app
+RUN pnpm i --frozen-lockfile
 
 COPY prisma /app/prisma
-RUN pnpm prisma generate 
+RUN npx prisma generate 
 
 COPY . /app
-RUN pnpm tspec generate --outputPath openapi.json
-RUN pnpm build
+RUN pnpm run build

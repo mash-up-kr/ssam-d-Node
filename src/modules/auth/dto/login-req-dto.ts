@@ -29,4 +29,13 @@ export class LoginReqDto {
    */
   @IsString()
   provider: string;
+
+  /**
+   * 디바이스 토큰-옵셔널
+   *
+   * @example aflkdjfjeow
+   */
+  @IsString()
+  @IsOptional()
+  deviceToken: string;
 }

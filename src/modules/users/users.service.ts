@@ -1,45 +1,49 @@
 import { Injectable } from '@nestjs/common';
-import { UserOnboardingReqDto, UserReqDto } from './dto/user-req-dto';
-import { UserKeywordRepository, UserRepository } from 'src/repositories';
-import { KeywordsService } from '../keywords/keywords.service';
+import { UserNicknameReqDto, UserReqDto } from './dto/user-req-dto';
+import { UserRepository } from 'src/repositories';
 import { DuplicatedNicknameException, UserNotFoundException } from 'src/exceptions';
+import { User } from 'src/domains/user';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private readonly keywordsService: KeywordsService,
-    private readonly userRepository: UserRepository,
-    private readonly userKeywordRepository: UserKeywordRepository
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  async findOne(userReqDto: UserReqDto) {
+  async findOne(userReqDto: UserReqDto): Promise<User> {
     const { email } = userReqDto;
     const user = await this.userRepository.get({ email });
     return user;
   }
 
-  async isDuplicatedNickname(nickname: string) {
+  async deleteById(userId: number): Promise<void> {
+    const user = await this.userRepository.get({ id: userId });
+    if (!user) throw new UserNotFoundException();
+
+    await this.userRepository.delete(userId);
+  }
+
+  async getUserById(userId: number): Promise<User> {
+    const user = await this.userRepository.get({ id: userId });
+    if (!user) throw new UserNotFoundException();
+    return user;
+  }
+
+  async isDuplicatedNickname(userId: number, nickname: string): Promise<void> {
     const user = await this.userRepository.get({ nickname });
-    if (user) {
+    if (user && user.id !== userId) {
       throw new DuplicatedNicknameException({ nickname });
     }
   }
 
-  async saveOnboarding(userId: number, onboardingDto: UserOnboardingReqDto) {
+  async updateNickname(userId: number, userNicknameDto: UserNicknameReqDto): Promise<void> {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
 
-    const { nickname, keywords: plainKeywords } = onboardingDto;
-
-    await this.keywordsService.add(plainKeywords);
-    const keywords = await this.keywordsService.getList(plainKeywords);
-    const keywordIds = keywords.map(keyword => keyword.id);
-
-    await this.userKeywordRepository.add(userId, keywordIds);
+    const { nickname } = userNicknameDto;
+    await this.isDuplicatedNickname(userId, nickname);
     await this.userRepository.update(userId, { nickname });
   }
 
-  async updateAgreeAlarm(userId: number, agreeAlarm: boolean) {
+  async updateAgreeAlarm(userId: number, agreeAlarm: boolean): Promise<void> {
     const user = await this.userRepository.get({ id: userId });
     if (!user) throw new UserNotFoundException();
 
