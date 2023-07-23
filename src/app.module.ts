@@ -11,11 +11,18 @@ import { LoggerMiddleware } from './core/intercepters/logging.interceptor';
 import { LazyDecoratorModule } from './common/lazy-decorators/lazy-decorators.module';
 import { RoomModule } from './modules/room/room.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `env.${process.env.NODE_ENV}`,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
+      exclude: ['/api*'],
     }),
     PrismaModule,
     LazyDecoratorModule,
