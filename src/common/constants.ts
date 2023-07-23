@@ -11,3 +11,5 @@ export const PROFILE_IMAGE_LIST: ProfileImage[] = [
   { url: 'https://kr.object.ncloudstorage.com/app-images/assets/img_profile_04.png', color: ImageColor.Green },
   { url: 'https://kr.object.ncloudstorage.com/app-images/assets/img_profile_05.png', color: ImageColor.Pink },
 ];
+
+export const ROOM_CONNECTION_CLOSED_MESSAGE = '상대방이 연결을 끊었습니다.';

@@ -29,7 +29,7 @@ export class SignalController {
   @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  async getSignalListDate(@AuthUser() receiverId, @Query() pageReqDto: PageReqDto) {
+  async getSignalList(@AuthUser() receiverId, @Query() pageReqDto: PageReqDto) {
     const page = new PageReqDto(pageReqDto.pageNo, pageReqDto.pageLength);
     return await this.signalService.getSignalListById(receiverId, page);
   }

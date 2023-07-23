@@ -38,11 +38,6 @@ export class RoomService {
       pageReqDto.limit(),
       pageReqDto.offset()
     );
-    roomResDtoList.forEach(roomResDto => {
-      if (!roomResDto.isAlive) {
-        roomResDto.recentSignalContent = '상대방이 연결을 끊었습니다.';
-      }
-    });
     return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
 
@@ -77,7 +72,6 @@ export class RoomService {
 
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
     const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
-
     const chatResDtoList = chatList.map(
       chat =>
         new ChatResDto({
@@ -90,10 +84,8 @@ export class RoomService {
               ? getImageColor(matchingUser.profileImageUrl)
               : getImageColor(nowUser.profileImageUrl),
           isMine: chat.senderId === userId,
-          isReplyable: false,
         })
     );
-    chatResDtoList[0].isReplyable = true;
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
@@ -106,9 +98,9 @@ export class RoomService {
     const room = await this.roomRepository.get({ id: roomId }, transaction);
     if (!room.isAlive) throw new RoomIsDeadException();
 
-    await this.chatRepository.save(chat, transaction);
+    const chatEntity = await this.chatRepository.save(chat, transaction);
     await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
-
+    await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt });
     /**
      * @todo fcm alarm
      */
@@ -132,14 +124,12 @@ export class RoomService {
     const chat = await this.chatRepository.get({ id: chatId });
     if (!chat) throw new ChatNotFoundException();
 
-    let isReplyable: boolean = false;
-    const recentChat = await this.chatRepository.getMostRecentChat(roomId);
-    if (chat.id === recentChat.id && chat.senderId !== userId) isReplyable = true;
-
     const sender = await this.userRepository.get({ id: chat.senderId });
     if (!sender) throw new UserNotFoundException();
     const room = await this.roomRepository.get({ id: roomId });
     if (!room) throw new RoomNotFoundException();
+
+    const isReplyable = room.isAlive && (await this.checkIsReplyable(chat, roomId, userId));
 
     return new ChatDetailResDto({
       id: chatId,
@@ -153,6 +143,12 @@ export class RoomService {
       receivedTimeMillis: new Date(chat.createdAt).getTime(),
       isReplyable: isReplyable,
     });
+  }
+
+  async checkIsReplyable(chat: Chat, roomId: number, userId: number): Promise<boolean> {
+    if (!chat) return false;
+    const recentChat = await this.chatRepository.getLatestChat(roomId);
+    return chat.id === recentChat.id && chat.senderId !== userId;
   }
 
   @Transactional()

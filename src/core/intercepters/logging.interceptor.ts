@@ -1,5 +1,6 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import moment from 'moment-timezone';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
@@ -16,8 +17,9 @@ export class LoggerMiddleware implements NestMiddleware {
       const contentLength = response.get('content-length');
       const end = Date.now();
       const duration = end - start;
+      const koreaTime = moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss');
 
-      const logMessage = `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip} - ${duration}ms`;
+      const logMessage = `${koreaTime} - ${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip} - ${duration}ms`;
       this.logger.log(logMessage);
     });
 

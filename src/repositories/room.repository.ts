@@ -24,6 +24,13 @@ export class RoomRepository {
     return new Room(roomEntity);
   }
 
+  async update(id: number, room: Prisma.RoomUpdateInput, transaction?: PrismaTransaction) {
+    const prisma = transaction ?? this.prisma;
+
+    const roomEntity = await prisma.room.update({ where: { id }, data: room });
+    return new Room(roomEntity);
+  }
+
   async getList(roomIds: number[]): Promise<Room[]> {
     const rooms = await this.prisma.room.findMany({ where: { id: { in: roomIds } } });
     return rooms.map(room => new Room(room));

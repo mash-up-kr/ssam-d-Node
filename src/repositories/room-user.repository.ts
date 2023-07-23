@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { User } from 'src/domains/user';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { RoomResDto } from '../modules/room/dto/room-res-dto';
+import { ROOM_CONNECTION_CLOSED_MESSAGE } from '../common/constants';
 
 @Injectable()
 export class RoomUserRepository {
@@ -90,23 +91,30 @@ export class RoomUserRepository {
           },
         },
       },
+      orderBy: {
+        room: {
+          latestChatTime: 'desc',
+        },
+      },
     });
-    return roomUsers
-      .sort((a, b) => new Date(a.room.chat[0].createdAt).getTime() - new Date(b.room.chat[0].createdAt).getTime())
-      .map(
-        roomUser =>
-          new RoomResDto({
-            id: roomUser.room.id,
-            keywords: roomUser.room.keywords.split(','),
-            recentSignalContent: roomUser.room.chat[0].content,
-            matchingKeywordCount: roomUser.room.keywords.split(',').length,
-            nickname: roomUser.user.nickname,
-            profileImage: roomUser.user.profileImageUrl,
-            isAlive: roomUser.room.isAlive,
-            isChatRead: roomUser.room.roomUser[0].isChatRead,
-            recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
-          })
-      );
+
+    return roomUsers.map(roomUser => {
+      const recentSignalContent = roomUser.room.isAlive
+        ? roomUser.room.chat[0].content
+        : ROOM_CONNECTION_CLOSED_MESSAGE;
+
+      return new RoomResDto({
+        id: roomUser.room.id,
+        keywords: roomUser.room.keywords.split(','),
+        recentSignalContent: recentSignalContent,
+        matchingKeywordCount: roomUser.room.keywords.split(',').length,
+        nickname: roomUser.user.nickname,
+        profileImage: roomUser.user.profileImageUrl,
+        isAlive: roomUser.room.isAlive,
+        isChatRead: roomUser.room.roomUser[0].isChatRead,
+        recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+      });
+    });
   }
 
   async updateIsChatRead(id: number, isChatRead: boolean, transaction: PrismaTransaction = null): Promise<void> {

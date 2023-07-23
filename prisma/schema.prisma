@@ -68,13 +68,14 @@ model Signal {
 }
 
 model Room {
-  id        Int        @id @default(autoincrement())
-  keywords  String?
-  isAlive   Boolean    @default(true) @map("is_alive")
-  createdAt DateTime   @default(now()) @map("created_at")
-  deletedAt DateTime?  @map("deleted_at")
-  chat      Chat[]     @relation("Chat")
-  roomUser  RoomUser[]
+  id             Int        @id @default(autoincrement())
+  keywords       String?
+  isAlive        Boolean    @default(true)      @map("is_alive")
+  chat           Chat[]     @relation("Chat")
+  roomUser       RoomUser[]
+  latestChatTime DateTime   @default(now())     @map("latest_chat_time")
+  createdAt      DateTime   @default(now())     @map("created_at")
+  deletedAt      DateTime?  @map("deleted_at")
 
   @@map("room")
 }

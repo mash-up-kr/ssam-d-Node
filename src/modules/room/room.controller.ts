@@ -24,7 +24,7 @@ export class RoomController {
 
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('')
-  async getRoomListData(@AuthUser() userId: number, @Query() pageReqDto: PageReqDto) {
+  async getRoomList(@AuthUser() userId: number, @Query() pageReqDto: PageReqDto) {
     const page = new PageReqDto(pageReqDto.pageNo, pageReqDto.pageLength);
     return await this.roomService.getRoomListByUserId(userId, page);
   }
@@ -36,7 +36,7 @@ export class RoomController {
 
   @UsePipes(new ValidationPipe({ transform: true }))
   @Get('/:id/chats')
-  async getChatListData(
+  async getChatList(
     @AuthUser() userId: number,
     @Param('id', ParseIntPipe) roomId: number,
     @Query() pageReqDto: PageReqDto

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChatRepository,
+  CrashRepository,
   RoomRepository,
   RoomUserRepository,
   SignalRepository,
-  CrashRepository,
   UserKeywordRepository,
   UserRepository,
 } from 'src/repositories';
@@ -13,8 +13,8 @@ import { Signal } from 'src/domains/signal';
 import {
   SignalNotFoundException,
   SignalReplyException,
-  SignalSendException,
   SignalSenderMismatchException,
+  SignalSendException,
   UserNotFoundException,
 } from 'src/exceptions';
 import { Transactional } from '../../common/lazy-decorators/transactional.decorator';
@@ -147,26 +147,24 @@ export class SignalService {
   async getSignalListById(receiverId: number, pageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
     const { pageLength } = pageReqDto;
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
-    const signal: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
-    const senderIds = signal.map(signal => signal.senderId);
+    const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
+    const senderIds = signals.map(signal => signal.senderId);
     const userData = await this.userRepository.getUserList(senderIds);
 
-    const signalList = signal
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-      .map(
-        signalData =>
-          new SignalResDto({
-            signalId: signalData.id,
-            receiverId: signalData.receiverId,
-            senderId: signalData.senderId,
-            senderName: userData.find(user => user.id === signalData.senderId).nickname,
-            senderProfileImageUrl: userData.find(user => user.id === signalData.senderId).profileImageUrl,
-            content: signalData.content,
-            keywords: signalData.keywords.split(','),
-            keywordsCount: signalData.keywords.split(',').length,
-            receivedTimeMillis: new Date(signalData.createdAt).getTime(),
-          })
-      );
+    const signalList = signals.map(
+      signal =>
+        new SignalResDto({
+          signalId: signal.id,
+          receiverId: signal.receiverId,
+          senderId: signal.senderId,
+          senderName: userData.find(user => user.id === signal.senderId).nickname,
+          senderProfileImageUrl: userData.find(user => user.id === signal.senderId).profileImageUrl,
+          content: signal.content,
+          keywords: signal.keywords.split(','),
+          keywordsCount: signal.keywords.split(',').length,
+          receivedTimeMillis: new Date(signal.createdAt).getTime(),
+        })
+    );
     return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 }

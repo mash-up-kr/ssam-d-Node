@@ -20,11 +20,11 @@ export class UserRepository {
     await this.prisma.user.delete({ where: { id } });
   }
 
-  async update(id: number, userData: Prisma.UserUpdateInput, transaction?: PrismaTransaction): Promise<User> {
+  async update(id: number, user: Prisma.UserUpdateInput, transaction?: PrismaTransaction): Promise<User> {
     const prisma = transaction ?? this.prisma;
 
-    const user = await prisma.user.update({ where: { id }, data: userData });
-    return new User(user);
+    const userEntity = await prisma.user.update({ where: { id }, data: user });
+    return new User(userEntity);
   }
 
   async save(data: Prisma.UserCreateInput, transaction?: PrismaTransaction): Promise<User> {
