@@ -21,9 +21,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new CustomExceptionFilter(configService));
   app.useGlobalInterceptors(new ResponseInterceptor());
-  app.setGlobalPrefix('api', {
-    exclude: [{ path: 'docs', method: RequestMethod.GET }],
-  });
+  // app.setGlobalPrefix('api', {
+  //   exclude: [{ path: 'docs', method: RequestMethod.GET }],
+  // });
 
   await InitApiDocMiddleware(app, port);
 
