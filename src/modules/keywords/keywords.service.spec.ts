@@ -21,7 +21,6 @@ describe('KeywordsService', () => {
     }).compile();
 
     keywordService = module.get(KeywordsService);
-    userRepository = module.get(UserRepository);
     keywordRepository = module.get(KeywordRepository);
   });
 
