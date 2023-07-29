@@ -25,6 +25,8 @@ import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
 import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 import { DELETED_USER_NICKNAME } from 'src/common/constants';
+import { SentSignalResDto } from './dto/sent-signal-res-dto';
+import { SentSignalDetailResDto } from './dto/sent-signal-detail-res-dto';
 
 @Injectable()
 export class SignalService {
@@ -167,5 +169,41 @@ export class SignalService {
       });
     });
     return new PageResDto(totalSignalNumber, pageLength, signalList);
+  }
+
+  async getSentSignals(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<SentSignalResDto>> {
+    console.log(userId);
+    const { pageLength } = pageReqDto;
+    const sentSignals = await this.signalRepository.getSentSignalsByUserId(
+      userId,
+      pageReqDto.limit(),
+      pageReqDto.offset()
+    );
+    const sentSignalResDtoList = sentSignals.map(
+      sentSignal =>
+        new SentSignalResDto({
+          id: sentSignal.id,
+          content: sentSignal.content,
+          sentTimeMillis: sentSignal.createdAt,
+        })
+    );
+    console.log(sentSignalResDtoList);
+    return new PageResDto(sentSignals.length, pageLength, sentSignalResDtoList);
+  }
+
+  async getSentSignalDetail(userId: number, signalId: number): Promise<SentSignalDetailResDto> {
+    const signal = await this.signalRepository.get({ id: signalId });
+    if (!signal) throw new SignalNotFoundException();
+    const user = await this.userRepository.get({ id: signal.senderId });
+    if (!user) throw new UserNotFoundException();
+
+    return new SentSignalDetailResDto({
+      id: signal.id,
+      keywords: signal.keywordList,
+      matchingKeywordCount: signal.keywordList.length,
+      content: signal.content,
+      profileImage: user.profileImageUrl,
+      sentTimeMillis: new Date(signal.createdAt).getTime(),
+    });
   }
 }
