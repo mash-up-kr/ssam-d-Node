@@ -6,9 +6,9 @@ export class PageReqDto {
    *@requires false
    * @type {number}
    */
-  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value))
   pageNo: number;
 
   @IsNumber()

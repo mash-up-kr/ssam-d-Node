@@ -25,5 +25,6 @@ import { KeywordsModule } from '../keywords/keywords.module';
     ChatRepository,
     UserRepository,
   ],
+  exports: [SignalService],
 })
 export class SignalModule {}
