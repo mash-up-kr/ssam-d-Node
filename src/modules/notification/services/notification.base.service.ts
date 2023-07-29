@@ -17,7 +17,7 @@ export interface ISendFirebaseMessages {
  *
  */
 @Injectable()
-export class NotificationService {
+export class NotificationBaseService {
   constructor(private readonly configService: ConfigService) {
     firebaseAdmin.initializeApp({
       credential: firebaseAdmin.credential.cert({
@@ -27,6 +27,7 @@ export class NotificationService {
       }),
     });
   }
+
   async sendNotification(
     deviceTokenIds: Array<string>,
     payload: firebaseAdmin.messaging.MessagingPayload,
@@ -47,7 +48,7 @@ export class NotificationService {
     for (let i = 0; i < totalDeviceCount; i += MAX_BATCH_SIZE) {
       const batchDeviceIds = deviceTokenIds.slice(i, i + MAX_BATCH_SIZE);
 
-      const result = await this.send(batchDeviceIds, payload, imageUrl);
+      const result = await this.sendAll(batchDeviceIds, payload);
 
       if (result.failureCount > 0) {
         const failedTokens = [];
@@ -72,18 +73,13 @@ export class NotificationService {
 
     return { failureCount, successCount, failedDeviceIds };
   }
-  private async send(
-    batchDeviceIds: string[],
-    payload: firebaseAdmin.messaging.MessagingPayload,
-    imageUrl?: string
-  ): Promise<BatchResponse> {
+  async sendAll(batchDeviceIds: string[], payload: firebaseAdmin.messaging.MessagingPayload): Promise<BatchResponse> {
     const body: firebaseAdmin.messaging.MulticastMessage = {
       tokens: batchDeviceIds,
       data: payload?.data,
       notification: {
         title: payload?.notification?.title,
         body: payload?.notification?.body,
-        imageUrl,
       },
 
       android: {
@@ -97,6 +93,35 @@ export class NotificationService {
 
     try {
       const result: BatchResponse = await firebaseAdmin.messaging().sendEachForMulticast(body, false);
+      return result;
+    } catch (error) {
+      /**
+       * Todo: Logger ,error
+       */
+      throw error;
+    }
+  }
+
+  async sendOne(deviceTokenId: string, payload: firebaseAdmin.messaging.MessagingPayload): Promise<string> {
+    const body: firebaseAdmin.messaging.Message = {
+      token: deviceTokenId,
+      data: payload?.data,
+      notification: {
+        title: payload?.notification?.title,
+        body: payload?.notification?.body,
+      },
+
+      android: {
+        priority: 'high',
+        ttl: 60 * 60 * 24,
+        notification: {
+          sound: payload?.notification?.sound,
+        },
+      },
+    };
+
+    try {
+      const result = await firebaseAdmin.messaging().send(body, false);
       return result;
     } catch (error) {
       /**
