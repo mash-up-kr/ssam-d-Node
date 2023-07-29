@@ -124,6 +124,8 @@ model Crash {
   keywords    String?
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   @@index([userId], map: "trash_user_id_fkey")
   @@map("crash")
