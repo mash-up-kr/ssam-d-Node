@@ -51,6 +51,7 @@ export class RoomService {
     return new RoomDetailResDto({
       id: roomId,
       keywords: room.keywordList,
+      matchingUserId: matchingUser.id,
       matchingUserName: matchingUser.nickname,
       matchingUserProfileImage: matchingUser.profileImageUrl,
       chatColor: getImageColor(matchingUser.profileImageUrl),

@@ -13,6 +13,7 @@ import { RoomModule } from './modules/room/room.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ReportModule } from './modules/report/report.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { join } from 'path';
     SignalModule,
     RoomModule,
     ChatModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
