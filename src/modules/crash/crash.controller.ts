@@ -2,10 +2,9 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CrashService } from './crash.service';
 import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
-import { SignalReqDto } from '../signal/dto/signal-req-dto';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { CrashReqDto } from './dto/crash-req.dto';
+import { AuthGuard } from '../auth/guards/jwt.auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('crashes')

@@ -10,7 +10,7 @@ type CrashApiSpec = Tspec.DefineApiSpec<{
   tags: ['크래시'];
   security: 'jwt';
   paths: {
-    '/signal': {
+    '/crashes': {
       get: {
         summary: '크래시 목록 불러오기';
         query: {
@@ -22,7 +22,7 @@ type CrashApiSpec = Tspec.DefineApiSpec<{
         };
       };
     };
-    '/crash/:id/reply': {
+    '/crashes/:id/reply': {
       post: {
         path: { id: number };
         summary: '크래시 답장';
