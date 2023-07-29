@@ -2,14 +2,6 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class CrashReqDto {
   /**
-   * crash ID
-   * @type {numbrer}
-   * @example 1
-   */
-  @IsNumber()
-  crashId: number;
-
-  /**
    * 시그널 내용
    *
    * @type {string}

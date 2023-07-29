@@ -22,7 +22,7 @@ type CrashApiSpec = Tspec.DefineApiSpec<{
         };
       };
     };
-    '/crashes/:id/reply': {
+    '/crashes/{id}/reply': {
       post: {
         path: { id: number };
         summary: '크래시 답장';

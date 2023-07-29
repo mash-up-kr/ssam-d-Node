@@ -26,8 +26,13 @@ export class CrashService {
     return { totalCount, list: crashes };
   }
 
-  async reply(userId: number, replyReqDto: CrashReqDto, transaction: PrismaTransaction = null): Promise<void> {
-    const { crashId, content } = replyReqDto;
+  async reply(
+    userId: number,
+    crashId: number,
+    replyReqDto: CrashReqDto,
+    transaction: PrismaTransaction = null
+  ): Promise<void> {
+    const { content } = replyReqDto;
 
     const crash = await this.crashRepository.get(crashId, transaction);
     if (!crash) {
