@@ -173,11 +173,7 @@ export class SignalService {
 
   async getSentSignals(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<SentSignalResDto>> {
     const { pageLength } = pageReqDto;
-    const sentSignals = await this.signalRepository.getSentSignalsByUserId(
-      userId,
-      pageReqDto.limit(),
-      pageReqDto.offset()
-    );
+    const sentSignals = await this.signalRepository.getSentSignalsByUserId(userId, pageReqDto.limit, pageReqDto.offset);
     const sentSignalResDtoList = sentSignals.map(
       sentSignal =>
         new SentSignalResDto({
