@@ -172,7 +172,6 @@ export class SignalService {
   }
 
   async getSentSignals(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<SentSignalResDto>> {
-    console.log(userId);
     const { pageLength } = pageReqDto;
     const sentSignals = await this.signalRepository.getSentSignalsByUserId(
       userId,
@@ -187,7 +186,6 @@ export class SignalService {
           sentTimeMillis: sentSignal.createdAt,
         })
     );
-    console.log(sentSignalResDtoList);
     return new PageResDto(sentSignals.length, pageLength, sentSignalResDtoList);
   }
 
