@@ -1,7 +1,11 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CrashService } from './crash.service';
 import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
+import { SignalReqDto } from '../signal/dto/signal-req-dto';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { CrashReqDto } from './dto/crash-req.dto';
 
 @UseGuards(AuthGuard)
 @Controller('crashes')
@@ -15,5 +19,10 @@ export class CrashController {
 
     const result = await this.crashService.getList(userId, paging);
     return new PageResDto(result.totalCount, pageLength, result.list);
+  }
+
+  @Post('/:id')
+  async reply(@AuthUser() userId: number, @Body() replyReqDto: CrashReqDto) {
+    await this.crashService.reply(userId, replyReqDto);
   }
 }

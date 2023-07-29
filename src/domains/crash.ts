@@ -3,11 +3,13 @@ export class Crash {
   readonly content: string;
   readonly keywords: string;
   readonly userId: number;
+  readonly createdAt: Date;
 
   constructor(crash) {
     this.id = crash.id;
     this.content = crash.content;
     this.keywords = crash.keywords;
     this.userId = crash.userId;
+    this.createdAt = crash.createdAt;
   }
 }

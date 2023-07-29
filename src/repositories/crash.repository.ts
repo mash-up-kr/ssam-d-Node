@@ -11,15 +11,15 @@ export class CrashRepository {
       data: {
         userId: crashData.userId,
         content: crashData.content,
-        keywords: crashData.keywords,
       },
     });
   }
 
-  async getList(offset: number, limit: number, transaction: PrismaTransaction): Promise<Crash[]> {
+  async getList(userId: number, offset: number, limit: number, transaction: PrismaTransaction): Promise<Crash[]> {
     const prisma = transaction ?? this.prisma;
 
     const crashes = await prisma.crash.findMany({
+      where: { NOT: { userId } },
       take: limit,
       skip: offset,
       orderBy: {
@@ -35,5 +35,20 @@ export class CrashRepository {
 
     const count = await prisma.crash.count();
     return count;
+  }
+
+  async get(crashId: number, transaction?: PrismaTransaction): Promise<Crash> {
+    const prisma = transaction ?? this.prisma;
+
+    const crashEntity = await prisma.crash.findFirst({ where: { id: crashId, deletedAt: undefined } });
+    if (!crashEntity) return null;
+
+    return new Crash(crashEntity);
+  }
+
+  async delete(crashId: number, transaction?: PrismaTransaction): Promise<void> {
+    const prisma = transaction ?? this.prisma;
+
+    await prisma.crash.delete({ where: { id: crashId } });
   }
 }

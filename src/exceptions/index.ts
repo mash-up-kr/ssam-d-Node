@@ -45,3 +45,10 @@ export class DeviceTokenNotFoundException extends ExceptionOf.INTERNAL(
   500,
   '디바이스토큰 아이디가 존재하지 않습니다.' as const
 ) {}
+
+export class CrashNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 크래쉬입니다.' as const) {}
+
+export class InvalidCrashException extends ExceptionOf.USER(
+  400,
+  '답장할 수 없거나 유효하지 않은 크래쉬입니다.' as const
+) {}
