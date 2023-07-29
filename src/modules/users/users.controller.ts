@@ -34,7 +34,6 @@ export class UsersController {
   @Get('/signals')
   async getSentSignals(@AuthUser() userId: number, @Query() pageReqDto: PageReqDto) {
     const page = new PageReqDto(pageReqDto.pageNo, pageReqDto.pageLength);
-    console.log(userId);
     return await this.signalService.getSentSignals(userId, page);
   }
 
