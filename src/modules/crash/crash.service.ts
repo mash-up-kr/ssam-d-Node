@@ -10,9 +10,9 @@ export class CrashService {
   constructor(private readonly crashRepository: CrashRepository) {}
 
   @Transactional()
-  async getList(paging: PageReqDto, transaction: PrismaTransaction = null) {
+  async getList(userId: number, paging: PageReqDto, transaction: PrismaTransaction = null) {
     const { offset, limit } = paging;
-    const crashes = await this.crashRepository.getList(offset, limit, transaction);
+    const crashes = await this.crashRepository.getList(userId, offset, limit, transaction);
     const totalCount = await this.crashRepository.getCount(transaction);
 
     return { totalCount, list: crashes };
