@@ -35,8 +35,8 @@ export class RoomService {
     const roomResDtoList = await this.roomUserRepository.getRoomList(
       userId,
       roomIds,
-      pageReqDto.limit(),
-      pageReqDto.offset()
+      pageReqDto.limit,
+      pageReqDto.offset
     );
     return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
@@ -72,7 +72,7 @@ export class RoomService {
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
-    const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
+    const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit, pageReqDto.offset);
     const chatResDtoList = chatList.map(
       chat =>
         new ChatResDto({
