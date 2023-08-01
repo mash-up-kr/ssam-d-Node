@@ -28,11 +28,7 @@ export class NotificationBaseService {
     });
   }
 
-  async sendNotification(
-    deviceTokenIds: Array<string>,
-    payload: firebaseAdmin.messaging.MessagingPayload,
-    imageUrl?: string
-  ) {
+  async sendNotification(deviceTokenIds: Array<string>, payload: firebaseAdmin.messaging.MessagingPayload) {
     if (deviceTokenIds.length === 0) {
       throw new DeviceTokenNotFoundException();
     }

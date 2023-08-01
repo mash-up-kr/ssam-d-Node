@@ -33,6 +33,7 @@ export class ChatNotificationService {
       data: {
         roomId: roomId.toString(),
         receivedTimeMillis: receivedTimeMillis.toString(),
+        notiType: 'CHAT',
       },
       /**
        * todo : content 잘라서 줘야하는지 물어보기
@@ -40,7 +41,6 @@ export class ChatNotificationService {
       notification: {
         title: content,
         body: senderName + '님이 보낸 메시지',
-        clickAction: '재성오빠가 알려주는 것',
       },
     };
     const result = await this.notificationBaseService.sendOne(deviceTokenId, payload);

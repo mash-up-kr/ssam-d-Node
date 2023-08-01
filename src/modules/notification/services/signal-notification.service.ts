@@ -21,7 +21,7 @@ export interface ISendFirebaseMessages {
 export class SignalNotificationService {
   constructor(private readonly notificationBaseService: NotificationBaseService) {}
 
-  async sendNotification(deviceTokenIds: Array<string>, matchingKeywords: string[], receivedTimeMillis: number) {
+  async sendNotification(deviceTokenIds: string[], matchingKeywords: string[], receivedTimeMillis: number) {
     if (deviceTokenIds.length === 0) {
       throw new DeviceTokenNotFoundException();
     }
@@ -34,17 +34,19 @@ export class SignalNotificationService {
     let successCount = 0;
     const failedDeviceIds = [];
 
+    const displayedMatchingKeywordString = await this.makeNotificationString(matchingKeywords);
+
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
         receivedTimeMillis: receivedTimeMillis.toString(),
+        notiType: 'SIGNAL',
       },
       /**
        * todo : content 잘라서 줘야하는지 물어보기
        */
       notification: {
         title: '구독 키워드에 대한 시그널이 도착했어요',
-        body: matchingKeywords.join(',').length <= 12 ? '처리 나중에하자..' : '건회오빠한테 물어보자..',
-        clickAction: '재성오빠가 알려주는 것',
+        body: displayedMatchingKeywordString,
       },
     };
     for (let i = 0; i < totalDeviceCount; i += MAX_BATCH_SIZE) {
@@ -65,5 +67,37 @@ export class SignalNotificationService {
     }
 
     return { failureCount, successCount, failedDeviceIds };
+  }
+
+  async makeNotificationString(matchingKeywords: string[]): Promise<string> {
+    const MAX_DISPLAYING_KEYWORD_LENGTH = 12;
+
+    if (matchingKeywords.length === 1) return matchingKeywords[0] + ' 키워드가 일치해요';
+    let displayStringLength = 0;
+    for (let i = 0; i < matchingKeywords.length; i++) {
+      displayStringLength += matchingKeywords[i].length;
+      if (displayStringLength > MAX_DISPLAYING_KEYWORD_LENGTH) {
+        if (i === matchingKeywords.length - 1)
+          return (
+            matchingKeywords
+              .slice(0, i + 1)
+              .join(',')
+              .substring(0, 12) +
+            '...' +
+            ' 키워드가 일치해요'
+          );
+        else {
+          return (
+            matchingKeywords.slice(0, i).join(',') +
+            ' 외 ' +
+            (matchingKeywords.length - (i + 1)).toString() +
+            '개 키워드가 일치해요'
+          );
+        }
+      }
+      displayStringLength += 1; // 쉼표길이
+    }
+
+    return matchingKeywords.join(',') + ' 키워드가 일치해요';
   }
 }
