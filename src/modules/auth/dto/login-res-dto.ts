@@ -1,3 +1,5 @@
+import { UserResDto } from 'src/modules/users/dto/user-res-dto';
+
 export class LoginResDto {
   /**
    *
@@ -26,9 +28,15 @@ export class LoginResDto {
    */
   readonly refreshToken: string;
 
-  constructor({ userId, accessToken, refreshToken }) {
+  readonly user: UserResDto | null;
+
+  readonly keywords: string[];
+
+  constructor({ userId, accessToken, refreshToken, user, keywords }) {
     this.userId = userId;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    this.user = new UserResDto(user);
+    this.keywords = keywords;
   }
 }
