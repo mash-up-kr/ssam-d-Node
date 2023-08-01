@@ -47,4 +47,18 @@ export class SignalRepository {
   async countSignalsById(receiverId: number): Promise<number> {
     return await this.prisma.signal.count({ where: { receiverId: receiverId } });
   }
+
+  async getSentSignalsByUserId(userId: number, limit: number, offset: number): Promise<Signal[]> {
+    const sentSignals = await this.prisma.signal.findMany({
+      take: limit,
+      skip: offset,
+      where: {
+        senderId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return sentSignals.map(sentSignal => new Signal(sentSignal));
+  }
 }

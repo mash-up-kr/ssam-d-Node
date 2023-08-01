@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class PageReqDto {
@@ -6,9 +6,9 @@ export class PageReqDto {
    *@requires false
    * @type {number}
    */
-  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value))
   pageNo: number;
 
   @IsNumber()

@@ -13,6 +13,12 @@ export class RoomDetailResDto {
   keywords: string[];
 
   /**
+   * @type {number}
+   * @example 13
+   */
+  matchingUserId: number;
+
+  /**
    * @type {string}
    * @example 유저네임
    */
@@ -36,9 +42,10 @@ export class RoomDetailResDto {
    */
   isAlive: number;
 
-  constructor({ id, keywords, matchingUserName, chatColor, matchingUserProfileImage, isAlive }) {
+  constructor({ id, keywords, matchingUserId, matchingUserName, chatColor, matchingUserProfileImage, isAlive }) {
     this.id = id;
     this.keywords = keywords;
+    this.matchingUserId = matchingUserId;
     this.matchingUserName = matchingUserName;
     this.chatColor = chatColor;
     this.matchingUserProfileImage = matchingUserProfileImage;

@@ -1,5 +1,4 @@
 import { IsArray } from 'class-validator';
-import { SignalResDto } from 'src/modules/signal/dto/signal-res-dto';
 
 export class PageResDto<T> {
   /**

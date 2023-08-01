@@ -1,5 +1,3 @@
-import { PickType } from '@nestjs/mapped-types';
-import { IsEmail, IsString } from 'class-validator';
 import { User } from 'src/domains/user';
 
 export class UserResDto {
