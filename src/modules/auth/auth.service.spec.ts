@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { DeviceTokenRepository, UserRepository } from 'src/repositories';
-import { MockUserRepository } from 'test/mock/repositories';
+import { DeviceTokenRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
+import { MockUserKeywordRepository, MockUserRepository } from 'test/mock/repositories';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MockDeviceTokenRepository } from 'test/mock/repositories/mock-device-token.repository';
@@ -11,6 +11,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let configService: ConfigService;
   let userRepository: ReturnType<typeof MockUserRepository>;
+  let userKeywordRepository: ReturnType<typeof MockUserKeywordRepository>;
   let deviceTokenRepository: ReturnType<typeof MockDeviceTokenRepository>;
   let configSpy: jest.SpyInstance;
 
@@ -20,6 +21,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: UserRepository, useValue: MockUserRepository() },
+        { provide: UserKeywordRepository, useValue: MockUserKeywordRepository() },
         { provide: DeviceTokenRepository, useValue: MockDeviceTokenRepository() },
       ],
     }).compile();
