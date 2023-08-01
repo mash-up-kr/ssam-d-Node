@@ -26,6 +26,7 @@ export class CrashService {
     return { totalCount, list: crashes };
   }
 
+  @Transactional()
   async reply(
     userId: number,
     crashId: number,
