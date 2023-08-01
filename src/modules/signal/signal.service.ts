@@ -150,7 +150,7 @@ export class SignalService {
   async getSignalListById(receiverId: number, pageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
     const { pageLength } = pageReqDto;
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
-    const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
+    const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit, pageReqDto.offset);
     const senderIds = signals.map(signal => signal.senderId);
     const userList = await this.userRepository.getUserList(senderIds);
 
@@ -173,11 +173,7 @@ export class SignalService {
 
   async getSentSignals(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<SentSignalResDto>> {
     const { pageLength } = pageReqDto;
-    const sentSignals = await this.signalRepository.getSentSignalsByUserId(
-      userId,
-      pageReqDto.limit(),
-      pageReqDto.offset()
-    );
+    const sentSignals = await this.signalRepository.getSentSignalsByUserId(userId, pageReqDto.limit, pageReqDto.offset);
     const sentSignalResDtoList = sentSignals.map(
       sentSignal =>
         new SentSignalResDto({
