@@ -128,3 +128,14 @@ model Crash {
   @@index([userId], map: "trash_user_id_fkey")
   @@map("crash")
 }
+
+model Report {
+  id               Int       @id @default(autoincrement())
+  content          String 
+  roomId           Int       @map("room_id")
+  reportingUserId  Int       @map("reporting_user_id")
+  reportedUserId   Int       @map("reported_user_id")
+  createdAt        DateTime  @default(now())     @map("created_at")
+
+  @@map("report")
+}
