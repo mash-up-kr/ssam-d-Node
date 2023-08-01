@@ -40,3 +40,8 @@ export class CannotSendChatException extends ExceptionOf.USER(
 export class RoomIsDeadException extends ExceptionOf.USER(400, '상대방이 연결이 끊은 방입니다.' as const) {}
 
 export class SignalSendException extends ExceptionOf.USER(500, '시그널을 보낼 수 없습니다.' as const) {}
+
+export class DeviceTokenNotFoundException extends ExceptionOf.INTERNAL(
+  500,
+  '디바이스토큰 아이디가 존재하지 않습니다.' as const
+) {}

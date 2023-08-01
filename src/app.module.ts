@@ -15,6 +15,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ReportModule } from './modules/report/report.module';
 
+import { NotificationModule } from './modules/notification/notification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,7 @@ import { ReportModule } from './modules/report/report.module';
     SignalModule,
     RoomModule,
     ChatModule,
+    NotificationModule,
     ReportModule,
   ],
   controllers: [AppController],
