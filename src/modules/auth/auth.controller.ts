@@ -9,11 +9,7 @@ export class AuthController {
 
   @Post('login')
   async create(@Body() loginReqDto: LoginReqDto) {
-    const loginData = await this.authService.login(loginReqDto);
-    return new LoginResDto({
-      userId: loginData.userId,
-      accessToken: loginData.accessToken,
-      refreshToken: loginData.refreshToken,
-    });
+    const result = await this.authService.login(loginReqDto);
+    return new LoginResDto(result);
   }
 }
