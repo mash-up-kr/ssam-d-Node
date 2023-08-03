@@ -20,6 +20,7 @@ export class CrashRepository {
 
     const crashes = await prisma.crash.findMany({
       where: { NOT: { userId } },
+      include: { user: true },
       take: limit,
       skip: offset,
       orderBy: {

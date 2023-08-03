@@ -7,6 +7,7 @@ import { CrashReqDto } from './dto/crash-req.dto';
 import { CrashNotFoundException, InvalidCrashException } from 'src/exceptions';
 import { RoomUser } from 'src/domains/room-user';
 import { Chat } from 'src/domains/chat';
+import { CrashResDto } from './dto/crash-res.dto';
 
 @Injectable()
 export class CrashService {
