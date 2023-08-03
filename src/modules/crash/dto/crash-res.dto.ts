@@ -62,7 +62,6 @@ export class CrashResDto {
   }
 
   static fromDomain(crash: Crash): CrashResDto {
-    console.log(crash);
     return new CrashResDto({
       id: crash.id,
       content: crash.content,

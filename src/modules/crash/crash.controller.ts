@@ -23,6 +23,13 @@ export class CrashController {
     return new PageResDto(result.totalCount, pageLength, crashes);
   }
 
+  @Get('/:crashId')
+  async getCrash(@AuthUser() userId: number, @Param('crashId', ParseIntPipe) crashId: number) {
+    const crash = await this.crashService.get(userId, crashId);
+
+    return CrashResDto.fromDomain(crash);
+  }
+
   @Post('/:id/reply')
   async reply(
     @AuthUser() userId: number,

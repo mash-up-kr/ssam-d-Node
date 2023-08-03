@@ -4,7 +4,7 @@ import { Transactional } from 'src/common/lazy-decorators/transactional.decorato
 import { ChatRepository, CrashRepository, RoomRepository, RoomUserRepository } from 'src/repositories';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { CrashReqDto } from './dto/crash-req.dto';
-import { CrashNotFoundException, InvalidCrashException } from 'src/exceptions';
+import { CannotAccessMyCrashException, CrashNotFoundException, InvalidCrashException } from 'src/exceptions';
 import { RoomUser } from 'src/domains/room-user';
 import { Chat } from 'src/domains/chat';
 import { CrashResDto } from './dto/crash-res.dto';
@@ -25,6 +25,23 @@ export class CrashService {
     const totalCount = await this.crashRepository.getCount(transaction);
 
     return { totalCount, list: crashes };
+  }
+
+  /**
+   * @description
+   * 누군가 답장하기 전에 이미 목록 조회를 한 경우 상세까지 와서 답장 가능
+   */
+  async get(userId: number, crashId: number) {
+    const crash = await this.crashRepository.get(crashId);
+    if (!crash) {
+      throw new CrashNotFoundException();
+    }
+
+    if (crash.userId === userId) {
+      throw new CannotAccessMyCrashException();
+    }
+
+    return crash;
   }
 
   @Transactional()
