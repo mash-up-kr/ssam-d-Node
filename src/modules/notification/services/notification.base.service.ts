@@ -3,7 +3,6 @@ import * as firebaseAdmin from 'firebase-admin';
 import { DeviceTokenNotFoundException } from 'src/exceptions';
 import { ConfigService } from '@nestjs/config';
 import { BatchResponse } from 'firebase-admin/lib/messaging/messaging-api';
-
 export interface ISendFirebaseMessages {
   token: string;
   title?: string;
@@ -59,10 +58,6 @@ export class NotificationBaseService {
       failureCount += result.failureCount;
       successCount += result.successCount;
 
-      /**
-       * 클라이언트 구현 전까지 임시로 보기 위해서
-       *
-       */
       console.log('failureCount' + failureCount);
       console.log('successCount' + successCount);
     }
@@ -73,27 +68,12 @@ export class NotificationBaseService {
     const body: firebaseAdmin.messaging.MulticastMessage = {
       tokens: batchDeviceIds,
       data: payload?.data,
-      notification: {
-        title: payload?.notification?.title,
-        body: payload?.notification?.body,
-      },
-
-      android: {
-        priority: 'high',
-        ttl: 60 * 60 * 24,
-        notification: {
-          sound: payload?.notification?.sound,
-        },
-      },
     };
 
     try {
       const result: BatchResponse = await firebaseAdmin.messaging().sendEachForMulticast(body, false);
       return result;
     } catch (error) {
-      /**
-       * Todo: Logger ,error
-       */
       throw error;
     }
   }
@@ -102,27 +82,12 @@ export class NotificationBaseService {
     const body: firebaseAdmin.messaging.Message = {
       token: deviceTokenId,
       data: payload?.data,
-      notification: {
-        title: payload?.notification?.title,
-        body: payload?.notification?.body,
-      },
-
-      android: {
-        priority: 'high',
-        ttl: 60 * 60 * 24,
-        notification: {
-          sound: payload?.notification?.sound,
-        },
-      },
     };
 
     try {
       const result = await firebaseAdmin.messaging().send(body, false);
       return result;
     } catch (error) {
-      /**
-       * Todo: Logger ,error
-       */
       throw error;
     }
   }

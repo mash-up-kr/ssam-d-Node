@@ -34,21 +34,18 @@ export class SignalNotificationService {
     let successCount = 0;
     const failedDeviceIds = [];
 
-    const displayedMatchingKeywordString = await this.makeNotificationString(matchingKeywords);
-
+    const displayedMatchingKeywordString =
+      matchingKeywords.length === 1
+        ? matchingKeywords[0] + ' 키워드가 일치해요'
+        : matchingKeywords[0].toString() + ' 외 ' + (matchingKeywords.length - 1).toString() + '개 키워드가 일치해요';
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
-        receivedTimeMillis: receivedTimeMillis.toString(),
         notiType: 'SIGNAL',
-      },
-      /**
-       * todo : content 잘라서 줘야하는지 물어보기
-       */
-      notification: {
-        title: '구독 키워드에 대한 시그널이 도착했어요',
+        title: '구독 키워드에 대한 시그널이 도착했어요2',
         body: displayedMatchingKeywordString,
       },
     };
+
     for (let i = 0; i < totalDeviceCount; i += MAX_BATCH_SIZE) {
       const batchDeviceIds = deviceTokenIds.slice(i, i + MAX_BATCH_SIZE);
 
