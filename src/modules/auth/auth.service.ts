@@ -34,8 +34,9 @@ export class AuthService {
     await this.userRepository.update(userId, { refreshToken }, tx);
     await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId, tx);
 
-    const user = await this.userRepository.get({ id: userId });
-    const keywords = await this.userKeywordRepository.getSubscribingKeywords(userId);
+    const user = await this.userRepository.get({ id: userId }, tx);
+
+    const keywords = await this.userKeywordRepository.getSubscribingKeywords(userId, tx);
 
     return { userId, accessToken, refreshToken, user, keywords };
   }
