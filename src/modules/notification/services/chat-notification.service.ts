@@ -32,15 +32,9 @@ export class ChatNotificationService {
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
         roomId: roomId.toString(),
-        receivedTimeMillis: receivedTimeMillis.toString(),
         notiType: 'CHAT',
-      },
-      /**
-       * todo : content 잘라서 줘야하는지 물어보기
-       */
-      notification: {
-        title: content,
-        body: senderName + '님이 보낸 메시지',
+        title: senderName + '님이 보낸 메시지',
+        body: content,
       },
     };
     const result = await this.notificationBaseService.sendOne(deviceTokenId, payload);
