@@ -21,6 +21,15 @@ type CrashApiSpec = Tspec.DefineApiSpec<{
         };
       };
     };
+    '/crashes/{id}': {
+      get: {
+        summary: '크래시 상세 조회';
+        path: { id: number };
+        responses: {
+          200: ApiResponse<CrashResDto>;
+        };
+      };
+    };
     '/crashes/{id}/reply': {
       post: {
         path: { id: number };

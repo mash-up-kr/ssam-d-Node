@@ -52,3 +52,8 @@ export class InvalidCrashException extends ExceptionOf.USER(
   400,
   '답장할 수 없거나 유효하지 않은 크래쉬입니다.' as const
 ) {}
+
+export class CannotAccessMyCrashException extends ExceptionOf.USER(
+  400,
+  '자신이 만들어낸 크래쉬에는 접근할 수 없습니다.' as const
+) {}

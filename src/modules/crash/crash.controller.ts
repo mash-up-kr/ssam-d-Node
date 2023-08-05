@@ -5,6 +5,7 @@ import { PageResDto } from 'src/common/dto/page-res-dto';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { CrashReqDto } from './dto/crash-req.dto';
 import { AuthGuard } from '../auth/guards/jwt.auth.guard';
+import { CrashResDto } from './dto/crash-res.dto';
 
 @UseGuards(AuthGuard)
 @Controller('crashes')
@@ -17,7 +18,16 @@ export class CrashController {
     const paging = new PageReqDto(pageNo, pageLength);
 
     const result = await this.crashService.getList(userId, paging);
-    return new PageResDto(result.totalCount, pageLength, result.list);
+
+    const crashes = result.list.map(crash => CrashResDto.fromDomain(crash));
+    return new PageResDto(result.totalCount, pageLength, crashes);
+  }
+
+  @Get('/:crashId')
+  async getCrash(@AuthUser() userId: number, @Param('crashId', ParseIntPipe) crashId: number) {
+    const crash = await this.crashService.get(userId, crashId);
+
+    return CrashResDto.fromDomain(crash);
   }
 
   @Post('/:id/reply')

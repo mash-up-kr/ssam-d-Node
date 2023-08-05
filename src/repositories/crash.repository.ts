@@ -20,6 +20,7 @@ export class CrashRepository {
 
     const crashes = await prisma.crash.findMany({
       where: { NOT: { userId } },
+      include: { user: true },
       take: limit,
       skip: offset,
       orderBy: {
@@ -40,7 +41,10 @@ export class CrashRepository {
   async get(crashId: number, transaction?: PrismaTransaction): Promise<Crash> {
     const prisma = transaction ?? this.prisma;
 
-    const crashEntity = await prisma.crash.findFirst({ where: { id: crashId, deletedAt: undefined } });
+    const crashEntity = await prisma.crash.findFirst({
+      where: { id: crashId, deletedAt: undefined },
+      include: { user: true },
+    });
     if (!crashEntity) return null;
 
     return new Crash(crashEntity);
