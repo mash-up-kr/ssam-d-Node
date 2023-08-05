@@ -11,6 +11,7 @@ export class CrashRepository {
       data: {
         userId: crashData.userId,
         content: crashData.content,
+        keywords: crashData.keywords
       },
     });
   }
