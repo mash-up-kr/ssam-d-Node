@@ -14,5 +14,5 @@ export const PROFILE_IMAGE_LIST: ProfileImage[] = [
 
 export const ROOM_CONNECTION_CLOSED_MESSAGE = '상대방이 연결을 끊었습니다.';
 export const DELETED_USER_NICKNAME = '키링 은하계를 떠난 자';
-
-export const MY_NICKNAME = '나'
+export const DELETED_USER_PROFILE_IMAGE = 'https://kr.object.ncloudstorage.com/app-images/assets/img_profile_06.png';
+export const MY_NICKNAME = '나';
