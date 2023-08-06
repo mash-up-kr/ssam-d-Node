@@ -14,10 +14,10 @@ export class CrashResDto {
   readonly content: string;
 
   /**
-   * @type {string}
+   * @type {string[]}
    * @example 매쉬업, 노드, 안드로이드, 디자인
    */
-  readonly keywords: string;
+  readonly keywords: string[];
 
   /**
    * @type {number}
@@ -65,9 +65,9 @@ export class CrashResDto {
     return new CrashResDto({
       id: crash.id,
       content: crash.content,
-      keywords: crash.keywords ?? '',
+      keywords: crash.keywordList,
       userId: crash.userId,
-      matchingKeywordCount: crash.keywords?.split(',').length ?? 0,
+      matchingKeywordCount: crash.keywordList.length ?? 0,
       nickname: crash.user.nickname,
       profileImage: crash.user.profileImageUrl,
       receivedTimeMillis: crash.createdAt.getTime(),
