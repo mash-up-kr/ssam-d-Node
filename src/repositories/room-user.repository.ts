@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { User } from 'src/domains/user';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { RoomResDto } from '../modules/room/dto/room-res-dto';
-import { ROOM_CONNECTION_CLOSED_MESSAGE } from '../common/constants';
+import { DELETED_USER_NICKNAME, DELETED_USER_PROFILE_IMAGE, ROOM_CONNECTION_CLOSED_MESSAGE } from '../common/constants';
 
 @Injectable()
 export class RoomUserRepository {
@@ -74,6 +74,7 @@ export class RoomUserRepository {
           select: {
             profileImageUrl: true,
             nickname: true,
+            deletedAt: true,
           },
         },
         room: {
@@ -99,6 +100,8 @@ export class RoomUserRepository {
     });
 
     return roomUsers.map(roomUser => {
+      const nickname = roomUser.user.deletedAt ? roomUser.user.nickname : DELETED_USER_NICKNAME;
+      const profileImage = roomUser.user.deletedAt ? roomUser.user.profileImageUrl : DELETED_USER_PROFILE_IMAGE;
       const recentSignalContent = roomUser.room.isAlive
         ? roomUser.room.chat[0].content
         : ROOM_CONNECTION_CLOSED_MESSAGE;
@@ -108,8 +111,8 @@ export class RoomUserRepository {
         keywords: roomUser.room.keywords?.split(',') ?? [],
         recentSignalContent: recentSignalContent,
         matchingKeywordCount: roomUser.room.keywords?.split(',').length ?? 0,
-        nickname: roomUser.user.nickname,
-        profileImage: roomUser.user.profileImageUrl,
+        nickname: nickname,
+        profileImage: profileImage,
         isAlive: roomUser.room.isAlive,
         isChatRead: roomUser.room.roomUser[0].isChatRead,
         recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),

@@ -24,6 +24,18 @@ export class RoomRepository {
     return new Room(roomEntity);
   }
 
+  async getRoomIdsByUserId(userId: number, transaction?: PrismaTransaction): Promise<number[]> {
+    const prisma = transaction ?? this.prisma;
+
+    const rooms: Pick<Room, 'id'>[] = await prisma.$queryRaw`
+    SELECT r.id
+      FROM room r
+      JOIN room_user ru ON r.id = ru.room_id
+     WHERE ru.user_id = ${userId}
+  `;
+    return rooms.map(room => room.id);
+  }
+
   async update(id: number, room: Prisma.RoomUpdateInput, transaction?: PrismaTransaction) {
     const prisma = transaction ?? this.prisma;
 

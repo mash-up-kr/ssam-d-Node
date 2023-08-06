@@ -6,5 +6,6 @@ import { ChatRepository, RoomRepository, RoomUserRepository, UserRepository } fr
 @Module({
   controllers: [RoomController],
   providers: [RoomService, RoomRepository, RoomUserRepository, UserRepository, ChatRepository],
+  exports: [RoomService, RoomRepository, RoomUserRepository],
 })
 export class RoomModule {}
