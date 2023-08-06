@@ -16,4 +16,9 @@ export class Crash {
     this.user = crash.user;
     this.createdAt = crash.createdAt;
   }
+  get keywordList(): string[] {
+    if (!this.keywords) return [];
+    const keyword = this.keywords.split(',');
+    return keyword.map(item => item.trim());
+  }
 }

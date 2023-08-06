@@ -105,9 +105,9 @@ export class RoomUserRepository {
 
       return new RoomResDto({
         id: roomUser.room.id,
-        keywords: roomUser.room.keywords.split(','),
+        keywords: roomUser.room.keywords?.split(',') ?? [],
         recentSignalContent: recentSignalContent,
-        matchingKeywordCount: roomUser.room.keywords.split(',').length,
+        matchingKeywordCount: roomUser.room.keywords?.split(',').length ?? 0,
         nickname: roomUser.user.nickname,
         profileImage: roomUser.user.profileImageUrl,
         isAlive: roomUser.room.isAlive,

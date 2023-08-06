@@ -64,13 +64,13 @@ export class CrashService {
 
     await this.crashRepository.delete(crashId);
 
-    const room = await this.roomRepository.save({ keywords: crash.keywords }, transaction);
+    const room = await this.roomRepository.save({}, transaction);
 
     const firstSender = new RoomUser({ roomId: room.id, userId: crash.userId });
     const replySender = new RoomUser({ roomId: room.id, userId });
     await this.roomUserRepository.saveAll([firstSender, replySender], transaction);
 
-    const firstChat = new Chat({ roomId: room.id, content, senderId: crash.userId, createdAt: crash.createdAt });
+    const firstChat = new Chat({ roomId: room.id, content: crash.content, senderId: crash.userId, createdAt: crash.createdAt });
     const replyChat = new Chat({ roomId: room.id, content, senderId: userId });
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
   }
