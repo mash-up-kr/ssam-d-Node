@@ -11,6 +11,7 @@ import {
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import {
+  MatchingUserNotFoundException,
   SignalNotFoundException,
   SignalReplyException,
   SignalSenderMismatchException,
@@ -101,6 +102,11 @@ export class SignalService {
     const { content } = signalReqDto;
     const firstSignal = await this.signalRepository.get({ id: signalId });
     if (!firstSignal) throw new SignalNotFoundException();
+
+    const firstSender = await this.userRepository.get({ id: firstSignal.senderId });
+    if (!firstSender) {
+      throw new MatchingUserNotFoundException();
+    }
 
     if (senderId !== firstSignal.receiverId) {
       throw new SignalSenderMismatchException();
