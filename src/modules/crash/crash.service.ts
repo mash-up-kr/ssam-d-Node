@@ -45,6 +45,11 @@ export class CrashService {
 
     return crash;
   }
+  async replyAndNotification(userId: number, crashId: number, replyReqDto: CrashReqDto): Promise<void> {
+    const { content } = replyReqDto;
+    const roomId = await this.reply(userId, crashId, replyReqDto);
+    await this.chatNotificationService.sendChatNotification(userId, roomId, content);
+  }
 
   @Transactional()
   async reply(
@@ -52,7 +57,7 @@ export class CrashService {
     crashId: number,
     replyReqDto: CrashReqDto,
     transaction: PrismaTransaction = null
-  ): Promise<void> {
+  ): Promise<number> {
     const { content } = replyReqDto;
 
     const crash = await this.crashRepository.get(crashId, transaction);
@@ -72,9 +77,15 @@ export class CrashService {
     const replySender = new RoomUser({ roomId: room.id, userId });
     await this.roomUserRepository.saveAll([firstSender, replySender], transaction);
 
-    const firstChat = new Chat({ roomId: room.id, content: crash.content, senderId: crash.userId, createdAt: crash.createdAt });
+    const firstChat = new Chat({
+      roomId: room.id,
+      content: crash.content,
+      senderId: crash.userId,
+      createdAt: crash.createdAt,
+    });
     const replyChat = new Chat({ roomId: room.id, content, senderId: userId });
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
     await this.chatNotificationService.sendChatNotification(userId, room.id, content);
+    return room.id;
   }
 }

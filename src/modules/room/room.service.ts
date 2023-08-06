@@ -92,6 +92,11 @@ export class RoomService {
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
+  async sendChatAndNotification(senderId: number, roomId: number, content: string) {
+    await this.sendChat(senderId, roomId, content);
+    await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
+  }
+
   @Transactional()
   async sendChat(senderId: number, roomId: number, content: string, transaction: PrismaTransaction = null) {
     const senderInRoom = await this.roomUserRepository.get(senderId, roomId, transaction);
@@ -104,10 +109,6 @@ export class RoomService {
     const chatEntity = await this.chatRepository.save(chat, transaction);
     await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
     await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt }, transaction);
-    /**
-     * @todo fcm alarm
-     */
-    await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
   }
 
   private async setUnreadForReceiverRoom(

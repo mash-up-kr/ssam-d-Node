@@ -36,6 +36,6 @@ export class CrashController {
     @Param('id', ParseIntPipe) crashId: number,
     @Body() replyReqDto: CrashReqDto
   ) {
-    await this.crashService.reply(userId, crashId, replyReqDto);
+    await this.crashService.replyAndNotification(userId, crashId, replyReqDto);
   }
 }

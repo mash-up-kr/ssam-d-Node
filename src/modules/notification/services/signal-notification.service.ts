@@ -28,17 +28,17 @@ export class SignalNotificationService {
 
   async sendSignalNotification(signal: Signal[]): Promise<void> {
     for (let i = 0; i < signal.length; i++) {
-      let receiverId: number = signal[i].receiverId;
-      let deviceToken = await this.deviceTokenRepository.find(receiverId);
+      const receiverId: number = signal[i].receiverId;
+      const deviceToken = await this.deviceTokenRepository.find(receiverId);
       if (!deviceToken.value) continue;
-      let keyword = signal[i].keywords.split(',');
-      let keywordList = keyword.map(item => item.trim());
-      let displayedMatchingKeywordString =
+      const keyword = signal[i].keywords.split(',');
+      const keywordList = keyword.map(item => item.trim());
+      const displayedMatchingKeywordString =
         keywordList.length === 1
           ? keywordList[0] + ' 키워드가 일치해요'
           : keywordList[0].toString() + ' 외 ' + (keywordList.length - 1).toString() + '개 키워드가 일치해요';
 
-      let payload: firebaseAdmin.messaging.MessagingPayload = {
+      const payload: firebaseAdmin.messaging.MessagingPayload = {
         data: {
           notiType: 'SIGNAL',
           title: '구독 키워드에 대한 시그널이 도착했어요',
