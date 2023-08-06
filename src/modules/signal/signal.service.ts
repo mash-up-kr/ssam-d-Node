@@ -27,6 +27,7 @@ import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 import { DELETED_USER_NICKNAME } from 'src/common/constants';
 import { SentSignalResDto } from './dto/sent-signal-res-dto';
 import { SentSignalDetailResDto } from './dto/sent-signal-detail-res-dto';
+import { SignalNotificationService } from '../notification/services/signal-notification.service';
 
 @Injectable()
 export class SignalService {
@@ -37,7 +38,8 @@ export class SignalService {
     private readonly roomUserRepository: RoomUserRepository,
     private readonly chatRepository: ChatRepository,
     private readonly userKeywordRepository: UserKeywordRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly signalNotificationService: SignalNotificationService
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -63,6 +65,8 @@ export class SignalService {
           content: content,
         } as unknown as Exclude<Signal, 'id'>;
       });
+      await this.signalNotificationService.sendSignalNotification(signalData);
+
       try {
         await this.signalRepository.save(signalData);
       } catch (e) {

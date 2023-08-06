@@ -18,6 +18,7 @@ import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
 
 @Injectable()
 export class RoomService {
@@ -25,7 +26,8 @@ export class RoomService {
     private readonly roomUserRepository: RoomUserRepository,
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
-    private readonly chatRepository: ChatRepository
+    private readonly chatRepository: ChatRepository,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
@@ -105,6 +107,7 @@ export class RoomService {
     /**
      * @todo fcm alarm
      */
+    await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
   }
 
   private async setUnreadForReceiverRoom(

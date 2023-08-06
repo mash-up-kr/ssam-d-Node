@@ -11,10 +11,13 @@ import {
   UserRepository,
 } from 'src/repositories';
 import { KeywordsModule } from '../keywords/keywords.module';
+import { SignalNotificationService } from '../notification/services/signal-notification.service';
+import { NotificationBaseService } from '../notification/services/notification.base.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   controllers: [SignalController],
-  imports: [KeywordsModule],
+  imports: [KeywordsModule, NotificationModule],
   providers: [
     SignalService,
     SignalRepository,

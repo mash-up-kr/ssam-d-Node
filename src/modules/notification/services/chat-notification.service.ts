@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as firebaseAdmin from 'firebase-admin';
 import { DeviceTokenNotFoundException } from 'src/exceptions';
 import { NotificationBaseService } from './notification.base.service';
+import { RoomUserRepository, DeviceTokenRepository, UserRepository } from 'src/repositories';
 
 export interface ISendFirebaseMessages {
   token: string;
@@ -17,27 +18,30 @@ export interface ISendFirebaseMessages {
  */
 @Injectable()
 export class ChatNotificationService {
-  constructor(private readonly notificationBaseService: NotificationBaseService) {}
+  constructor(
+    private readonly notificationBaseService: NotificationBaseService,
+    private readonly roomUserRepository: RoomUserRepository,
+    private readonly deviceTokenRepository: DeviceTokenRepository,
+    private readonly userRepository: UserRepository
+  ) {}
 
-  async sendNotification(
-    deviceTokenId: string,
-    roomId: number,
-    receivedTimeMillis: number,
-    content: string,
-    senderName: string
-  ): Promise<string> {
-    if (deviceTokenId.length === 0) {
+  async sendChatNotification(senderId: number, roomId: number, content: string): Promise<string> {
+    const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
+    const sender = await this.userRepository.get({ id: senderId });
+    const deviceTokenObject = await this.deviceTokenRepository.find(receiver.id);
+    const deviceToken = deviceTokenObject.value;
+    if (deviceToken.length === 0) {
       throw new DeviceTokenNotFoundException();
     }
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
         roomId: roomId.toString(),
         notiType: 'CHAT',
-        title: senderName + '님이 보낸 메시지',
+        title: sender.nickname + '님이 보낸 메시지',
         body: content,
       },
     };
-    const result = await this.notificationBaseService.sendOne(deviceTokenId, payload);
+    const result = await this.notificationBaseService.sendOne(deviceToken, payload);
 
     return result;
   }
