@@ -15,6 +15,6 @@ import { DeviceTokenRepository, RoomUserRepository, UserRepository } from 'src/r
     RoomUserRepository,
     UserRepository,
   ],
-  exports: [ChatNotificationService, SignalNotificationService],
+  exports: [ChatNotificationService, SignalNotificationService, DeviceTokenRepository, NotificationBaseService],
 })
 export class NotificationModule {}

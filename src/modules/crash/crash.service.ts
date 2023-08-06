@@ -8,6 +8,7 @@ import { CannotAccessMyCrashException, CrashNotFoundException, InvalidCrashExcep
 import { RoomUser } from 'src/domains/room-user';
 import { Chat } from 'src/domains/chat';
 import { CrashResDto } from './dto/crash-res.dto';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
 
 @Injectable()
 export class CrashService {
@@ -15,7 +16,8 @@ export class CrashService {
     private readonly crashRepository: CrashRepository,
     private readonly roomRepository: RoomRepository,
     private readonly roomUserRepository: RoomUserRepository,
-    private readonly chatRepository: ChatRepository
+    private readonly chatRepository: ChatRepository,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   @Transactional()
@@ -73,5 +75,6 @@ export class CrashService {
     const firstChat = new Chat({ roomId: room.id, content: crash.content, senderId: crash.userId, createdAt: crash.createdAt });
     const replyChat = new Chat({ roomId: room.id, content, senderId: userId });
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
+    await this.chatNotificationService.sendChatNotification(userId, room.id, content);
   }
 }

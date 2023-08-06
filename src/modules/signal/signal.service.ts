@@ -28,6 +28,7 @@ import { DELETED_USER_NICKNAME } from 'src/common/constants';
 import { SentSignalResDto } from './dto/sent-signal-res-dto';
 import { SentSignalDetailResDto } from './dto/sent-signal-detail-res-dto';
 import { SignalNotificationService } from '../notification/services/signal-notification.service';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
 
 @Injectable()
 export class SignalService {
@@ -39,7 +40,8 @@ export class SignalService {
     private readonly chatRepository: ChatRepository,
     private readonly userKeywordRepository: UserKeywordRepository,
     private readonly userRepository: UserRepository,
-    private readonly signalNotificationService: SignalNotificationService
+    private readonly signalNotificationService: SignalNotificationService,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -54,9 +56,6 @@ export class SignalService {
         throw new SignalSendException();
       }
     } else {
-      /**
-       * TODO:  deviceToken으로 알림하고 시그널 전송하기, + 키워드 개수
-       * */
       const signalData = matchingInfo.map(matchingData => {
         return {
           senderId: senderId,
@@ -111,7 +110,8 @@ export class SignalService {
     }
 
     try {
-      await this.createRoomAndChat(firstSignal, senderId, content);
+      const roomId = await this.createRoomAndChat(firstSignal, senderId, content);
+      await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
     } catch (e) {
       throw new SignalReplyException();
     }
@@ -123,7 +123,7 @@ export class SignalService {
     senderId: number,
     content: string,
     transaction: PrismaTransaction = null
-  ): Promise<void> {
+  ): Promise<number> {
     const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
     await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
     await this.signalRepository.deleteById(firstSignal.id, transaction);
@@ -149,6 +149,7 @@ export class SignalService {
       senderId: senderId,
     };
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
+    return room.id;
   }
 
   async getSignalListById(receiverId: number, pageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
