@@ -7,7 +7,6 @@ import { RoomService } from '../room/room.service';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let roomService: RoomService;
   let userRepository: ReturnType<typeof MockUserRepository>;
   let roomRepository: ReturnType<typeof MockRoomRepository>;
 
@@ -25,7 +24,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    roomService = module.get<RoomService>(RoomService);
     userRepository = module.get(UserRepository);
     roomRepository = module.get(RoomRepository);
   });
