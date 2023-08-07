@@ -100,8 +100,8 @@ export class RoomUserRepository {
     });
 
     return roomUsers.map(roomUser => {
-      const nickname = roomUser.user.deletedAt ? roomUser.user.nickname : DELETED_USER_NICKNAME;
-      const profileImage = roomUser.user.deletedAt ? roomUser.user.profileImageUrl : DELETED_USER_PROFILE_IMAGE;
+      const nickname = roomUser.user.deletedAt ? DELETED_USER_NICKNAME : roomUser.user.nickname;
+      const profileImage = roomUser.user.deletedAt ? DELETED_USER_PROFILE_IMAGE : roomUser.user.profileImageUrl;
       const recentSignalContent = roomUser.room.isAlive
         ? roomUser.room.chat[0].content
         : ROOM_CONNECTION_CLOSED_MESSAGE;
