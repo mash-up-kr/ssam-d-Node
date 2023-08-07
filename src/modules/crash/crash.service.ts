@@ -47,6 +47,7 @@ export class CrashService {
   }
   async replyAndNotification(userId: number, crashId: number, replyReqDto: CrashReqDto): Promise<void> {
     const { content } = replyReqDto;
+
     const roomId = await this.reply(userId, crashId, replyReqDto);
     await this.chatNotificationService.sendChatNotification(userId, roomId, content);
   }
@@ -85,7 +86,6 @@ export class CrashService {
     });
     const replyChat = new Chat({ roomId: room.id, content, senderId: userId });
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
-    await this.chatNotificationService.sendChatNotification(userId, room.id, content);
     return room.id;
   }
 }
