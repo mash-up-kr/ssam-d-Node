@@ -16,7 +16,7 @@ model User {
   provider        String        @default("KAKAO")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
-  agreeAlarm      Boolean       @default(false) @map("agree_alarm")
+  agreeAlarm      Boolean       @default(true) @map("agree_alarm")
   profileImageUrl String        @map("profile_image_url")
   deletedAt       DateTime?     @map("deleted_at")
   send            Chat[]        @relation("Sender")
@@ -124,7 +124,20 @@ model Crash {
   keywords    String?
   user        User      @relation(fields: [userId], references: [id])
   userId      Int       @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   @@index([userId], map: "trash_user_id_fkey")
   @@map("crash")
+}
+
+model Report {
+  id               Int       @id @default(autoincrement())
+  content          String 
+  roomId           Int       @map("room_id")
+  reportingUserId  Int       @map("reporting_user_id")
+  reportedUserId   Int       @map("reported_user_id")
+  createdAt        DateTime  @default(now())     @map("created_at")
+
+  @@map("report")
 }

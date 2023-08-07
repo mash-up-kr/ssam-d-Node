@@ -11,6 +11,7 @@ import {
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import {
+  MatchingUserNotFoundException,
   SignalNotFoundException,
   SignalReplyException,
   SignalSenderMismatchException,
@@ -25,6 +26,10 @@ import { PageReqDto } from 'src/common/dto/page-req-dto';
 import { PageResDto } from 'src/common/dto/page-res-dto';
 import { SignalDetailResDto } from './dto/signal-detail-res-dto';
 import { DELETED_USER_NICKNAME } from 'src/common/constants';
+import { SentSignalResDto } from './dto/sent-signal-res-dto';
+import { SentSignalDetailResDto } from './dto/sent-signal-detail-res-dto';
+import { SignalNotificationService } from '../notification/services/signal-notification.service';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
 
 @Injectable()
 export class SignalService {
@@ -35,7 +40,9 @@ export class SignalService {
     private readonly roomUserRepository: RoomUserRepository,
     private readonly chatRepository: ChatRepository,
     private readonly userKeywordRepository: UserKeywordRepository,
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly signalNotificationService: SignalNotificationService,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   async sendSignal(senderId: number, signalReqDto: SignalReqDto): Promise<void> {
@@ -50,9 +57,6 @@ export class SignalService {
         throw new SignalSendException();
       }
     } else {
-      /**
-       * TODO:  deviceToken으로 알림하고 시그널 전송하기, + 키워드 개수
-       * */
       const signalData = matchingInfo.map(matchingData => {
         return {
           senderId: senderId,
@@ -61,6 +65,8 @@ export class SignalService {
           content: content,
         } as unknown as Exclude<Signal, 'id'>;
       });
+      await this.signalNotificationService.sendSignalNotification(signalData);
+
       try {
         await this.signalRepository.save(signalData);
       } catch (e) {
@@ -100,12 +106,18 @@ export class SignalService {
     const firstSignal = await this.signalRepository.get({ id: signalId });
     if (!firstSignal) throw new SignalNotFoundException();
 
+    const firstSender = await this.userRepository.get({ id: firstSignal.senderId });
+    if (!firstSender) {
+      throw new MatchingUserNotFoundException();
+    }
+
     if (senderId !== firstSignal.receiverId) {
       throw new SignalSenderMismatchException();
     }
 
     try {
-      await this.createRoomAndChat(firstSignal, senderId, content);
+      const roomId = await this.createRoomAndChat(firstSignal, senderId, content);
+      await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
     } catch (e) {
       throw new SignalReplyException();
     }
@@ -117,7 +129,7 @@ export class SignalService {
     senderId: number,
     content: string,
     transaction: PrismaTransaction = null
-  ): Promise<void> {
+  ): Promise<number> {
     const room = await this.roomRepository.save({ keywords: firstSignal.keywords }, transaction);
     await this.signalRepository.update(firstSignal.id, { roomId: room.id }, transaction);
     await this.signalRepository.deleteById(firstSignal.id, transaction);
@@ -143,29 +155,62 @@ export class SignalService {
       senderId: senderId,
     };
     await this.chatRepository.saveAll([firstChat, replyChat], transaction);
+    return room.id;
   }
 
   async getSignalListById(receiverId: number, pageReqDto: PageReqDto): Promise<PageResDto<SignalResDto>> {
     const { pageLength } = pageReqDto;
     const totalSignalNumber = await this.signalRepository.countSignalsById(receiverId);
-    const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit(), pageReqDto.offset());
+    const signals: Signal[] = await this.signalRepository.getList(receiverId, pageReqDto.limit, pageReqDto.offset);
     const senderIds = signals.map(signal => signal.senderId);
     const userList = await this.userRepository.getUserList(senderIds);
 
-    const signalList = signals.map(signal => {
-      const sender = userList.find(user => user.id === signal.senderId);
-      return new SignalResDto({
-        signalId: signal.id,
-        receiverId: signal.receiverId,
-        senderId: signal.senderId,
-        senderName: sender?.nickname ?? DELETED_USER_NICKNAME,
-        senderProfileImageUrl: sender?.profileImageUrl,
-        content: signal.content,
-        keywords: signal.keywords.split(','),
-        keywordsCount: signal.keywords.split(',').length,
-        receivedTimeMillis: new Date(signal.createdAt).getTime(),
+    const signalList = signals
+      .filter(signal => userList.map(user => user.id).includes(signal.senderId))
+      .map(signal => {
+        const sender = userList.find(user => user.id === signal.senderId);
+        return new SignalResDto({
+          signalId: signal.id,
+          receiverId: signal.receiverId,
+          senderId: signal.senderId,
+          senderName: sender?.nickname ?? DELETED_USER_NICKNAME,
+          senderProfileImageUrl: sender?.profileImageUrl,
+          content: signal.content,
+          keywords: signal.keywords.split(','),
+          keywordsCount: signal.keywords.split(',').length,
+          receivedTimeMillis: new Date(signal.createdAt).getTime(),
+        });
       });
-    });
     return new PageResDto(totalSignalNumber, pageLength, signalList);
+  }
+
+  async getSentSignals(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<SentSignalResDto>> {
+    const { pageLength } = pageReqDto;
+    const sentSignals = await this.signalRepository.getSentSignalsByUserId(userId, pageReqDto.limit, pageReqDto.offset);
+    const sentSignalResDtoList = sentSignals.map(
+      sentSignal =>
+        new SentSignalResDto({
+          id: sentSignal.id,
+          content: sentSignal.content,
+          sentTimeMillis: sentSignal.createdAt,
+        })
+    );
+    return new PageResDto(sentSignals.length, pageLength, sentSignalResDtoList);
+  }
+
+  async getSentSignalDetail(userId: number, signalId: number): Promise<SentSignalDetailResDto> {
+    const signal = await this.signalRepository.get({ id: signalId });
+    if (!signal) throw new SignalNotFoundException();
+    const user = await this.userRepository.get({ id: signal.senderId });
+    if (!user) throw new UserNotFoundException();
+
+    return new SentSignalDetailResDto({
+      id: signal.id,
+      keywords: signal.keywordList,
+      matchingKeywordCount: signal.keywordList.length,
+      content: signal.content,
+      profileImage: user.profileImageUrl,
+      sentTimeMillis: new Date(signal.createdAt).getTime(),
+    });
   }
 }

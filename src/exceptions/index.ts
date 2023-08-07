@@ -40,3 +40,20 @@ export class CannotSendChatException extends ExceptionOf.USER(
 export class RoomIsDeadException extends ExceptionOf.USER(400, '상대방이 연결이 끊은 방입니다.' as const) {}
 
 export class SignalSendException extends ExceptionOf.USER(500, '시그널을 보낼 수 없습니다.' as const) {}
+
+export class DeviceTokenNotFoundException extends ExceptionOf.INTERNAL(
+  500,
+  '디바이스토큰 아이디가 존재하지 않습니다.' as const
+) {}
+
+export class CrashNotFoundException extends ExceptionOf.USER(400, '존재하지 않는 크래쉬입니다.' as const) {}
+
+export class InvalidCrashException extends ExceptionOf.USER(
+  400,
+  '답장할 수 없거나 유효하지 않은 크래쉬입니다.' as const
+) {}
+
+export class CannotAccessMyCrashException extends ExceptionOf.USER(
+  400,
+  '자신이 만들어낸 크래쉬에는 접근할 수 없습니다.' as const
+) {}

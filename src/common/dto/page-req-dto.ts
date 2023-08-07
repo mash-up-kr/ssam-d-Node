@@ -6,9 +6,9 @@ export class PageReqDto {
    *@requires false
    * @type {number}
    */
-  @Transform(({ value }) => parseInt(value))
   @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => parseInt(value))
   pageNo: number;
 
   @IsNumber()
@@ -16,7 +16,7 @@ export class PageReqDto {
   @Transform(({ value }) => parseInt(value))
   pageLength?: number;
 
-  offset(): number {
+  get offset(): number {
     if (this.pageLength < 1 || this.pageLength === null || this.pageLength === undefined) {
       this.pageLength = 10;
     }
@@ -24,7 +24,7 @@ export class PageReqDto {
     return (Number(this.pageNo) - 1) * Number(this.pageLength);
   }
 
-  limit(): number {
+  get limit(): number {
     if (this.pageLength < 1 || this.pageLength === null || this.pageLength === undefined) {
       this.pageLength = 10;
     }

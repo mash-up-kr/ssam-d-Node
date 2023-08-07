@@ -1,23 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { UserRepository } from 'src/repositories';
-import { MockUserRepository } from 'test/mock/repositories';
+import { RoomRepository, UserRepository } from 'src/repositories';
+import { MockRoomRepository, MockUserRepository } from 'test/mock/repositories';
 import { DuplicatedNicknameException, UserNotFoundException } from 'src/exceptions';
+import { RoomService } from '../room/room.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let userRepository: ReturnType<typeof MockUserRepository>;
+  let roomRepository: ReturnType<typeof MockRoomRepository>;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService, { provide: UserRepository, useValue: MockUserRepository() }],
+      providers: [
+        UsersService,
+        {
+          provide: RoomService,
+          useValue: { deleteRoom: jest.fn() },
+        },
+        { provide: UserRepository, useValue: MockUserRepository() },
+        { provide: RoomRepository, useValue: MockRoomRepository() },
+      ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     userRepository = module.get(UserRepository);
+    roomRepository = module.get(RoomRepository);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(userRepository).toBeDefined();
     expect(userRepository).toBeDefined();
   });
 
@@ -73,7 +86,10 @@ describe('UsersService', () => {
       await expect(service.deleteById(userId)).rejects.toBeInstanceOf(UserNotFoundException);
     });
     it('유저 정상 삭제', async () => {
+      userRepository.get.mockResolvedValue({ id: 1 });
+      roomRepository.getRoomIdsByUserId.mockResolvedValue([{ id: 1 }]);
       const userId = 1;
+
       const res = await service.deleteById(userId);
       expect(res).toEqual(undefined);
     });

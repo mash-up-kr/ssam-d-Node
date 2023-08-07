@@ -18,6 +18,8 @@ import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
+import { DELETED_USER_NICKNAME, DELETED_USER_PROFILE_IMAGE } from 'src/common/constants';
 
 @Injectable()
 export class RoomService {
@@ -25,7 +27,8 @@ export class RoomService {
     private readonly roomUserRepository: RoomUserRepository,
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
-    private readonly chatRepository: ChatRepository
+    private readonly chatRepository: ChatRepository,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
@@ -35,8 +38,8 @@ export class RoomService {
     const roomResDtoList = await this.roomUserRepository.getRoomList(
       userId,
       roomIds,
-      pageReqDto.limit(),
-      pageReqDto.offset()
+      pageReqDto.limit,
+      pageReqDto.offset
     );
     return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
@@ -48,11 +51,15 @@ export class RoomService {
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
+    const nickname = matchingUser.deletedAt ? matchingUser.nickname : DELETED_USER_NICKNAME;
+    const profileImage = matchingUser.deletedAt ? matchingUser.profileImageUrl : DELETED_USER_PROFILE_IMAGE;
+
     return new RoomDetailResDto({
       id: roomId,
       keywords: room.keywordList,
-      matchingUserName: matchingUser.nickname,
-      matchingUserProfileImage: matchingUser.profileImageUrl,
+      matchingUserId: matchingUser.id,
+      matchingUserName: nickname,
+      matchingUserProfileImage: profileImage,
       chatColor: getImageColor(matchingUser.profileImageUrl),
       isAlive: room.isAlive,
     });
@@ -71,7 +78,7 @@ export class RoomService {
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
     const totalChatNumber = await this.chatRepository.countChatByRoomId(roomId);
-    const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit(), pageReqDto.offset());
+    const chatList = await this.chatRepository.getListByRoomId(roomId, pageReqDto.limit, pageReqDto.offset);
     const chatResDtoList = chatList.map(
       chat =>
         new ChatResDto({
@@ -89,6 +96,11 @@ export class RoomService {
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
+  async sendChatAndNotification(senderId: number, roomId: number, content: string) {
+    await this.sendChat(senderId, roomId, content);
+    await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
+  }
+
   @Transactional()
   async sendChat(senderId: number, roomId: number, content: string, transaction: PrismaTransaction = null) {
     const senderInRoom = await this.roomUserRepository.get(senderId, roomId, transaction);
@@ -101,9 +113,6 @@ export class RoomService {
     const chatEntity = await this.chatRepository.save(chat, transaction);
     await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
     await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt }, transaction);
-    /**
-     * @todo fcm alarm
-     */
   }
 
   private async setUnreadForReceiverRoom(

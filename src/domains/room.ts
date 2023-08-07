@@ -14,6 +14,7 @@ export class Room {
   }
 
   get keywordList(): string[] {
+    if (!this.keywords) return [];
     const keyword = this.keywords.split(',');
     return keyword.map(item => item.trim());
   }

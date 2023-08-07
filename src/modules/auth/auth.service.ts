@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { DeviceTokenRepository, UserRepository } from 'src/repositories';
+import { DeviceTokenRepository, UserKeywordRepository, UserRepository } from 'src/repositories';
 
 import { LoginReqDto } from './dto/login-req-dto';
 import { LoginResDto } from './dto/login-res-dto';
@@ -16,6 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly userRepository: UserRepository,
+    private readonly userKeywordRepository: UserKeywordRepository,
     private readonly deviceTokenRepository: DeviceTokenRepository
   ) {}
 
@@ -33,7 +34,11 @@ export class AuthService {
     await this.userRepository.update(userId, { refreshToken }, tx);
     await this.deviceTokenRepository.upsert(loginReqDto.deviceToken, userId, tx);
 
-    return { userId, accessToken, refreshToken };
+    const user = await this.userRepository.get({ id: userId }, tx);
+
+    const keywords = await this.userKeywordRepository.getSubscribingKeywords(userId, tx);
+
+    return { userId, accessToken, refreshToken, user, keywords };
   }
 
   async generateAccessToken(payload: object): Promise<string> {
