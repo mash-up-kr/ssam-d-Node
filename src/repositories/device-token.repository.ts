@@ -34,4 +34,8 @@ export class DeviceTokenRepository {
     const deviceToken = await this.prisma.deviceToken.findFirst({ where: { userId: userId } });
     return new DeviceToken(deviceToken);
   }
+  async findAll(userId: number): Promise<DeviceToken[]> {
+    const deviceTokens = await this.prisma.deviceToken.findMany({ where: { userId: userId } });
+    return deviceTokens.map(deviceToken => new DeviceToken(deviceToken));
+  }
 }

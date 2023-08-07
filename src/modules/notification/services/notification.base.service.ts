@@ -64,9 +64,9 @@ export class NotificationBaseService {
 
     return { failureCount, successCount, failedDeviceIds };
   }
-  async sendAll(batchDeviceIds: string[], payload: firebaseAdmin.messaging.MessagingPayload): Promise<BatchResponse> {
+  async sendAll(deviceTokenIds: string[], payload: firebaseAdmin.messaging.MessagingPayload): Promise<BatchResponse> {
     const body: firebaseAdmin.messaging.MulticastMessage = {
-      tokens: batchDeviceIds,
+      tokens: deviceTokenIds,
       data: payload?.data,
     };
 
@@ -74,7 +74,8 @@ export class NotificationBaseService {
       const result: BatchResponse = await firebaseAdmin.messaging().sendEachForMulticast(body, false);
       return result;
     } catch (error) {
-      throw error;
+      console.log(error);
+      console.log(deviceTokenIds);
     }
   }
 
