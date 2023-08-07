@@ -88,7 +88,8 @@ export class NotificationBaseService {
       const result = await firebaseAdmin.messaging().send(body, false);
       return result;
     } catch (error) {
-      throw error;
+      console.log(error);
+      console.log(deviceTokenId);
     }
   }
 }

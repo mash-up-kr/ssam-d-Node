@@ -18,6 +18,7 @@ import { PageResDto } from '../../common/dto/page-res-dto';
 import { Transactional } from 'src/common/lazy-decorators/transactional.decorator';
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
+import { ChatNotificationService } from '../notification/services/chat-notification.service';
 import { DELETED_USER_NICKNAME, DELETED_USER_PROFILE_IMAGE } from 'src/common/constants';
 
 @Injectable()
@@ -26,7 +27,8 @@ export class RoomService {
     private readonly roomUserRepository: RoomUserRepository,
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
-    private readonly chatRepository: ChatRepository
+    private readonly chatRepository: ChatRepository,
+    private readonly chatNotificationService: ChatNotificationService
   ) {}
 
   async getRoomListByUserId(userId: number, pageReqDto: PageReqDto): Promise<PageResDto<RoomResDto>> {
@@ -94,6 +96,11 @@ export class RoomService {
     return new PageResDto(totalChatNumber, pageReqDto.pageLength, chatResDtoList);
   }
 
+  async sendChatAndNotification(senderId: number, roomId: number, content: string) {
+    await this.sendChat(senderId, roomId, content);
+    await this.chatNotificationService.sendChatNotification(senderId, roomId, content);
+  }
+
   @Transactional()
   async sendChat(senderId: number, roomId: number, content: string, transaction: PrismaTransaction = null) {
     const senderInRoom = await this.roomUserRepository.get(senderId, roomId, transaction);
@@ -106,9 +113,6 @@ export class RoomService {
     const chatEntity = await this.chatRepository.save(chat, transaction);
     await this.setUnreadForReceiverRoom(senderId, roomId, transaction);
     await this.roomRepository.update(roomId, { latestChatTime: chatEntity.createdAt }, transaction);
-    /**
-     * @todo fcm alarm
-     */
   }
 
   private async setUnreadForReceiverRoom(

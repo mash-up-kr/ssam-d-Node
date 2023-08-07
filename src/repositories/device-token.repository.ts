@@ -30,4 +30,8 @@ export class DeviceTokenRepository {
     });
     return new DeviceToken(savedDeviceToken);
   }
+  async find(userId: number): Promise<DeviceToken> {
+    const deviceToken = await this.prisma.deviceToken.findFirst({ where: { userId: userId } });
+    return new DeviceToken(deviceToken);
+  }
 }

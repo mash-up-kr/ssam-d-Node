@@ -16,7 +16,7 @@ model User {
   provider        String        @default("KAKAO")
   createdAt       DateTime      @default(now()) @map("created_at")
   updatedAt       DateTime      @updatedAt @map("updated_at")
-  agreeAlarm      Boolean       @default(false) @map("agree_alarm")
+  agreeAlarm      Boolean       @default(true) @map("agree_alarm")
   profileImageUrl String        @map("profile_image_url")
   deletedAt       DateTime?     @map("deleted_at")
   send            Chat[]        @relation("Sender")
