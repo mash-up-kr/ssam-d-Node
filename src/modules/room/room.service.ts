@@ -19,6 +19,7 @@ import { Transactional } from 'src/common/lazy-decorators/transactional.decorato
 import { PrismaTransaction } from 'src/types/prisma.type';
 import { ChatDetailResDto } from '../chat/dto/chat-detail-res-dto';
 import { ChatNotificationService } from '../notification/services/chat-notification.service';
+import { DELETED_USER_NICKNAME, DELETED_USER_PROFILE_IMAGE } from 'src/common/constants';
 
 @Injectable()
 export class RoomService {
@@ -50,12 +51,15 @@ export class RoomService {
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
+    const nickname = matchingUser.deletedAt ? matchingUser.nickname : DELETED_USER_NICKNAME;
+    const profileImage = matchingUser.deletedAt ? matchingUser.profileImageUrl : DELETED_USER_PROFILE_IMAGE;
+
     return new RoomDetailResDto({
       id: roomId,
       keywords: room.keywordList,
       matchingUserId: matchingUser.id,
-      matchingUserName: matchingUser.nickname,
-      matchingUserProfileImage: matchingUser.profileImageUrl,
+      matchingUserName: nickname,
+      matchingUserProfileImage: profileImage,
       chatColor: getImageColor(matchingUser.profileImageUrl),
       isAlive: room.isAlive,
     });

@@ -11,6 +11,7 @@ import {
 import { SignalReqDto } from './dto/signal-req-dto';
 import { Signal } from 'src/domains/signal';
 import {
+  MatchingUserNotFoundException,
   SignalNotFoundException,
   SignalReplyException,
   SignalSenderMismatchException,
@@ -105,6 +106,11 @@ export class SignalService {
     const firstSignal = await this.signalRepository.get({ id: signalId });
     if (!firstSignal) throw new SignalNotFoundException();
 
+    const firstSender = await this.userRepository.get({ id: firstSignal.senderId });
+    if (!firstSender) {
+      throw new MatchingUserNotFoundException();
+    }
+
     if (senderId !== firstSignal.receiverId) {
       throw new SignalSenderMismatchException();
     }
@@ -159,20 +165,22 @@ export class SignalService {
     const senderIds = signals.map(signal => signal.senderId);
     const userList = await this.userRepository.getUserList(senderIds);
 
-    const signalList = signals.map(signal => {
-      const sender = userList.find(user => user.id === signal.senderId);
-      return new SignalResDto({
-        signalId: signal.id,
-        receiverId: signal.receiverId,
-        senderId: signal.senderId,
-        senderName: sender?.nickname ?? DELETED_USER_NICKNAME,
-        senderProfileImageUrl: sender?.profileImageUrl,
-        content: signal.content,
-        keywords: signal.keywords.split(','),
-        keywordsCount: signal.keywords.split(',').length,
-        receivedTimeMillis: new Date(signal.createdAt).getTime(),
+    const signalList = signals
+      .filter(signal => userList.map(user => user.id).includes(signal.senderId))
+      .map(signal => {
+        const sender = userList.find(user => user.id === signal.senderId);
+        return new SignalResDto({
+          signalId: signal.id,
+          receiverId: signal.receiverId,
+          senderId: signal.senderId,
+          senderName: sender?.nickname ?? DELETED_USER_NICKNAME,
+          senderProfileImageUrl: sender?.profileImageUrl,
+          content: signal.content,
+          keywords: signal.keywords.split(','),
+          keywordsCount: signal.keywords.split(',').length,
+          receivedTimeMillis: new Date(signal.createdAt).getTime(),
+        });
       });
-    });
     return new PageResDto(totalSignalNumber, pageLength, signalList);
   }
 

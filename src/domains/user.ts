@@ -9,6 +9,7 @@ export class User {
   readonly createdAt: Date;
   readonly updatedAt: Date;
   readonly agreeAlarm: boolean;
+  readonly deletedAt: Date;
 
   constructor(user) {
     this.id = user.id;
@@ -21,5 +22,6 @@ export class User {
     this.createdAt = user.createdAt;
     this.updatedAt = user.updatedAt;
     this.agreeAlarm = user.agreeAlarm;
+    this.deletedAt = user.deletedAt;
   }
 }
