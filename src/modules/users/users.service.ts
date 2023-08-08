@@ -25,11 +25,14 @@ export class UsersService {
   async deleteById(userId: number, transaction: PrismaTransaction = null): Promise<void> {
     const user = await this.userRepository.get({ id: userId }, transaction);
     if (!user) throw new UserNotFoundException();
+
+    await this.userRepository.delete(userId);
     const roomIds = await this.roomRepository.getRoomIdsByUserId(userId, transaction);
     for (const roomId of roomIds) {
       await this.roomService.deleteRoom(userId, roomId, transaction);
     }
   }
+  가;
 
   async getUserById(userId: number): Promise<User> {
     const user = await this.userRepository.get({ id: userId });
