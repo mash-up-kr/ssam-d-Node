@@ -30,9 +30,8 @@ export class SignalNotificationService {
     for (let i = 0; i < signal.length; i++) {
       const receiverId: number = signal[i].receiverId;
       const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiverId);
+      if (deviceTokenObjects.length === 0) continue;
       const deviceTokenValue = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
-
-      if (!deviceTokenValue) continue;
       const keyword = signal[i].keywords.split(',');
       const keywordList = keyword.map(item => item.trim());
       const displayedMatchingKeywordString =
