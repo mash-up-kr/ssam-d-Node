@@ -51,8 +51,8 @@ export class RoomService {
     const matchingUser = await this.roomUserRepository.getMatchingUser(userId, roomId);
     if (!matchingUser) throw new MatchingUserNotFoundException();
 
-    const nickname = matchingUser.deletedAt ? matchingUser.nickname : DELETED_USER_NICKNAME;
-    const profileImage = matchingUser.deletedAt ? matchingUser.profileImageUrl : DELETED_USER_PROFILE_IMAGE;
+    const nickname = matchingUser.deletedAt ? DELETED_USER_NICKNAME : matchingUser.nickname;
+    const profileImage = matchingUser.deletedAt ? DELETED_USER_PROFILE_IMAGE : matchingUser.profileImageUrl;
 
     return new RoomDetailResDto({
       id: roomId,
