@@ -3,6 +3,7 @@ import * as firebaseAdmin from 'firebase-admin';
 import { DeviceTokenNotFoundException } from 'src/exceptions';
 import { ConfigService } from '@nestjs/config';
 import { BatchResponse } from 'firebase-admin/lib/messaging/messaging-api';
+import { DeviceTokenRepository } from 'src/repositories';
 export interface ISendFirebaseMessages {
   token: string;
   title?: string;
@@ -17,7 +18,10 @@ export interface ISendFirebaseMessages {
  */
 @Injectable()
 export class NotificationBaseService {
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly deviceTokenRepository: DeviceTokenRepository
+  ) {
     firebaseAdmin.initializeApp({
       credential: firebaseAdmin.credential.cert({
         projectId: this.configService.get('FIREBASE_PROJECT_ID'),
@@ -36,46 +40,21 @@ export class NotificationBaseService {
      */
     const MAX_BATCH_SIZE = 500;
     const totalDeviceCount = deviceTokenIds.length;
-    let failureCount = 0;
-    let successCount = 0;
-    const failedDeviceIds = [];
 
     for (let i = 0; i < totalDeviceCount; i += MAX_BATCH_SIZE) {
       const batchDeviceIds = deviceTokenIds.slice(i, i + MAX_BATCH_SIZE);
 
-      const result = await this.sendAll(batchDeviceIds, payload);
-
-      if (result.failureCount > 0) {
-        const failedTokens = [];
-        result.responses.forEach((resp, id) => {
-          if (!resp.success) {
-            failedTokens.push(batchDeviceIds[id]);
-          }
-        });
-        failedDeviceIds.push(...failedTokens);
-      }
-
-      failureCount += result.failureCount;
-      successCount += result.successCount;
-
-      console.log('failureCount' + failureCount);
-      console.log('successCount' + successCount);
+      await this.sendAll(batchDeviceIds, payload);
     }
-
-    return { failureCount, successCount, failedDeviceIds };
   }
-  async sendAll(batchDeviceIds: string[], payload: firebaseAdmin.messaging.MessagingPayload): Promise<BatchResponse> {
+  async sendAll(deviceTokenIds: string[], payload: firebaseAdmin.messaging.MessagingPayload) {
     const body: firebaseAdmin.messaging.MulticastMessage = {
-      tokens: batchDeviceIds,
+      tokens: deviceTokenIds,
       data: payload?.data,
     };
 
-    try {
-      const result: BatchResponse = await firebaseAdmin.messaging().sendEachForMulticast(body, false);
-      return result;
-    } catch (error) {
-      throw error;
-    }
+    const result: BatchResponse = await firebaseAdmin.messaging().sendEachForMulticast(body, false);
+    await this.processNotificationResult(deviceTokenIds, result);
   }
 
   async sendOne(deviceTokenId: string, payload: firebaseAdmin.messaging.MessagingPayload): Promise<string> {
@@ -85,11 +64,23 @@ export class NotificationBaseService {
     };
 
     try {
-      const result = await firebaseAdmin.messaging().send(body, false);
+      const result: string = await firebaseAdmin.messaging().send(body, false);
       return result;
     } catch (error) {
       console.log(error);
       console.log(deviceTokenId);
+    }
+  }
+
+  async processNotificationResult(deviceTokens: string[], result: BatchResponse) {
+    if (result.failureCount > 0) {
+      const failedDeviceTokens = [];
+      result.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          failedDeviceTokens.push(deviceTokens[idx]);
+        }
+      });
+      await this.deviceTokenRepository.deleteMany(failedDeviceTokens);
     }
   }
 }

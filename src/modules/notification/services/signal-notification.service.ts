@@ -29,8 +29,10 @@ export class SignalNotificationService {
   async sendSignalNotification(signal: Signal[]): Promise<void> {
     for (let i = 0; i < signal.length; i++) {
       const receiverId: number = signal[i].receiverId;
-      const deviceToken = await this.deviceTokenRepository.find(receiverId);
-      if (!deviceToken.value) continue;
+      const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiverId);
+      const deviceTokenValue = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
+
+      if (!deviceTokenValue) continue;
       const keyword = signal[i].keywords.split(',');
       const keywordList = keyword.map(item => item.trim());
       const displayedMatchingKeywordString =
@@ -46,7 +48,7 @@ export class SignalNotificationService {
         },
       };
 
-      await this.notificationBaseService.sendOne(deviceToken.value, payload);
+      await this.notificationBaseService.sendAll(deviceTokenValue, payload);
     }
   }
 }
