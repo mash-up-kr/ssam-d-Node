@@ -3,6 +3,7 @@ import * as firebaseAdmin from 'firebase-admin';
 import { DeviceTokenNotFoundException } from 'src/exceptions';
 import { NotificationBaseService } from './notification.base.service';
 import { RoomUserRepository, DeviceTokenRepository, UserRepository } from 'src/repositories';
+import { BatchResponse } from 'firebase-admin/lib/messaging/messaging-api';
 
 export interface ISendFirebaseMessages {
   token: string;
@@ -25,14 +26,12 @@ export class ChatNotificationService {
     private readonly userRepository: UserRepository
   ) {}
 
-  async sendChatNotification(senderId: number, roomId: number, content: string): Promise<string> {
+  async sendChatNotification(senderId: number, roomId: number, content: string) {
     const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
     const sender = await this.userRepository.get({ id: senderId });
-    const deviceTokenObject = await this.deviceTokenRepository.find(receiver.id);
-    const deviceToken = deviceTokenObject.value;
-    if (deviceToken.length === 0) {
-      throw new DeviceTokenNotFoundException();
-    }
+    const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiver.id);
+    const deviceTokenValues = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
+
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
         roomId: roomId.toString(),
@@ -41,8 +40,6 @@ export class ChatNotificationService {
         body: content,
       },
     };
-    const result = await this.notificationBaseService.sendOne(deviceToken, payload);
-
-    return result;
+    await this.notificationBaseService.sendAll(deviceTokenValues, payload);
   }
 }
