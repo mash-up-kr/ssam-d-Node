@@ -38,4 +38,13 @@ export class DeviceTokenRepository {
     const deviceTokens = await this.prisma.deviceToken.findMany({ where: { userId: userId } });
     return deviceTokens.map(deviceToken => new DeviceToken(deviceToken));
   }
+  async deleteMany(deviceToekns: string[]): Promise<void> {
+    await this.prisma.deviceToken.deleteMany({
+      where: {
+        deviceToken: {
+          in: deviceToekns,
+        },
+      },
+    });
+  }
 }

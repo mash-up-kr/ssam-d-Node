@@ -26,7 +26,7 @@ export class ChatNotificationService {
     private readonly userRepository: UserRepository
   ) {}
 
-  async sendChatNotification(senderId: number, roomId: number, content: string): Promise<BatchResponse> {
+  async sendChatNotification(senderId: number, roomId: number, content: string) {
     const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
     const sender = await this.userRepository.get({ id: senderId });
     const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiver.id);
@@ -40,7 +40,6 @@ export class ChatNotificationService {
         body: content,
       },
     };
-    const result: BatchResponse = await this.notificationBaseService.sendAll(deviceTokenValue, payload);
-    return result;
+    await this.notificationBaseService.sendAll(deviceTokenValue, payload);
   }
 }
