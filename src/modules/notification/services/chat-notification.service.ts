@@ -30,6 +30,7 @@ export class ChatNotificationService {
     const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
     const sender = await this.userRepository.get({ id: senderId });
     const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiver.id);
+    if (deviceTokenObjects.length === 0) return;
     const deviceTokenValues = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
 
     const payload: firebaseAdmin.messaging.MessagingPayload = {
