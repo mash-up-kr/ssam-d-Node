@@ -30,7 +30,7 @@ export class ChatNotificationService {
     const receiver = await this.roomUserRepository.getMatchingUser(senderId, roomId);
     const sender = await this.userRepository.get({ id: senderId });
     const deviceTokenObjects = await this.deviceTokenRepository.findAll(receiver.id);
-    const deviceTokenValue = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
+    const deviceTokenValues = deviceTokenObjects.map(deviceTokenObject => deviceTokenObject.value);
 
     const payload: firebaseAdmin.messaging.MessagingPayload = {
       data: {
@@ -40,6 +40,6 @@ export class ChatNotificationService {
         body: content,
       },
     };
-    await this.notificationBaseService.sendAll(deviceTokenValue, payload);
+    await this.notificationBaseService.sendAll(deviceTokenValues, payload);
   }
 }
