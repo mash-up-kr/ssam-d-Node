@@ -11,6 +11,14 @@ export class LoggerMiddleware implements NestMiddleware {
     const userAgent = request.get('user-agent') || '';
 
     const start = Date.now();
+    console.log(`request log start`);
+    console.log(`메소드 : ${method}`);
+    console.log(`쿼리 / 파람`);
+    console.log(request.query);
+    console.log(request.params);
+    console.log(`바디`);
+    console.log(request.body);
+    console.log(`request log end`);
 
     response.on('finish', () => {
       const { statusCode } = response;
