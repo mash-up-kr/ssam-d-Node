@@ -92,7 +92,7 @@ export class SignalService {
       matchingKeywordCount: signal.keywordList.length,
       content: signal.content,
       profileImage: sender.profileImageUrl,
-      nickname: sender.nickname,
+      nickname: sender?.nickname ?? DELETED_USER_NICKNAME,
       receivedTimeMillis: new Date(signal.createdAt).getTime(),
     });
   }

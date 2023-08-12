@@ -64,7 +64,13 @@ export class UserKeywordRepository {
       `;
 
     const userKeywords: UserKeyword[] = matchingInfo.map(data => new UserKeyword(data));
-
+    console.log('Start-----------------');
+    console.log(`sender id : ${senderId}`);
+    console.log('키워드 파라미터');
+    console.log(joinedKeyword);
+    console.log('유저 키워드 결과');
+    console.log(userKeywords);
+    console.log('End-----------------');
     return userKeywords;
   }
 
