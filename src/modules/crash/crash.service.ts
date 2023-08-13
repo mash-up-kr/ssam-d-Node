@@ -26,6 +26,7 @@ export class CrashService {
     const crashes = await this.crashRepository.getList(userId, offset, limit, transaction);
     const totalCount = await this.crashRepository.getCount(transaction);
 
+    console.log(crashes[0]);
     return { totalCount, list: crashes };
   }
 
