@@ -103,7 +103,7 @@ export class RoomUserRepository {
       const nickname = roomUser.user.deletedAt ? DELETED_USER_NICKNAME : roomUser.user.nickname;
       const profileImage = roomUser.user.deletedAt ? DELETED_USER_PROFILE_IMAGE : roomUser.user.profileImageUrl;
       const recentSignalContent = roomUser.room.isAlive
-        ? roomUser.room.chat[0].content
+        ? roomUser.room.chat[0]?.content
         : ROOM_CONNECTION_CLOSED_MESSAGE;
 
       return new RoomResDto({
@@ -115,7 +115,7 @@ export class RoomUserRepository {
         profileImage: profileImage,
         isAlive: roomUser.room.isAlive,
         isChatRead: roomUser.room.roomUser[0].isChatRead,
-        recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0].createdAt).getTime(),
+        recentSignalReceivedTimeMillis: new Date(roomUser.room.chat[0]?.createdAt).getTime(),
       });
     });
   }
