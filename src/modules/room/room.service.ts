@@ -41,6 +41,8 @@ export class RoomService {
       pageReqDto.limit,
       pageReqDto.offset
     );
+
+    console.log(roomResDtoList[0]);
     return new PageResDto(totalRoomNumber, pageReqDto.pageLength, roomResDtoList);
   }
 
